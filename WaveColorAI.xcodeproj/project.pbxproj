@@ -7,29 +7,29 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		60A6295D2E9273290062697F /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60A6295C2E9273290062697F /* StoreKit.framework */; };
+		603DF2672E92586D00E4B304 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 603DF2662E92586D00E4B304 /* StoreKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		60A6292F2E92716E0062697F /* WaveColorAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WaveColorAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		60A6295C2E9273290062697F /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		603DF2662E92586D00E4B304 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		604226C62E925709006A0BE8 /* WaveColorAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WaveColorAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		60A6295E2E92734C0062697F /* Exceptions for "WaveColorAI" folder in "WaveColorAI" target */ = {
+		60150A6B2E925B9A00997265 /* Exceptions for "WaveColorAI" folder in "WaveColorAI" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Resources/Info.plist,
 			);
-			target = 60A6292E2E92716E0062697F /* WaveColorAI */;
+			target = 604226C52E925709006A0BE8 /* WaveColorAI */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		60A629312E92716E0062697F /* WaveColorAI */ = {
+		604226C82E925709006A0BE8 /* WaveColorAI */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				60A6295E2E92734C0062697F /* Exceptions for "WaveColorAI" folder in "WaveColorAI" target */,
+				60150A6B2E925B9A00997265 /* Exceptions for "WaveColorAI" folder in "WaveColorAI" target */,
 			);
 			path = WaveColorAI;
 			sourceTree = "<group>";
@@ -37,104 +37,139 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		60A6292C2E92716E0062697F /* Frameworks */ = {
+		604226C32E925709006A0BE8 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				60A6295D2E9273290062697F /* StoreKit.framework in Frameworks */,
+				603DF2672E92586D00E4B304 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		60A629262E92716E0062697F = {
+		603DF2652E92586D00E4B304 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				60A629312E92716E0062697F /* WaveColorAI */,
-				60A6295B2E9273290062697F /* Frameworks */,
-				60A629302E92716E0062697F /* Products */,
-			);
-			sourceTree = "<group>";
-		};
-		60A629302E92716E0062697F /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				60A6292F2E92716E0062697F /* WaveColorAI.app */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		60A6295B2E9273290062697F /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				60A6295C2E9273290062697F /* StoreKit.framework */,
+				603DF2662E92586D00E4B304 /* StoreKit.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		604226BD2E925709006A0BE8 = {
+			isa = PBXGroup;
+			children = (
+				604226C82E925709006A0BE8 /* WaveColorAI */,
+				603DF2652E92586D00E4B304 /* Frameworks */,
+				604226C72E925709006A0BE8 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		604226C72E925709006A0BE8 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				604226C62E925709006A0BE8 /* WaveColorAI.app */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		60A6292E2E92716E0062697F /* WaveColorAI */ = {
+		604226C52E925709006A0BE8 /* WaveColorAI */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 60A6293A2E9271710062697F /* Build configuration list for PBXNativeTarget "WaveColorAI" */;
+			buildConfigurationList = 604226D12E92570C006A0BE8 /* Build configuration list for PBXNativeTarget "WaveColorAI" */;
 			buildPhases = (
-				60A6292B2E92716E0062697F /* Sources */,
-				60A6292C2E92716E0062697F /* Frameworks */,
-				60A6292D2E92716E0062697F /* Resources */,
+				604226C22E925709006A0BE8 /* Sources */,
+				604226C32E925709006A0BE8 /* Frameworks */,
+				604226C42E925709006A0BE8 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				60A629312E92716E0062697F /* WaveColorAI */,
+				604226C82E925709006A0BE8 /* WaveColorAI */,
 			);
 			name = WaveColorAI;
 			packageProductDependencies = (
 			);
 			productName = WaveColorAI;
-			productReference = 60A6292F2E92716E0062697F /* WaveColorAI.app */;
+			productReference = 604226C62E925709006A0BE8 /* WaveColorAI.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		60A629272E92716E0062697F /* Project object */ = {
+		604226BE2E925709006A0BE8 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2600;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
-					60A6292E2E92716E0062697F = {
+					604226C52E925709006A0BE8 = {
 						CreatedOnToolsVersion = 26.0.1;
 					};
 				};
 			};
-			buildConfigurationList = 60A6292A2E92716E0062697F /* Build configuration list for PBXProject "WaveColorAI" */;
+			buildConfigurationList = 604226C12E925709006A0BE8 /* Build configuration list for PBXProject "WaveColorAI" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
+				de,
+				he,
+				ar,
+				el,
+				"zh-Hans",
+				ja,
+				fa,
+				uk,
 				es,
+				sw,
+				da,
+				it,
+				sk,
+				ms,
+				ta,
+				sv,
+				cs,
+				ko,
+				fil,
+				"zh-Hant",
+				no,
+				hu,
+				tr,
+				pl,
+				"pt-BR",
+				vi,
+				ru,
+				fr,
+				fi,
+				id,
+				nl,
+				th,
+				bn,
+				"pt-PT",
+				ro,
+				hi,
 			);
-			mainGroup = 60A629262E92716E0062697F;
+			mainGroup = 604226BD2E925709006A0BE8;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 60A629302E92716E0062697F /* Products */;
+			productRefGroup = 604226C72E925709006A0BE8 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				60A6292E2E92716E0062697F /* WaveColorAI */,
+				604226C52E925709006A0BE8 /* WaveColorAI */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		60A6292D2E92716E0062697F /* Resources */ = {
+		604226C42E925709006A0BE8 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -144,7 +179,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		60A6292B2E92716E0062697F /* Sources */ = {
+		604226C22E925709006A0BE8 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -154,7 +189,7 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		60A629382E9271710062697F /* Debug */ = {
+		604226CF2E92570C006A0BE8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -189,7 +224,6 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = N4Q6CC2YAQ;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -218,7 +252,7 @@
 			};
 			name = Debug;
 		};
-		60A629392E9271710062697F /* Release */ = {
+		604226D02E92570C006A0BE8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -253,7 +287,6 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = N4Q6CC2YAQ;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -275,7 +308,7 @@
 			};
 			name = Release;
 		};
-		60A6293B2E9271710062697F /* Debug */ = {
+		604226D22E92570C006A0BE8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -285,6 +318,7 @@
 				DEVELOPMENT_TEAM = N4Q6CC2YAQ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "$(SRCROOT)/WaveColorAI/Resources/Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -307,7 +341,7 @@
 			};
 			name = Debug;
 		};
-		60A6293C2E9271710062697F /* Release */ = {
+		604226D32E92570C006A0BE8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -317,6 +351,7 @@
 				DEVELOPMENT_TEAM = N4Q6CC2YAQ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "$(SRCROOT)/WaveColorAI/Resources/Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -342,25 +377,25 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		60A6292A2E92716E0062697F /* Build configuration list for PBXProject "WaveColorAI" */ = {
+		604226C12E925709006A0BE8 /* Build configuration list for PBXProject "WaveColorAI" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				60A629382E9271710062697F /* Debug */,
-				60A629392E9271710062697F /* Release */,
+				604226CF2E92570C006A0BE8 /* Debug */,
+				604226D02E92570C006A0BE8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		60A6293A2E9271710062697F /* Build configuration list for PBXNativeTarget "WaveColorAI" */ = {
+		604226D12E92570C006A0BE8 /* Build configuration list for PBXNativeTarget "WaveColorAI" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				60A6293B2E9271710062697F /* Debug */,
-				60A6293C2E9271710062697F /* Release */,
+				604226D22E92570C006A0BE8 /* Debug */,
+				604226D32E92570C006A0BE8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 60A629272E92716E0062697F /* Project object */;
+	rootObject = 604226BE2E925709006A0BE8 /* Project object */;
 }

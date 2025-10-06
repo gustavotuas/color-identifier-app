@@ -1,0 +1,42 @@
+[
+  {
+    "brand": "Sherwin-Williams",
+    "name": "Alabaster",
+    "hex": "#EDE7DC"
+  },
+  {
+    "brand": "Sherwin-Williams",
+    "name": "Naval",
+    "hex": "#273A56"
+  },
+  {
+    "brand": "Sherwin-Williams",
+    "name": "Tricorn Black",
+    "hex": "#2C2C2C"
+  },
+  {
+    "brand": "Benjamin Moore",
+    "name": "Hale Navy",
+    "hex": "#3B4A5A"
+  },
+  {
+    "brand": "Benjamin Moore",
+    "name": "White Dove",
+    "hex": "#F0EEE6"
+  },
+  {
+    "brand": "Benjamin Moore",
+    "name": "Revere Pewter",
+    "hex": "#CCC4B8"
+  },
+  {
+    "brand": "Behr",
+    "name": "Swiss Coffee",
+    "hex": "#ECEAE2"
+  },
+  {
+    "brand": "Behr",
+    "name": "Nocturne Blue",
+    "hex": "#1E3A5F"
+  }
+]

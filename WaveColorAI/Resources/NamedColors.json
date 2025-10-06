@@ -1,0 +1,46 @@
+[
+  {
+    "name": "Black",
+    "hex": "#000000"
+  },
+  {
+    "name": "White",
+    "hex": "#FFFFFF"
+  },
+  {
+    "name": "Navy",
+    "hex": "#000080"
+  },
+  {
+    "name": "Aegean Sea",
+    "hex": "#58AFA2"
+  },
+  {
+    "name": "Shy Sky",
+    "hex": "#86BBDC"
+  },
+  {
+    "name": "Coffee Cloud",
+    "hex": "#C0A98E"
+  },
+  {
+    "name": "1989 Miami Hotline",
+    "hex": "#DD3366"
+  },
+  {
+    "name": "24 Carrot",
+    "hex": "#E56E24"
+  },
+  {
+    "name": "Earth Red 1975",
+    "hex": "#7B463B"
+  },
+  {
+    "name": "Silver",
+    "hex": "#C0C0C0"
+  },
+  {
+    "name": "Olive",
+    "hex": "#808000"
+  }
+]

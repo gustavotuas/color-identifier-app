@@ -1,51 +1,66 @@
 {
+  "identifier": "LaunchSale",
+  "description": "WaveColorAI Launch Sale with 3-day trials on monthly/yearly",
   "products": [
     {
-      "id": "com.wavecolorai.pro.weekly",
-      "type": "Auto-Renewable Subscription",
-      "displayName": "Weekly Pro Access",
-      "price": 5.99,
+      "id": "com.wavecolorai.weekly",
+      "type": "auto-renewable-subscription",
+      "displayName": "WaveColorAI Pro (Weekly)",
+      "prices": [
+        {
+          "storefront": "USA",
+          "price": 3.99
+        }
+      ],
       "subscription": {
-        "duration": "P1W",
-        "subscriptionGroupID": "group1",
-        "familyShareable": false
+        "group": "WaveColorAI Pro",
+        "duration": "P1W"
       }
     },
     {
-      "id": "com.wavecolorai.pro.monthly",
-      "type": "Auto-Renewable Subscription",
-      "displayName": "Monthly Pro Access",
-      "price": 14.99,
+      "id": "com.wavecolorai.monthly",
+      "type": "auto-renewable-subscription",
+      "displayName": "WaveColorAI Pro (Monthly)",
+      "prices": [
+        {
+          "storefront": "USA",
+          "price": 14.99
+        }
+      ],
       "subscription": {
+        "group": "WaveColorAI Pro",
         "duration": "P1M",
-        "subscriptionGroupID": "group1",
-        "familyShareable": false,
         "introductoryOffer": {
-          "mode": "FreeTrial",
-          "duration": "P3D"
+          "mode": "pay_as_you_go",
+          "period": "P3D",
+          "cycles": 1
         }
       }
     },
     {
-      "id": "com.wavecolorai.pro.yearly",
-      "type": "Auto-Renewable Subscription",
-      "displayName": "Yearly Pro Access",
-      "price": 59.99,
+      "id": "com.wavecolorai.yearly",
+      "type": "auto-renewable-subscription",
+      "displayName": "WaveColorAI Pro (Yearly)",
+      "prices": [
+        {
+          "storefront": "USA",
+          "price": 59.00
+        }
+      ],
       "subscription": {
+        "group": "WaveColorAI Pro",
         "duration": "P1Y",
-        "subscriptionGroupID": "group1",
-        "familyShareable": false,
         "introductoryOffer": {
-          "mode": "FreeTrial",
-          "duration": "P3D"
+          "mode": "pay_as_you_go",
+          "period": "P3D",
+          "cycles": 1
         }
       }
     }
   ],
-  "subscriptionGroups": [
-    {
-      "id": "group1",
-      "name": "Pro Access Subscriptions"
-    }
-  ]
+  "settings": {
+    "storefront": "USA",
+    "language": "en-US"
+  },
+  "schemaVersion": "2.0"
 }

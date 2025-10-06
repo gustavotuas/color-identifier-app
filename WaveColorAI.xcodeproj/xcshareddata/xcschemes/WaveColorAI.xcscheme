@@ -15,7 +15,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "60A6292E2E92716E0062697F"
+               BlueprintIdentifier = "604226C52E925709006A0BE8"
                BuildableName = "WaveColorAI.app"
                BlueprintName = "WaveColorAI"
                ReferencedContainer = "container:WaveColorAI.xcodeproj">
@@ -44,7 +44,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "60A6292E2E92716E0062697F"
+            BlueprintIdentifier = "604226C52E925709006A0BE8"
             BuildableName = "WaveColorAI.app"
             BlueprintName = "WaveColorAI"
             ReferencedContainer = "container:WaveColorAI.xcodeproj">
@@ -64,7 +64,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "60A6292E2E92716E0062697F"
+            BlueprintIdentifier = "604226C52E925709006A0BE8"
             BuildableName = "WaveColorAI.app"
             BlueprintName = "WaveColorAI"
             ReferencedContainer = "container:WaveColorAI.xcodeproj">
