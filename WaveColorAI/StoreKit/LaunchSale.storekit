@@ -1,0 +1,51 @@
+{
+  "products": [
+    {
+      "id": "com.wavecolorai.pro.weekly",
+      "type": "Auto-Renewable Subscription",
+      "displayName": "Weekly Pro Access",
+      "price": 5.99,
+      "subscription": {
+        "duration": "P1W",
+        "subscriptionGroupID": "group1",
+        "familyShareable": false
+      }
+    },
+    {
+      "id": "com.wavecolorai.pro.monthly",
+      "type": "Auto-Renewable Subscription",
+      "displayName": "Monthly Pro Access",
+      "price": 14.99,
+      "subscription": {
+        "duration": "P1M",
+        "subscriptionGroupID": "group1",
+        "familyShareable": false,
+        "introductoryOffer": {
+          "mode": "FreeTrial",
+          "duration": "P3D"
+        }
+      }
+    },
+    {
+      "id": "com.wavecolorai.pro.yearly",
+      "type": "Auto-Renewable Subscription",
+      "displayName": "Yearly Pro Access",
+      "price": 59.99,
+      "subscription": {
+        "duration": "P1Y",
+        "subscriptionGroupID": "group1",
+        "familyShareable": false,
+        "introductoryOffer": {
+          "mode": "FreeTrial",
+          "duration": "P3D"
+        }
+      }
+    }
+  ],
+  "subscriptionGroups": [
+    {
+      "id": "group1",
+      "name": "Pro Access Subscriptions"
+    }
+  ]
+}
