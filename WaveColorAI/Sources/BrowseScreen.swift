@@ -265,30 +265,7 @@ struct ColorTile: View {
     }
 }
 
-// MARK: - Color Wheel Layout 🎨
-struct ColorWheelView: View {
-    let colors: [NamedColor]
 
-    var body: some View {
-        GeometryReader { geo in
-            let radius = min(geo.size.width, geo.size.height) / 2.2
-            let center = CGPoint(x: geo.size.width / 2, y: geo.size.height / 2)
-            ZStack {
-                ForEach(Array(colors.enumerated()), id: \.offset) { i, color in
-                    let angle = Angle(degrees: Double(i) / Double(colors.count) * 360)
-                    let x = center.x + CGFloat(cos(angle.radians)) * radius
-                    let y = center.y + CGFloat(sin(angle.radians)) * radius
-
-                    Circle()
-                        .fill(Color(hexToRGB(color.hex).uiColor))
-                        .frame(width: 36, height: 36)
-                        .position(x: x, y: y)
-                }
-            }
-            .frame(width: geo.size.width, height: geo.size.height)
-        }
-    }
-}
 
 private struct DetailRow: View {
     let title: String
