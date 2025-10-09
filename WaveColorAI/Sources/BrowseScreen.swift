@@ -22,11 +22,12 @@ struct BrowseScreen: View {
         }
     }
 
-    // MARK: - Filtered + Sorted
-    var filtered: [NamedColor] {
+    // MARK: - Filtering and sorting
+    private var filtered: [NamedColor] {
         var result = catalog.names.filter { c in
             let rgbText = hexToRGB(c.hex).rgbText.lowercased()
-            let rgbNumbers = rgbText.replacingOccurrences(of: "rgb", with: "")
+            let rgbNumbers = rgbText
+                .replacingOccurrences(of: "rgb", with: "")
                 .replacingOccurrences(of: "(", with: "")
                 .replacingOccurrences(of: ")", with: "")
                 .replacingOccurrences(of: " ", with: "")
@@ -35,11 +36,11 @@ struct BrowseScreen: View {
                 || c.hex.lowercased().contains(query.lowercased())
                 || rgbNumbers.contains(query.lowercased())
         }
-
         result.sort { ascending ? $0.name < $1.name : $0.name > $1.name }
         return result
     }
 
+    // MARK: - Body
     var body: some View {
         NavigationStack {
             ZStack {
@@ -73,43 +74,36 @@ struct BrowseScreen: View {
             .navigationTitle("Colors")
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    // 🔁 Sort order
                     Button {
                         ascending.toggle()
                     } label: {
                         Image(systemName: ascending ? "arrow.up" : "arrow.down")
                     }
 
-                    // 🧩 Layout selector
                     Button {
                         withAnimation(.spring()) { toggleLayout() }
                     } label: {
                         Image(systemName: layout.icon)
                     }
 
-                    // 💎 PRO Button
                     if !store.isPro {
                         Button {
                             store.showPaywall = true
                         } label: {
-                            HStack(spacing: 4) {
-                                //Image(systemName: "diamond.fill")
-                                Text("PRO")
-                                    .font(.caption.bold())
-                            }
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 6)
-                            .background(
-                                LinearGradient(colors: [.purple, .pink],
-                                               startPoint: .topLeading,
-                                               endPoint: .bottomTrailing)
-                            )
-                            .foregroundColor(.white)
-                            .cornerRadius(8)
-                            .shadow(radius: 2)
+                            Text("PRO")
+                                .font(.caption.bold())
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 6)
+                                .background(
+                                    LinearGradient(colors: [.purple, .pink],
+                                                   startPoint: .topLeading,
+                                                   endPoint: .bottomTrailing)
+                                )
+                                .foregroundColor(.white)
+                                .cornerRadius(8)
+                                .shadow(radius: 2)
                         }
                     }
-
                 }
             }
             .searchable(text: $query,
@@ -122,9 +116,6 @@ struct BrowseScreen: View {
                     NSAttributedString(string: "Search by name, hex or RGB",
                                        attributes: [.foregroundColor: UIColor.lightGray])
             }
-        }
-        .sheet(isPresented: $store.showPaywall) {
-            PaywallView().environmentObject(store)
         }
     }
 
@@ -147,63 +138,42 @@ struct BrowseScreen: View {
     }
 }
 
+// MARK: - ColorRow (for list layout)
 struct ColorRow: View {
     @EnvironmentObject var favs: FavoritesStore
-    @EnvironmentObject var catalog: Catalog
-    @State private var showDetail = false
     let color: NamedColor
+    @State private var showDetail = false
 
     var body: some View {
         HStack {
             RoundedRectangle(cornerRadius: 8)
                 .fill(Color(hexToRGB(color.hex).uiColor))
-                .frame(width: 32, height: 32)
-
-            VStack(alignment: .leading, spacing: 2) {
+                .frame(width: 50, height: 50)
+            VStack(alignment: .leading) {
                 Text(color.name)
                     .font(.headline)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
                 Text(color.hex)
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
-
             Spacer()
-
-            Image(systemName: isFavorite ? "heart.fill" : "heart")
-                .foregroundColor(isFavorite ? .pink : .gray)
+            Button {
+                favs.add(color: hexToRGB(color.hex))
+                UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+            } label: {
+                Image(systemName: "heart")
+                    .foregroundColor(.pink)
+            }
         }
-        .padding(.vertical, 6)
-        .contentShape(Rectangle())
-        .onTapGesture {
-            showDetail = true
-        }
-        .highPriorityGesture(
-            TapGesture(count: 2)
-                .onEnded { toggleFavorite() }
-        )
+        .onTapGesture { showDetail = true }
         .sheet(isPresented: $showDetail) {
             ColorDetailView(color: color)
-        }
-    }
-
-    private var isFavorite: Bool {
-        favs.colors.contains { $0.color.hex == color.hex }
-    }
-
-    private func toggleFavorite() {
-        let rgb = hexToRGB(color.hex)
-        if isFavorite {
-            favs.colors.removeAll { $0.color.hex == rgb.hex }
-        } else {
-            favs.add(color: rgb)
+                .environmentObject(favs)
         }
     }
 }
 
-
-// MARK: - Color Tile (Grid)
+// MARK: - ColorTile (for grid layouts)
 struct ColorTile: View {
     @EnvironmentObject var favs: FavoritesStore
     let color: NamedColor
@@ -211,77 +181,37 @@ struct ColorTile: View {
     @State private var showDetail = false
 
     var body: some View {
-        VStack(spacing: 8) {
-            ZStack(alignment: .topTrailing) {
-                RoundedRectangle(cornerRadius: 14)
-                    .fill(Color(hexToRGB(color.hex).uiColor))
-                    .frame(height: layout == .grid2 ? 130 : 100)
-                    .onTapGesture(count: 1) { showDetail = true }
-                    .onTapGesture(count: 2) { toggleFavorite() }
-
-                Button {
-                    toggleFavorite()
-                } label: {
-                    Image(systemName: isFavorite ? "heart.fill" : "heart")
-                        .font(.system(size: 14))
-                        .padding(6)
-                        .foregroundColor(isFavorite ? .white : .black.opacity(0.7))
-                        .background(.ultraThinMaterial, in: Circle())
-                        .padding(8)
+        VStack(spacing: 6) {
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color(hexToRGB(color.hex).uiColor))
+                .frame(height: layout == .grid3 ? 90 : 120)
+                .onTapGesture {
+                    showDetail = true
                 }
-            }
+                .contextMenu {
+                    Button {
+                        favs.add(color: hexToRGB(color.hex))
+                    } label: {
+                        Label("Add to Favorites", systemImage: "heart")
+                    }
+                }
 
             VStack(spacing: 2) {
                 Text(color.name)
-                    .font(.subheadline.bold())
-                    .lineLimit(1)
-                    .truncationMode(.tail)
+                    .font(.caption.bold())
                     .foregroundColor(.primary)
+                    .lineLimit(1)
                 Text(color.hex)
-                    .font(.caption)
+                    .font(.caption2)
                     .foregroundColor(.secondary)
             }
         }
-        .frame(maxWidth: .infinity)
-        .background(Color.white.opacity(0.6))
-        .cornerRadius(14)
+        .background(Color.white.opacity(0.7))
+        .cornerRadius(10)
         .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
         .sheet(isPresented: $showDetail) {
             ColorDetailView(color: color)
+                .environmentObject(favs)
         }
-    }
-
-    private var isFavorite: Bool {
-        favs.colors.contains { $0.color.hex == color.hex }
-    }
-
-    private func toggleFavorite() {
-        let rgb = hexToRGB(color.hex)
-        if isFavorite {
-            favs.colors.removeAll { $0.color.hex == rgb.hex }
-        } else {
-            favs.add(color: rgb)
-        }
-    }
-}
-
-
-
-private struct DetailRow: View {
-    let title: String
-    let value: String
-    var body: some View {
-        HStack {
-            Text(title)
-                .font(.headline)
-                .frame(width: 90, alignment: .leading)
-            Text(value)
-                .font(.body)
-                .foregroundColor(.secondary)
-                .lineLimit(1)
-                .truncationMode(.tail)
-            Spacer()
-        }
-        .padding(.vertical, 4)
     }
 }

@@ -5,8 +5,7 @@ struct WaveColorAIApp: App {
     @StateObject var store = StoreVM()
     @StateObject var catalog = Catalog()
     @StateObject var favs = FavoritesStore()
-
-    @State private var showPaywall = false
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
         WindowGroup {
@@ -14,27 +13,28 @@ struct WaveColorAIApp: App {
                 .environmentObject(store)
                 .environmentObject(catalog)
                 .environmentObject(favs)
-                .onAppear {
-                    triggerPaywall()
-                }
                 .task {
                     await store.load()
-                    triggerPaywall()
+                    // Primer arranque: muestra paywall si no es PRO
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                        if !store.isPro {
+                            store.showPaywall = true
+                        }
+                    }
                 }
-                .fullScreenCover(isPresented: $showPaywall) {
-                    PaywallView()
-                        .environmentObject(store)
+                // Cada vez que vuelve a estar activa la app (foreground)
+                .onChange(of: scenePhase) { phase in
+                    if phase == .active && !store.isPro {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                            // Un único lugar controla la presentación
+                            store.showPaywall = true
+                        }
+                    }
                 }
-        }
-    }
-
-    private func triggerPaywall() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-            if !store.isPro {
-                showPaywall = true
-            } else {
-                showPaywall = false
-            }
+                // ÚNICO presentador del Paywall en toda la app
+                .fullScreenCover(isPresented: $store.showPaywall) {
+                    PaywallView().environmentObject(store)
+                }
         }
     }
 }

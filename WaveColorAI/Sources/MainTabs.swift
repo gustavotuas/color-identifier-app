@@ -6,13 +6,11 @@ struct HomeScreen: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                
-                // Título principal
+
                 Text("WaveColorAI")
                     .font(.largeTitle)
                     .bold()
-                
-                // Acciones rápidas
+
                 GroupBox(NSLocalizedString("quick_actions", comment: "")) {
                     HStack {
                         NavigationLink(NSLocalizedString("open_camera", comment: "")) {
@@ -21,21 +19,18 @@ struct HomeScreen: View {
                         Spacer()
                     }
                 }
-                
-                // Botón de desbloqueo Pro
+
                 if !store.isPro {
                     Button(NSLocalizedString("unlock_pro", comment: "")) {
+                        // Solo cambiamos el flag global
                         store.showPaywall = true
                     }
                     .buttonStyle(.borderedProminent)
                 }
-                
+
                 Spacer(minLength: 40)
             }
             .padding()
-        }
-        .sheet(isPresented: $store.showPaywall) {
-            PaywallView().environmentObject(store)
         }
         .navigationBarHidden(true)
     }
@@ -62,12 +57,12 @@ struct ProfileScreen: View {
 struct MainTabs: View {
     var body: some View {
         TabView {
-            
+
             NavigationStack { BrowseScreen() }
                 .tabItem {
                     Label(NSLocalizedString("search", comment: ""), systemImage: "magnifyingglass")
                 }
-            
+
             NavigationStack { FavoritesScreen() }
                 .tabItem {
                     Label(NSLocalizedString("favorites", comment: ""), systemImage: "heart")
@@ -77,12 +72,11 @@ struct MainTabs: View {
                 .tabItem {
                     Label(NSLocalizedString("camera", comment: ""), systemImage: "camera")
                 }
-            
+
             NavigationStack { PhotosScreen() }
                 .tabItem {
                     Label(NSLocalizedString("photo", comment: ""), systemImage: "photo")
                 }
-
 
             NavigationStack { ProfileScreen() }
                 .tabItem {
