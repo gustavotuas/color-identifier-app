@@ -1,0 +1,108 @@
+{
+  "appPolicies" : {
+    "eula" : "",
+    "policies" : [
+      {
+        "locale" : "en_US",
+        "policyText" : "",
+        "policyURL" : ""
+      }
+    ]
+  },
+  "identifier" : "3BF9F62F",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+
+  ],
+  "settings" : {
+    "_askToBuyEnabled" : false,
+    "_billingGracePeriodEnabled" : false,
+    "_billingIssuesEnabled" : false,
+    "_disableDialogs" : false,
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_renewalBillingIssuesEnabled" : false,
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+
+    ],
+    "_timeRate" : 0
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "7255DC99",
+      "localizations" : [
+
+      ],
+      "name" : "Plans",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "69.99",
+          "familyShareable" : true,
+          "groupNumber" : 1,
+          "internalID" : "CF9CEC4B",
+          "introductoryOffer" : {
+            "internalID" : "4C9F3FC6",
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P3D"
+          },
+          "localizations" : [
+            {
+              "description" : "",
+              "displayName" : "",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.wavecolorai.yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Yearly Pro Subscription",
+          "subscriptionGroupID" : "7255DC99",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "6.99",
+          "familyShareable" : true,
+          "groupNumber" : 1,
+          "internalID" : "4582C489",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "",
+              "displayName" : "",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.wavecolorai.weekly",
+          "recurringSubscriptionPeriod" : "P1W",
+          "referenceName" : "Weekly Pro Subscription",
+          "subscriptionGroupID" : "7255DC99",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}

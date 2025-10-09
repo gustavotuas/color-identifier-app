@@ -1,0 +1,254 @@
+[
+  {
+    "name": "Snow White",
+    "hex": "#FFFFFF",
+    "rgb": "255,255,255",
+    "group": "Neutral",
+    "theme": "Winter"
+  },
+  {
+    "name": "Midnight Black",
+    "hex": "#000000",
+    "rgb": "0,0,0",
+    "group": "Neutral",
+    "theme": "Classic"
+  },
+  {
+    "name": "Emerald Green",
+    "hex": "#50C878",
+    "rgb": "80,200,120",
+    "group": "Cool",
+    "theme": "Christmas"
+  },
+  {
+    "name": "Crimson Red",
+    "hex": "#DC143C",
+    "rgb": "220,20,60",
+    "group": "Warm",
+    "theme": "Christmas"
+  },
+  {
+    "name": "Gold Shine",
+    "hex": "#FFD700",
+    "rgb": "255,215,0",
+    "group": "Warm",
+    "theme": "Holiday"
+  },
+  {
+    "name": "Pumpkin Orange",
+    "hex": "#FF7518",
+    "rgb": "255,117,24",
+    "group": "Warm",
+    "theme": "Halloween"
+  },
+  {
+    "name": "Midnight Violet",
+    "hex": "#4B0082",
+    "rgb": "75,0,130",
+    "group": "Cool",
+    "theme": "Halloween"
+  },
+  {
+    "name": "Ocean Blue",
+    "hex": "#0077BE",
+    "rgb": "0,119,190",
+    "group": "Cool",
+    "theme": "Summer"
+  },
+  {
+    "name": "Sunset Peach",
+    "hex": "#FFDAB9",
+    "rgb": "255,218,185",
+    "group": "Warm",
+    "theme": "Summer"
+  },
+  {
+    "name": "Mint Frost",
+    "hex": "#AAF0D1",
+    "rgb": "170,240,209",
+    "group": "Cool",
+    "theme": "Spring"
+  },
+  {
+    "name": "Lavender Mist",
+    "hex": "#E6E6FA",
+    "rgb": "230,230,250",
+    "group": "Pastel",
+    "theme": "Spring"
+  },
+  {
+    "name": "Rose Quartz",
+    "hex": "#F7CAC9",
+    "rgb": "247,202,201",
+    "group": "Pastel",
+    "theme": "Valentine"
+  },
+  {
+    "name": "Champagne Gold",
+    "hex": "#F7E7CE",
+    "rgb": "247,231,206",
+    "group": "Metallic",
+    "theme": "Luxury"
+  },
+  {
+    "name": "Silver Steel",
+    "hex": "#C0C0C0",
+    "rgb": "192,192,192",
+    "group": "Metallic",
+    "theme": "Classic"
+  },
+  {
+    "name": "Bronze Glow",
+    "hex": "#CD7F32",
+    "rgb": "205,127,50",
+    "group": "Metallic",
+    "theme": "Luxury"
+  },
+  {
+    "name": "Forest Moss",
+    "hex": "#8A9A5B",
+    "rgb": "138,154,91",
+    "group": "Cool",
+    "theme": "Autumn"
+  },
+  {
+    "name": "Burnt Sienna",
+    "hex": "#E97451",
+    "rgb": "233,116,81",
+    "group": "Warm",
+    "theme": "Autumn"
+  },
+  {
+    "name": "Skyline",
+    "hex": "#7EC8E3",
+    "rgb": "126,200,227",
+    "group": "Cool",
+    "theme": "Summer"
+  },
+  {
+    "name": "Rosewood",
+    "hex": "#65000B",
+    "rgb": "101,0,11",
+    "group": "Warm",
+    "theme": "Classic"
+  },
+  {
+    "name": "Desert Sand",
+    "hex": "#EDC9AF",
+    "rgb": "237,201,175",
+    "group": "Neutral",
+    "theme": "Desert"
+  },
+  {
+    "name": "Moss Gray",
+    "hex": "#8D918D",
+    "rgb": "141,145,141",
+    "group": "Neutral",
+    "theme": "Winter"
+  },
+  {
+    "name": "Sky Mint",
+    "hex": "#8EE5EE",
+    "rgb": "142,229,238",
+    "group": "Cool",
+    "theme": "Spring"
+  },
+  {
+    "name": "Electric Purple",
+    "hex": "#BF00FF",
+    "rgb": "191,0,255",
+    "group": "Cool",
+    "theme": "Cyber"
+  },
+  {
+    "name": "Neon Pink",
+    "hex": "#FF10F0",
+    "rgb": "255,16,240",
+    "group": "Warm",
+    "theme": "Cyber"
+  },
+  {
+    "name": "Coral Reef",
+    "hex": "#FF7660",
+    "rgb": "255,118,96",
+    "group": "Warm",
+    "theme": "Tropical"
+  },
+  {
+    "name": "Aqua Blue",
+    "hex": "#00FFFF",
+    "rgb": "0,255,255",
+    "group": "Cool",
+    "theme": "Tropical"
+  },
+  {
+    "name": "Chocolate Brown",
+    "hex": "#5D4037",
+    "rgb": "93,64,55",
+    "group": "Warm",
+    "theme": "Autumn"
+  },
+  {
+    "name": "Sand Dune",
+    "hex": "#967117",
+    "rgb": "150,113,23",
+    "group": "Neutral",
+    "theme": "Desert"
+  },
+  {
+    "name": "Steel Blue",
+    "hex": "#4682B4",
+    "rgb": "70,130,180",
+    "group": "Cool",
+    "theme": "Classic"
+  },
+  {
+    "name": "Olive Green",
+    "hex": "#808000",
+    "rgb": "128,128,0",
+    "group": "Warm",
+    "theme": "Military"
+  },
+  {
+    "name": "Gunmetal Gray",
+    "hex": "#2C3539",
+    "rgb": "44,53,57",
+    "group": "Neutral",
+    "theme": "Industrial"
+  },
+  {
+    "name": "Rust Orange",
+    "hex": "#B7410E",
+    "rgb": "183,65,14",
+    "group": "Warm",
+    "theme": "Autumn"
+  },
+  {
+    "name": "Arctic Blue",
+    "hex": "#9AD0EC",
+    "rgb": "154,208,236",
+    "group": "Cool",
+    "theme": "Winter"
+  },
+  {
+    "name": "Pine Green",
+    "hex": "#01796F",
+    "rgb": "1,121,111",
+    "group": "Cool",
+    "theme": "Christmas"
+  },
+  {
+    "name": "Lilac Dream",
+    "hex": "#C8A2C8",
+    "rgb": "200,162,200",
+    "group": "Pastel",
+    "theme": "Spring"
+  },
+  {
+    "name": "Frost Gray",
+    "hex": "#A9A9A9",
+    "rgb": "169,169,169",
+    "group": "Neutral",
+    "theme": "Winter"
+  }
+]

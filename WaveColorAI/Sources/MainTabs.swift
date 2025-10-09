@@ -62,25 +62,27 @@ struct ProfileScreen: View {
 struct MainTabs: View {
     var body: some View {
         TabView {
-            NavigationStack { HomeScreen() }
+            
+            NavigationStack { BrowseScreen() }
                 .tabItem {
-                    Label(NSLocalizedString("home", comment: ""), systemImage: "house")
+                    Label(NSLocalizedString("search", comment: ""), systemImage: "magnifyingglass")
+                }
+            
+            NavigationStack { FavoritesScreen() }
+                .tabItem {
+                    Label(NSLocalizedString("favorites", comment: ""), systemImage: "heart")
                 }
 
             NavigationStack { CameraScreen() }
                 .tabItem {
                     Label(NSLocalizedString("camera", comment: ""), systemImage: "camera")
                 }
-
-            NavigationStack { BrowseScreen() }
+            
+            NavigationStack { PhotosScreen() }
                 .tabItem {
-                    Label(NSLocalizedString("browse", comment: ""), systemImage: "rectangle.grid.2x2")
+                    Label(NSLocalizedString("photo", comment: ""), systemImage: "photo")
                 }
 
-            NavigationStack { FavoritesScreen() }
-                .tabItem {
-                    Label(NSLocalizedString("favorites", comment: ""), systemImage: "heart")
-                }
 
             NavigationStack { ProfileScreen() }
                 .tabItem {

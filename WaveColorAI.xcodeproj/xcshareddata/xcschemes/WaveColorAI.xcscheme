@@ -51,7 +51,7 @@
          </BuildableReference>
       </BuildableProductRunnable>
       <StoreKitConfigurationFileReference
-         identifier = "../../WaveColorAI/StoreKit/LaunchSale.storekit">
+         identifier = "../../WaveColorAI/StoreKit/WaveColorAI.storekit">
       </StoreKitConfigurationFileReference>
    </LaunchAction>
    <ProfileAction

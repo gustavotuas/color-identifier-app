@@ -5,7 +5,9 @@ struct WaveColorAIApp: App {
     @StateObject var store = StoreVM()
     @StateObject var catalog = Catalog()
     @StateObject var favs = FavoritesStore()
-    @AppStorage("hasShownPaywall") var hasShownPaywall = false
+
+    @State private var showPaywall = false
+
     var body: some Scene {
         WindowGroup {
             MainTabs()
@@ -13,11 +15,25 @@ struct WaveColorAIApp: App {
                 .environmentObject(catalog)
                 .environmentObject(favs)
                 .onAppear {
-                    if !hasShownPaywall {
-                        store.showPaywall = true
-                        hasShownPaywall = true
-                    }
+                    triggerPaywall()
                 }
+                .task {
+                    await store.load()
+                    triggerPaywall()
+                }
+                .fullScreenCover(isPresented: $showPaywall) {
+                    PaywallView()
+                        .environmentObject(store)
+                }
+        }
+    }
+
+    private func triggerPaywall() {
+        guard !store.isPro else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+            if !store.isPro {
+                showPaywall = true
+            }
         }
     }
 }

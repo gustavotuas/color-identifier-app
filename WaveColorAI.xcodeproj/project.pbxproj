@@ -19,6 +19,7 @@
 		60150A6B2E925B9A00997265 /* Exceptions for "WaveColorAI" folder in "WaveColorAI" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Resources/ColorsExtended.json,
 				Resources/Info.plist,
 			);
 			target = 604226C52E925709006A0BE8 /* WaveColorAI */;
