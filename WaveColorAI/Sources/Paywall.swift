@@ -8,6 +8,7 @@ struct PaywallView: View {
     @State private var showClose = false
     @State private var canDismiss = false
     @State private var currentReview = 0
+    @State private var pulse = false // 👈 Nuevo: para animación del plan Yearly
 
     // ✅ Reviews embebidas en memoria
     private let reviews: [(stars: String, text: String)] = [
@@ -49,9 +50,9 @@ struct PaywallView: View {
                             Text("Unlock Pro Features")
                                 .font(.system(size: 26, weight: .bold))
                                 .multilineTextAlignment(.center)
-                                .padding(.top, showClose ? -6 : 0)
+                                .padding(.top, 0) // 👈 Removido el exceso de padding
                         }
-                        .padding(.top, topSafeAreaInset() + 6)
+                        .padding(.top, 12) // 👈 Más ajustado visualmente
 
                         // REVIEWS SECTION
                         TabView(selection: $currentReview) {
@@ -81,12 +82,16 @@ struct PaywallView: View {
                                 if b.id == store.yearly { return false }
                                 return a.price < b.price
                             }), id: \.id) { product in
-                                SelectablePlanCard(product: product, isSelected: store.selectedID == product.id)
-                                    .onTapGesture {
-                                        withAnimation(.spring()) {
-                                            store.selectedID = product.id
-                                        }
+                                SelectablePlanCard(
+                                    product: product,
+                                    isSelected: store.selectedID == product.id,
+                                    pulse: pulse && product.id == store.yearly // 👈 pasa animación
+                                )
+                                .onTapGesture {
+                                    withAnimation(.spring()) {
+                                        store.selectedID = product.id
                                     }
+                                }
                             }
                         }
                         .padding(.horizontal)
@@ -146,6 +151,14 @@ struct PaywallView: View {
         .interactiveDismissDisabled(!canDismiss)
         .task {
             await store.load()
+            // 👇 Selecciona por defecto el plan Yearly
+            if let yearly = store.products.first(where: { $0.id == store.yearly }) {
+                store.selectedID = yearly.id
+            }
+            // 👇 Activa animación de pulso
+            withAnimation(.easeInOut(duration: 1).repeatForever(autoreverses: true)) {
+                pulse = true
+            }
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                 withAnimation(.easeIn(duration: 0.3)) {
                     showClose = true
@@ -181,6 +194,7 @@ struct SelectablePlanCard: View {
     @EnvironmentObject var store: StoreVM
     let product: Product
     let isSelected: Bool
+    let pulse: Bool // 👈 Nuevo parámetro
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -196,10 +210,14 @@ struct SelectablePlanCard: View {
                         .background(Color.blue)
                         .foregroundColor(.white)
                         .cornerRadius(6)
+                        .scaleEffect(pulse ? 1.15 : 1.0) // 👈 efecto de latido
+                        .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: pulse)
                 }
                 if isSelected {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundColor(.blue)
+                        .scaleEffect(pulse ? 1.1 : 1.0) // 👈 efecto de latido para check
+                        .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: pulse)
                 }
             }
 
@@ -233,6 +251,8 @@ struct SelectablePlanCard: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(isSelected ? Color.blue : Color.gray.opacity(0.2),
                         lineWidth: isSelected ? 3 : 1)
+                .scaleEffect(pulse && isSelected ? 1.05 : 1.0) // 👈 efecto de pulso en borde
+                .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: pulse)
         )
     }
 
