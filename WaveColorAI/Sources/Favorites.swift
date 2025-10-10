@@ -26,8 +26,6 @@ final class NearestNameCache {
     }
 }
 
-
-
 /// Helper global para obtener UIColor desde HEX (con cache).
 @inline(__always)
 private func uiColor(for hex: String) -> UIColor {
@@ -130,8 +128,8 @@ struct FavoritesScreen: View {
     @EnvironmentObject var favs: FavoritesStore
     @EnvironmentObject var store: StoreVM
     @EnvironmentObject var catalog: Catalog
+    @EnvironmentObject var catalogs: CatalogStore     // para vendors
 
-    @State private var query = ""
     @State private var ascending = true
     @State private var showClearAlert = false
 
@@ -139,35 +137,11 @@ struct FavoritesScreen: View {
         Array(repeating: GridItem(.flexible(), spacing: 10), count: 3)
     }
 
-    // Filtra por name, hex y RGB; usa cache y precomputa claves de orden.
-    private var filteredColors: [FavoriteColor] {
-        let q = query.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-
-        var nameMap: [String: String] = [:]
-        nameMap.reserveCapacity(favs.colors.count)
-
-        let filtered = favs.colors.filter { fav in
-            let hexLC = fav.color.hex.lowercased()
-            let rgbLC = fav.color.rgbText.lowercased()
-            let name  = NearestNameCache.shared.name(for: fav.color, catalog: catalog)
-            if let name { nameMap[fav.color.hex] = name }
-            return q.isEmpty || hexLC.contains(q) || rgbLC.contains(q) || (name?.lowercased().contains(q) ?? false)
+    private var sortedColors: [FavoriteColor] {
+        let result = favs.colors.sorted {
+            ascending ? $0.color.hex < $1.color.hex : $0.color.hex > $1.color.hex
         }
-
-        return filtered.sorted { a, b in
-            let na = nameMap[a.color.hex] ?? a.color.hex
-            let nb = nameMap[b.color.hex] ?? b.color.hex
-            return ascending ? (na < nb) : (na > nb)
-        }
-    }
-
-    private var filteredPalettes: [FavoritePalette] {
-        favs.palettes.filter { pal in
-            query.isEmpty || pal.colors.contains {
-                $0.hex.lowercased().contains(query.lowercased()) ||
-                $0.rgbText.lowercased().contains(query.lowercased())
-            }
-        }
+        return result
     }
 
     var body: some View {
@@ -176,15 +150,16 @@ struct FavoritesScreen: View {
                 VStack(alignment: .leading, spacing: 24) {
 
                     // 🎨 Favorite Colors
-                    if !filteredColors.isEmpty {
+                    if !sortedColors.isEmpty {
                         Text("Favorite Colors")
                             .font(.headline)
                             .padding(.horizontal)
 
                         LazyVGrid(columns: gridColumns, spacing: 10) {
-                            ForEach(filteredColors) { item in
+                            ForEach(sortedColors) { item in
                                 FavoriteColorTile(item: item)
                                     .environmentObject(catalog)
+                                    .environmentObject(catalogs)
                                     .environmentObject(favs)
                                     .environmentObject(store)
                             }
@@ -193,13 +168,13 @@ struct FavoritesScreen: View {
                     }
 
                     // 🧩 Favorite Palettes
-                    if !filteredPalettes.isEmpty {
+                    if !favs.palettes.isEmpty {
                         Text("Favorite Palettes")
                             .font(.headline)
                             .padding(.horizontal)
 
                         VStack(spacing: 16) {
-                            ForEach(filteredPalettes) { pal in
+                            ForEach(favs.palettes) { pal in
                                 FavoritePaletteTile(palette: pal)
                                     .environmentObject(favs)
                             }
@@ -208,7 +183,7 @@ struct FavoritesScreen: View {
                     }
 
                     // Empty state
-                    if filteredColors.isEmpty && filteredPalettes.isEmpty {
+                    if sortedColors.isEmpty && favs.palettes.isEmpty {
                         VStack(spacing: 20) {
                             Image(systemName: "heart.slash")
                                 .font(.largeTitle)
@@ -228,7 +203,7 @@ struct FavoritesScreen: View {
             .navigationTitle("Favorites")
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    if !filteredColors.isEmpty {
+                    if !sortedColors.isEmpty {
                         Button {
                             ascending.toggle()
                             UIImpactFeedbackGenerator(style: .soft).impactOccurred()
@@ -236,6 +211,7 @@ struct FavoritesScreen: View {
                             Image(systemName: ascending ? "arrow.up" : "arrow.down")
                         }
                     }
+
                     if !favs.colors.isEmpty || !favs.palettes.isEmpty {
                         Button(role: .destructive) {
                             showClearAlert = true
@@ -243,6 +219,7 @@ struct FavoritesScreen: View {
                             Image(systemName: "trash")
                         }
                     }
+
                     if !store.isPro {
                         Button {
                             store.showPaywall = true
@@ -273,7 +250,6 @@ struct FavoritesScreen: View {
             } message: {
                 Text("This will permanently delete all your favorite colors and palettes.")
             }
-            .searchable(text: $query, prompt: "Search favorites by name or hex")
         }
     }
 }
@@ -283,14 +259,10 @@ struct FavoritesScreen: View {
 struct FavoriteColorTile: View {
     @EnvironmentObject var favs: FavoritesStore
     @EnvironmentObject var catalog: Catalog
-    @State private var selectedColor: NamedColor?   // para el sheet/detalle
+    @EnvironmentObject var catalogs: CatalogStore
+    @State private var selectedColor: NamedColor?
 
     let item: FavoriteColor
-
-    private var isFavorite: Bool {
-        let key = normalizeHex(item.color.hex)
-        return favs.colors.contains { normalizeHex($0.color.hex) == key }
-    }
 
     var body: some View {
         VStack(spacing: 4) {
@@ -299,44 +271,30 @@ struct FavoriteColorTile: View {
                     .fill(Color(uiColor(for: item.color.hex)))
                     .frame(height: 90)
                     .onTapGesture {
-                        if let found = catalog.nearestName(to: item.color) {
-                            selectedColor = found
-                        } else {
-                            selectedColor = makeNamedColor(from: item)
-                        }
+                        selectedColor = makeNamedColor(from: item)
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     }
-                    .contextMenu {
-                        Button {
-                            toggleFavorite()
-                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                        } label: {
-                            Label(isFavorite ? "Remove from Favorites" : "Add to Favorites",
-                                  systemImage: isFavorite ? "heart.slash" : "heart")
-                        }
-                    }
 
+                // ❎ Botón discreto para eliminar favorito
                 Button {
-                    toggleFavorite()
-                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                    removeFavorite()
                 } label: {
-                    Image(systemName: isFavorite ? "heart.fill" : "heart")
+                    Image(systemName: "xmark.circle.fill")
                         .font(.system(size: 14))
-                        .foregroundColor(iconColor(for: item.color.hex))
+                        .foregroundColor(.white.opacity(0.8))
                         .padding(6)
-                        .background(.ultraThinMaterial, in: Circle())
+                        .background(Color.black.opacity(0.15), in: Circle())
                         .padding(6)
-                        .scaleEffect(isFavorite ? 1.3 : 1.0)
-                        .animation(.spring(response: 0.3, dampingFraction: 0.5), value: isFavorite)
                 }
                 .buttonStyle(.plain)
             }
 
             VStack(spacing: 2) {
-                Text(item.color.hex.uppercased())
+                Text(makeNamedColor(from: item).name)
                     .font(.caption.bold())
                     .foregroundColor(.primary)
                     .lineLimit(1)
+
                 Text(item.color.rgbText)
                     .font(.caption2)
                     .foregroundColor(.secondary)
@@ -352,30 +310,34 @@ struct FavoriteColorTile: View {
     private func makeNamedColor(from item: FavoriteColor) -> NamedColor {
         let fixedHex = "#" + normalizeHex(item.color.hex)
         let rgb = hexToRGB(fixedHex)
+
+        // Buscar en catálogo genérico
+        if let exact = catalog.names.first(where: { normalizeHex($0.hex) == normalizeHex(fixedHex) }) {
+            return exact
+        }
+
+        // Buscar en todos los catálogos de vendors
+        for id in CatalogID.allCases where id != .generic {
+            let vendorColors = catalogs.colors(for: [id])
+            if let exact = vendorColors.first(where: { normalizeHex($0.hex) == normalizeHex(fixedHex) }) {
+                return exact
+            }
+        }
+
+        // Si no se encuentra
         return NamedColor(
-            name: "Custom Color",
+            name: item.color.hex.uppercased(),
             hex: fixedHex,
-            vendor: nil,                  // no viene de proveedor
-            rgb: [rgb.r, rgb.g, rgb.b]    // o pon nil si no lo necesitas
+            vendor: nil,
+            rgb: [rgb.r, rgb.g, rgb.b]
         )
     }
 
-    private func toggleFavorite() {
-        let rgb = hexToRGB(item.color.hex)
-        withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-            if isFavorite {
-                favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
-            } else {
-                let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
-                if !exists { favs.add(color: rgb) }
-            }
+    private func removeFavorite() {
+        withAnimation(.easeInOut(duration: 0.25)) {
+            favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(item.color.hex) }
         }
-    }
-
-    private func iconColor(for hex: String) -> Color {
-        let rgb = hexToRGB(hex)
-        let brightness = (0.299 * Double(rgb.r) + 0.587 * Double(rgb.g) + 0.114 * Double(rgb.b)) / 255.0
-        return brightness < 0.5 ? .white.opacity(0.9) : .black.opacity(0.7)
+        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
     }
 }
 
@@ -396,14 +358,14 @@ struct FavoritePaletteTile: View {
                     }
                 }
             }
+
             HStack {
                 Spacer()
                 Button(role: .destructive) {
                     favs.removePalette(palette)
                     UIImpactFeedbackGenerator(style: .soft).impactOccurred()
                 } label: {
-                    Label("Delete Palette", systemImage: "trash")
-                        .labelStyle(.iconOnly)
+                    Image(systemName: "trash")
                         .foregroundColor(.red)
                 }
             }
