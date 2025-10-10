@@ -9,6 +9,14 @@ struct BrowseScreen: View {
     @State private var layout: LayoutMode = .grid2
     @State private var ascending = true
 
+    // 🔹 Lazy loading
+    @State private var visibleCount = 100
+    private let batchSize = 100
+
+    // 🔹 Async filtering
+    @State private var filteredColors: [NamedColor] = []
+    @State private var queryTask: Task<Void, Never>? = nil
+
     enum LayoutMode: CaseIterable {
         case list, grid2, grid3, wheel
 
@@ -22,24 +30,6 @@ struct BrowseScreen: View {
         }
     }
 
-    // MARK: - Filtering and sorting
-    private var filtered: [NamedColor] {
-        var result = catalog.names.filter { c in
-            let rgbText = hexToRGB(c.hex).rgbText.lowercased()
-            let rgbNumbers = rgbText
-                .replacingOccurrences(of: "rgb", with: "")
-                .replacingOccurrences(of: "(", with: "")
-                .replacingOccurrences(of: ")", with: "")
-                .replacingOccurrences(of: " ", with: "")
-            return query.isEmpty
-                || c.name.lowercased().contains(query.lowercased())
-                || c.hex.lowercased().contains(query.lowercased())
-                || rgbNumbers.contains(query.lowercased())
-        }
-        result.sort { ascending ? $0.name < $1.name : $0.name > $1.name }
-        return result
-    }
-
     // MARK: - Body
     var body: some View {
         NavigationStack {
@@ -47,25 +37,27 @@ struct BrowseScreen: View {
                 Group {
                     switch layout {
                     case .list:
-                        List(filtered) { color in
+                        List(filteredColors.prefix(visibleCount)) { color in
                             ColorRow(color: color)
                                 .listRowSeparator(.hidden)
                                 .listRowBackground(Color.clear)
+                                .onAppear { handlePagination(color) }
                         }
                         .listStyle(.plain)
 
                     case .grid2, .grid3:
                         ScrollView {
                             LazyVGrid(columns: gridColumns, spacing: 16) {
-                                ForEach(filtered) { color in
+                                ForEach(filteredColors.prefix(visibleCount)) { color in
                                     ColorTile(color: color, layout: layout)
+                                        .onAppear { handlePagination(color) }
                                 }
                             }
                             .padding()
                         }
 
                     case .wheel:
-                        ColorWheelView(colors: filtered)
+                        ColorWheelView(colors: filteredColors.prefix(visibleCount).map { $0 })
                             .padding(.vertical, 60)
                     }
                 }
@@ -76,6 +68,7 @@ struct BrowseScreen: View {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Button {
                         ascending.toggle()
+                        sortFiltered()
                     } label: {
                         Image(systemName: ascending ? "arrow.up" : "arrow.down")
                     }
@@ -108,18 +101,19 @@ struct BrowseScreen: View {
             }
             .searchable(text: $query,
                         placement: .navigationBarDrawer(displayMode: .always),
-                        prompt: "Search by name, hex or RGB")
+                        prompt: "Search by name or hex")
             .onAppear {
-                UISearchBar.appearance().searchTextField.backgroundColor = UIColor.systemGray5
-                UISearchBar.appearance().searchTextField.textColor = .white
-                UISearchBar.appearance().searchTextField.attributedPlaceholder =
-                    NSAttributedString(string: "Search by name, hex or RGB",
-                                       attributes: [.foregroundColor: UIColor.lightGray])
+                setupSearchBar()
+                filteredColors = sortedCatalog()
+            }
+            .onChange(of: query) { newValue in
+                performAsyncFilter(newValue)
             }
         }
     }
 
     // MARK: - Helpers
+
     private func toggleLayout() {
         switch layout {
         case .list: layout = .grid2
@@ -136,8 +130,59 @@ struct BrowseScreen: View {
         default: return [GridItem(.flexible())]
         }
     }
+
+    private func handlePagination(_ color: NamedColor) {
+        if color.id == filteredColors.prefix(visibleCount).last?.id {
+            loadMore()
+        }
+    }
+
+    private func loadMore() {
+        guard visibleCount < filteredColors.count else { return }
+        visibleCount += batchSize
+    }
+
+    private func setupSearchBar() {
+        UISearchBar.appearance().searchTextField.backgroundColor = UIColor.systemGray5
+        UISearchBar.appearance().searchTextField.textColor = .white
+        UISearchBar.appearance().searchTextField.attributedPlaceholder =
+            NSAttributedString(string: "Search by name or hex",
+                               attributes: [.foregroundColor: UIColor.lightGray])
+    }
+
+    private func performAsyncFilter(_ query: String) {
+        queryTask?.cancel()
+        queryTask = Task {
+            let q = query.lowercased().trimmingCharacters(in: .whitespaces)
+            var result: [NamedColor]
+
+            if q.isEmpty {
+                result = sortedCatalog()
+            } else {
+                result = catalog.names.filter {
+                    $0.name.lowercased().contains(q) ||
+                    $0.hex.lowercased().contains(q)
+                }
+                result.sort { ascending ? $0.name < $1.name : $0.name > $1.name }
+            }
+
+            await MainActor.run {
+                filteredColors = result
+                visibleCount = batchSize
+            }
+        }
+    }
+
+    private func sortFiltered() {
+        filteredColors.sort { ascending ? $0.name < $1.name : $0.name > $1.name }
+    }
+
+    private func sortedCatalog() -> [NamedColor] {
+        catalog.names.sorted { ascending ? $0.name < $1.name : $0.name > $1.name }
+    }
 }
 
+// MARK: - ColorRow
 struct ColorRow: View {
     @EnvironmentObject var favs: FavoritesStore
     let color: NamedColor
@@ -160,7 +205,6 @@ struct ColorRow: View {
 
             Spacer()
 
-            // ❤️ Favorite button (reactive)
             Button {
                 toggleFavorite()
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
@@ -184,7 +228,6 @@ struct ColorRow: View {
         }
     }
 
-    // MARK: - Helpers
     private var isFavorite: Bool {
         favs.colors.contains { $0.color.hex == color.hex }
     }
@@ -199,7 +242,7 @@ struct ColorRow: View {
     }
 }
 
-
+// MARK: - ColorTile
 struct ColorTile: View {
     @EnvironmentObject var favs: FavoritesStore
     let color: NamedColor
@@ -209,7 +252,6 @@ struct ColorTile: View {
     var body: some View {
         VStack(spacing: 6) {
             ZStack(alignment: .topTrailing) {
-                // 🎨 Color background
                 RoundedRectangle(cornerRadius: 10)
                     .fill(Color(hexToRGB(color.hex).uiColor))
                     .frame(height: layout == .grid3 ? 90 : 120)
@@ -227,17 +269,18 @@ struct ColorTile: View {
                         }
                     }
 
-                // ❤️ Favorite button (top right)
                 Button {
                     toggleFavorite()
                     UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                 } label: {
                     Image(systemName: isFavorite ? "heart.fill" : "heart")
                         .font(.system(size: 14))
-                        .foregroundColor(isFavorite ? .white : .black.opacity(0.7))
+                        .foregroundColor(iconColor(for: color))
                         .padding(6)
                         .background(.ultraThinMaterial, in: Circle())
                         .padding(6)
+                        .scaleEffect(isFavorite ? 1.3 : 1.0)
+                        .animation(.spring(response: 0.3, dampingFraction: 0.5), value: isFavorite)
                 }
                 .buttonStyle(.plain)
             }
@@ -261,7 +304,16 @@ struct ColorTile: View {
         }
     }
 
-    // MARK: - Favorite helpers
+    private func iconColor(for named: NamedColor) -> Color {
+        let rgb = hexToRGB(named.hex)
+        let brightness = (0.299 * Double(rgb.r) + 0.587 * Double(rgb.g) + 0.114 * Double(rgb.b)) / 255.0
+        if isFavorite {
+            return brightness < 0.5 ? .red : .red.opacity(0.9)
+        } else {
+            return brightness < 0.5 ? .white.opacity(0.9) : .black.opacity(0.7)
+        }
+    }
+
     private var isFavorite: Bool {
         favs.colors.contains { $0.color.hex == color.hex }
     }
@@ -275,4 +327,3 @@ struct ColorTile: View {
         }
     }
 }
-
