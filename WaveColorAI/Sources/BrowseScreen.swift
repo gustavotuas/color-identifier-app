@@ -1,5 +1,13 @@
 import SwiftUI
 
+// Normaliza HEX: quita espacios, quita "#", y lo pone en UPPERCASE.
+private func normalizeHex(_ hex: String) -> String {
+    var s = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+    if s.hasPrefix("#") { s.removeFirst() }
+    return s
+}
+
+// MARK: - BrowseScreen
 struct BrowseScreen: View {
     @EnvironmentObject var catalog: Catalog
     @EnvironmentObject var store: StoreVM
@@ -161,7 +169,7 @@ struct BrowseScreen: View {
             } else {
                 result = catalog.names.filter {
                     $0.name.lowercased().contains(q) ||
-                    $0.hex.lowercased().contains(q)
+                    normalizeHex($0.hex).contains(normalizeHex(q))
                 }
                 result.sort { ascending ? $0.name < $1.name : $0.name > $1.name }
             }
@@ -206,13 +214,22 @@ struct ColorRow: View {
             Spacer()
 
             Button {
-                toggleFavorite()
+                let rgb = hexToRGB(color.hex)
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    if isFavoriteNormalized {
+                        // remove usando comparación normalizada
+                        favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
+                    } else {
+                        // evita duplicados si ya existe con otro formato (# / case)
+                        let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
+                        if !exists { favs.add(color: rgb) }
+                    }
+                }
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
             } label: {
-                Image(systemName: isFavorite ? "heart.fill" : "heart")
+                Image(systemName: isFavoriteNormalized ? "heart.fill" : "heart")
                     .font(.system(size: 20))
-                    .foregroundColor(isFavorite ? .pink : .gray)
-                    .animation(.easeInOut(duration: 0.2), value: isFavorite)
+                    .foregroundColor(isFavoriteNormalized ? .pink : .gray)
             }
             .buttonStyle(.plain)
         }
@@ -228,17 +245,9 @@ struct ColorRow: View {
         }
     }
 
-    private var isFavorite: Bool {
-        favs.colors.contains { $0.color.hex == color.hex }
-    }
-
-    private func toggleFavorite() {
-        let rgb = hexToRGB(color.hex)
-        if isFavorite {
-            favs.colors.removeAll { $0.color.hex == rgb.hex }
-        } else {
-            favs.add(color: rgb)
-        }
+    private var isFavoriteNormalized: Bool {
+        let key = normalizeHex(color.hex)
+        return favs.colors.contains { normalizeHex($0.color.hex) == key }
     }
 }
 
@@ -261,26 +270,40 @@ struct ColorTile: View {
                     }
                     .contextMenu {
                         Button {
-                            toggleFavorite()
+                            let rgb = hexToRGB(color.hex)
+                            if isFavoriteNormalized {
+                                favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
+                            } else {
+                                let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
+                                if !exists { favs.add(color: rgb) }
+                            }
                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                         } label: {
-                            Label(isFavorite ? "Remove from Favorites" : "Add to Favorites",
-                                  systemImage: isFavorite ? "heart.slash" : "heart")
+                            Label(isFavoriteNormalized ? "Remove from Favorites" : "Add to Favorites",
+                                  systemImage: isFavoriteNormalized ? "heart.slash" : "heart")
                         }
                     }
 
                 Button {
-                    toggleFavorite()
+                    let rgb = hexToRGB(color.hex)
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) {
+                        if isFavoriteNormalized {
+                            favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
+                        } else {
+                            let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
+                            if !exists { favs.add(color: rgb) }
+                        }
+                    }
                     UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                 } label: {
-                    Image(systemName: isFavorite ? "heart.fill" : "heart")
+                    Image(systemName: isFavoriteNormalized ? "heart.fill" : "heart")
                         .font(.system(size: 14))
                         .foregroundColor(iconColor(for: color))
                         .padding(6)
                         .background(.ultraThinMaterial, in: Circle())
                         .padding(6)
-                        .scaleEffect(isFavorite ? 1.3 : 1.0)
-                        .animation(.spring(response: 0.3, dampingFraction: 0.5), value: isFavorite)
+                        .scaleEffect(isFavoriteNormalized ? 1.3 : 1.0)
+                        .animation(.spring(response: 0.3, dampingFraction: 0.5), value: isFavoriteNormalized)
                 }
                 .buttonStyle(.plain)
             }
@@ -307,23 +330,15 @@ struct ColorTile: View {
     private func iconColor(for named: NamedColor) -> Color {
         let rgb = hexToRGB(named.hex)
         let brightness = (0.299 * Double(rgb.r) + 0.587 * Double(rgb.g) + 0.114 * Double(rgb.b)) / 255.0
-        if isFavorite {
+        if isFavoriteNormalized {
             return brightness < 0.5 ? .red : .red.opacity(0.9)
         } else {
             return brightness < 0.5 ? .white.opacity(0.9) : .black.opacity(0.7)
         }
     }
 
-    private var isFavorite: Bool {
-        favs.colors.contains { $0.color.hex == color.hex }
-    }
-
-    private func toggleFavorite() {
-        let rgb = hexToRGB(color.hex)
-        if isFavorite {
-            favs.colors.removeAll { $0.color.hex == rgb.hex }
-        } else {
-            favs.add(color: rgb)
-        }
+    private var isFavoriteNormalized: Bool {
+        let key = normalizeHex(color.hex)
+        return favs.colors.contains { normalizeHex($0.color.hex) == key }
     }
 }
