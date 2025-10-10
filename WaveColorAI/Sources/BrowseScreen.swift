@@ -1,13 +1,87 @@
 import SwiftUI
 
-// Normaliza HEX: quita espacios, quita "#", y lo pone en UPPERCASE.
+// MARK: - Utils
+
+/// Normaliza HEX: quita espacios, "#", y lo pone en UPPERCASE.
 private func normalizeHex(_ hex: String) -> String {
     var s = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
     if s.hasPrefix("#") { s.removeFirst() }
     return s
 }
 
+/// Cache ligera para evitar recalcular uiColor en cada render.
+final class UIColorCache {
+    static let shared = UIColorCache()
+    private let cache = NSCache<NSString, UIColor>()
+    private init() {}
+
+    func color(for hex: String) -> UIColor {
+        let key = normalizeHex(hex) as NSString
+        if let cached = cache.object(forKey: key) { return cached }
+        let ui = hexToRGB(hex).uiColor
+        cache.setObject(ui, forKey: key)
+        return ui
+    }
+}
+
+private func uiColor(for hex: String) -> UIColor {
+    UIColorCache.shared.color(for: hex)
+}
+
+// MARK: - Búsqueda incremental con GCD (sin Swift Concurrency)
+
+final class ColorSearchEngine {
+    private let all: [NamedColor]
+    private var lastQueryLower: String = ""
+    private var lastQueryHex: String = ""
+    private var lastResults: [NamedColor]
+    private let queue = DispatchQueue(label: "ColorSearchEngine.queue", qos: .userInitiated)
+
+    init(allColors: [NamedColor]) {
+        self.all = allColors
+        self.lastResults = allColors
+    }
+
+    /// Ejecuta búsqueda incremental en background y entrega en main thread.
+    func search(query raw: String, ascending: Bool, completion: @escaping ([NamedColor]) -> Void) {
+        let qRaw   = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        let qLower = qRaw.lowercased()
+        let qHex   = normalizeHex(qRaw)
+
+        queue.async { [weak self] in
+            guard let self = self else { return }
+
+            if qLower.isEmpty && qHex.isEmpty {
+                let base = self.all.sorted { ascending ? $0.name < $1.name : $0.name > $1.name }
+                self.lastQueryLower = qLower
+                self.lastQueryHex   = qHex
+                self.lastResults    = base
+                DispatchQueue.main.async { completion(base) }
+                return
+            }
+
+            let extendsLower = qLower.hasPrefix(self.lastQueryLower) && qLower.count >= self.lastQueryLower.count
+            let extendsHex   = qHex.hasPrefix(self.lastQueryHex) && qHex.count >= self.lastQueryHex.count
+            let base: [NamedColor] = (extendsLower || extendsHex) ? self.lastResults : self.all
+
+            var filtered = base.filter { nc in
+                if !qLower.isEmpty, nc.name.lowercased().contains(qLower) { return true }
+                if !qHex.isEmpty, normalizeHex(nc.hex).contains(qHex) { return true }
+                return false
+            }
+            filtered.sort { ascending ? $0.name < $1.name : $0.name > $1.name }
+
+            self.lastQueryLower = qLower
+            self.lastQueryHex   = qHex
+            self.lastResults    = filtered
+
+            DispatchQueue.main.async { completion(filtered) }
+        }
+    }
+}
+
 // MARK: - BrowseScreen
+
 struct BrowseScreen: View {
     @EnvironmentObject var catalog: Catalog
     @EnvironmentObject var store: StoreVM
@@ -17,13 +91,14 @@ struct BrowseScreen: View {
     @State private var layout: LayoutMode = .grid2
     @State private var ascending = true
 
-    // 🔹 Lazy loading
+    // Lazy loading
     @State private var visibleCount = 100
     private let batchSize = 100
 
-    // 🔹 Async filtering
+    // Search
     @State private var filteredColors: [NamedColor] = []
-    @State private var queryTask: Task<Void, Never>? = nil
+    @State private var searchEngine: ColorSearchEngine?
+    @State private var pendingSearchWorkItem: DispatchWorkItem?   // debounce cancelable
 
     enum LayoutMode: CaseIterable {
         case list, grid2, grid3, wheel
@@ -38,7 +113,6 @@ struct BrowseScreen: View {
         }
     }
 
-    // MARK: - Body
     var body: some View {
         NavigationStack {
             ZStack {
@@ -113,9 +187,12 @@ struct BrowseScreen: View {
             .onAppear {
                 setupSearchBar()
                 filteredColors = sortedCatalog()
+                if searchEngine == nil {
+                    searchEngine = ColorSearchEngine(allColors: catalog.names)
+                }
             }
             .onChange(of: query) { newValue in
-                performAsyncFilter(newValue)
+                performAsyncFilter(newValue)    // debounce + background
             }
         }
     }
@@ -158,31 +235,37 @@ struct BrowseScreen: View {
                                attributes: [.foregroundColor: UIColor.lightGray])
     }
 
+    /// Debounce + búsqueda incremental en background (GCD) + actualización en main.
     private func performAsyncFilter(_ query: String) {
-        queryTask?.cancel()
-        queryTask = Task {
-            let q = query.lowercased().trimmingCharacters(in: .whitespaces)
-            var result: [NamedColor]
+        // Cancela debounce previo
+        pendingSearchWorkItem?.cancel()
 
-            if q.isEmpty {
-                result = sortedCatalog()
-            } else {
-                result = catalog.names.filter {
-                    $0.name.lowercased().contains(q) ||
-                    normalizeHex($0.hex).contains(normalizeHex(q))
-                }
-                result.sort { ascending ? $0.name < $1.name : $0.name > $1.name }
-            }
-
-            await MainActor.run {
-                filteredColors = result
-                visibleCount = batchSize
+        let work = DispatchWorkItem { [query, ascending] in
+            guard let engine = searchEngine else { return }
+            engine.search(query: query, ascending: ascending) { result in
+                // Estamos ya en main (engine asegura main para completion)
+                self.filteredColors = result
+                self.visibleCount = self.batchSize
             }
         }
+        pendingSearchWorkItem = work
+
+        // Debounce 150ms
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: work)
     }
 
+    /// Re-usa el motor para reordenar sin recalcular todo el catálogo.
     private func sortFiltered() {
-        filteredColors.sort { ascending ? $0.name < $1.name : $0.name > $1.name }
+        pendingSearchWorkItem?.cancel()
+        let work = DispatchWorkItem { [query, ascending] in
+            guard let engine = searchEngine else { return }
+            engine.search(query: query, ascending: ascending) { result in
+                self.filteredColors = result
+                // No toco visibleCount para evitar “saltos” visuales.
+            }
+        }
+        pendingSearchWorkItem = work
+        DispatchQueue.main.async(execute: work)
     }
 
     private func sortedCatalog() -> [NamedColor] {
@@ -191,6 +274,7 @@ struct BrowseScreen: View {
 }
 
 // MARK: - ColorRow
+
 struct ColorRow: View {
     @EnvironmentObject var favs: FavoritesStore
     let color: NamedColor
@@ -199,7 +283,7 @@ struct ColorRow: View {
     var body: some View {
         HStack(spacing: 12) {
             RoundedRectangle(cornerRadius: 8)
-                .fill(Color(hexToRGB(color.hex).uiColor))
+                .fill(Color(uiColor(for: color.hex)))   // cacheado
                 .frame(width: 45, height: 45)
 
             VStack(alignment: .leading, spacing: 4) {
@@ -217,10 +301,8 @@ struct ColorRow: View {
                 let rgb = hexToRGB(color.hex)
                 withAnimation(.easeInOut(duration: 0.2)) {
                     if isFavoriteNormalized {
-                        // remove usando comparación normalizada
                         favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
                     } else {
-                        // evita duplicados si ya existe con otro formato (# / case)
                         let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
                         if !exists { favs.add(color: rgb) }
                     }
@@ -252,6 +334,7 @@ struct ColorRow: View {
 }
 
 // MARK: - ColorTile
+
 struct ColorTile: View {
     @EnvironmentObject var favs: FavoritesStore
     let color: NamedColor
@@ -262,7 +345,7 @@ struct ColorTile: View {
         VStack(spacing: 6) {
             ZStack(alignment: .topTrailing) {
                 RoundedRectangle(cornerRadius: 10)
-                    .fill(Color(hexToRGB(color.hex).uiColor))
+                    .fill(Color(uiColor(for: color.hex)))  // cacheado
                     .frame(height: layout == .grid3 ? 90 : 120)
                     .onTapGesture {
                         showDetail = true
@@ -275,7 +358,7 @@ struct ColorTile: View {
                                 favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
                             } else {
                                 let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
-                                if !exists { favs.add(color: rgb) }
+                                if (!exists) { favs.add(color: rgb) }
                             }
                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                         } label: {
@@ -291,7 +374,7 @@ struct ColorTile: View {
                             favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
                         } else {
                             let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
-                            if !exists { favs.add(color: rgb) }
+                            if (!exists) { favs.add(color: rgb) }
                         }
                     }
                     UIImpactFeedbackGenerator(style: .medium).impactOccurred()
