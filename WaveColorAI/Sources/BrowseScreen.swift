@@ -138,42 +138,68 @@ struct BrowseScreen: View {
     }
 }
 
-// MARK: - ColorRow (for list layout)
 struct ColorRow: View {
     @EnvironmentObject var favs: FavoritesStore
     let color: NamedColor
     @State private var showDetail = false
 
     var body: some View {
-        HStack {
+        HStack(spacing: 12) {
             RoundedRectangle(cornerRadius: 8)
                 .fill(Color(hexToRGB(color.hex).uiColor))
-                .frame(width: 50, height: 50)
-            VStack(alignment: .leading) {
+                .frame(width: 45, height: 45)
+
+            VStack(alignment: .leading, spacing: 4) {
                 Text(color.name)
                     .font(.headline)
+                    .lineLimit(1)
                 Text(color.hex)
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
+
             Spacer()
+
+            // ❤️ Favorite button (reactive)
             Button {
-                favs.add(color: hexToRGB(color.hex))
-                UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+                toggleFavorite()
+                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
             } label: {
-                Image(systemName: "heart")
-                    .foregroundColor(.pink)
+                Image(systemName: isFavorite ? "heart.fill" : "heart")
+                    .font(.system(size: 20))
+                    .foregroundColor(isFavorite ? .pink : .gray)
+                    .animation(.easeInOut(duration: 0.2), value: isFavorite)
             }
+            .buttonStyle(.plain)
         }
-        .onTapGesture { showDetail = true }
+        .padding(.vertical, 6)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            showDetail = true
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        }
         .sheet(isPresented: $showDetail) {
             ColorDetailView(color: color)
                 .environmentObject(favs)
         }
     }
+
+    // MARK: - Helpers
+    private var isFavorite: Bool {
+        favs.colors.contains { $0.color.hex == color.hex }
+    }
+
+    private func toggleFavorite() {
+        let rgb = hexToRGB(color.hex)
+        if isFavorite {
+            favs.colors.removeAll { $0.color.hex == rgb.hex }
+        } else {
+            favs.add(color: rgb)
+        }
+    }
 }
 
-// MARK: - ColorTile (for grid layouts)
+
 struct ColorTile: View {
     @EnvironmentObject var favs: FavoritesStore
     let color: NamedColor
@@ -182,19 +208,39 @@ struct ColorTile: View {
 
     var body: some View {
         VStack(spacing: 6) {
-            RoundedRectangle(cornerRadius: 10)
-                .fill(Color(hexToRGB(color.hex).uiColor))
-                .frame(height: layout == .grid3 ? 90 : 120)
-                .onTapGesture {
-                    showDetail = true
-                }
-                .contextMenu {
-                    Button {
-                        favs.add(color: hexToRGB(color.hex))
-                    } label: {
-                        Label("Add to Favorites", systemImage: "heart")
+            ZStack(alignment: .topTrailing) {
+                // 🎨 Color background
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color(hexToRGB(color.hex).uiColor))
+                    .frame(height: layout == .grid3 ? 90 : 120)
+                    .onTapGesture {
+                        showDetail = true
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     }
+                    .contextMenu {
+                        Button {
+                            toggleFavorite()
+                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                        } label: {
+                            Label(isFavorite ? "Remove from Favorites" : "Add to Favorites",
+                                  systemImage: isFavorite ? "heart.slash" : "heart")
+                        }
+                    }
+
+                // ❤️ Favorite button (top right)
+                Button {
+                    toggleFavorite()
+                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                } label: {
+                    Image(systemName: isFavorite ? "heart.fill" : "heart")
+                        .font(.system(size: 14))
+                        .foregroundColor(isFavorite ? .white : .black.opacity(0.7))
+                        .padding(6)
+                        .background(.ultraThinMaterial, in: Circle())
+                        .padding(6)
                 }
+                .buttonStyle(.plain)
+            }
 
             VStack(spacing: 2) {
                 Text(color.name)
@@ -214,4 +260,19 @@ struct ColorTile: View {
                 .environmentObject(favs)
         }
     }
+
+    // MARK: - Favorite helpers
+    private var isFavorite: Bool {
+        favs.colors.contains { $0.color.hex == color.hex }
+    }
+
+    private func toggleFavorite() {
+        let rgb = hexToRGB(color.hex)
+        if isFavorite {
+            favs.colors.removeAll { $0.color.hex == rgb.hex }
+        } else {
+            favs.add(color: rgb)
+        }
+    }
 }
+
