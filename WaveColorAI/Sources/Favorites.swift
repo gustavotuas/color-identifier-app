@@ -112,7 +112,7 @@ struct FavoritesScreen: View {
             || fav.color.hex.lowercased().contains(query.lowercased())
             || fav.color.rgbText.lowercased().contains(query.lowercased())
         }
-        // Orden por nombre si está disponible en el catálogo; si no, por HEX
+        // Orden por nombre (como Browse); si no hay nombre, usa HEX
         return filtered.sorted { a, b in
             let na = catalog.nearestName(to: a.color)?.name ?? a.color.hex
             let nb = catalog.nearestName(to: b.color)?.name ?? b.color.hex
@@ -142,6 +142,7 @@ struct FavoritesScreen: View {
                                 FavoriteColorTile(item: item)
                                     .environmentObject(catalog)
                                     .environmentObject(favs)
+                                    .environmentObject(store)
                             }
                         }
                         .padding(.horizontal)
@@ -162,6 +163,7 @@ struct FavoritesScreen: View {
                         .padding(.horizontal)
                     }
 
+                    // Vacío
                     if filteredColors.isEmpty && filteredPalettes.isEmpty {
                         VStack(spacing: 20) {
                             Image(systemName: "heart.slash")
@@ -202,7 +204,7 @@ struct FavoritesScreen: View {
                         }
                     }
 
-                    // 💎 PRO Button (solo cambia el flag; el root presenta)
+                    // 💎 PRO
                     if !store.isPro {
                         Button {
                             store.showPaywall = true
@@ -243,9 +245,11 @@ struct FavoritesScreen: View {
 struct FavoriteColorTile: View {
     @EnvironmentObject var favs: FavoritesStore
     @EnvironmentObject var catalog: Catalog
+    @EnvironmentObject var store: StoreVM
     let item: FavoriteColor
-    @State private var showDetail = false
-    @State private var namedColor: NamedColor?
+
+    // Usamos .sheet(item:) → evita presentar con contenido vacío
+    @State private var selectedColor: NamedColor?
 
     var body: some View {
         VStack(spacing: 4) {
@@ -254,12 +258,26 @@ struct FavoriteColorTile: View {
                     .fill(Color(item.color.uiColor))
                     .frame(height: 90)
                     .onTapGesture {
-                        namedColor = catalog.nearestName(to: item.color)
-                        showDetail = true
+                        // 1) Intentamos con el catálogo (como en Browse)
+                        if let found = catalog.nearestName(to: item.color) {
+                            selectedColor = found
+                        } else {
+                            // 2) Fallback SIEMPRE válido (asegura '#')
+                            let fixedHex = item.color.hex.hasPrefix("#") ? item.color.hex : "#\(item.color.hex)"
+                            selectedColor = NamedColor(
+                                name: "Custom Color",
+                                hex: fixedHex,
+                                rgb: item.color.rgbText,
+                                group: "Custom",
+                                theme: nil
+                            )
+                        }
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     }
 
+                // ❤️ remove favorite
                 Button {
-                    removeFavorite()
+                    favs.removeColor(item)
                 } label: {
                     Image(systemName: "heart.fill")
                         .font(.system(size: 12))
@@ -276,6 +294,10 @@ struct FavoriteColorTile: View {
                         .font(.caption.bold())
                         .lineLimit(1)
                         .foregroundColor(.primary)
+                } else {
+                    Text("Custom Color")
+                        .font(.caption.bold())
+                        .foregroundColor(.primary)
                 }
                 Text(item.color.hex)
                     .font(.caption2)
@@ -285,18 +307,10 @@ struct FavoriteColorTile: View {
         .background(Color.white.opacity(0.7))
         .cornerRadius(10)
         .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
-        .sheet(isPresented: $showDetail) {
-            if let namedColor {
-                ColorDetailView(color: namedColor)
-                    .environmentObject(favs)
-            }
-        }
-    }
-
-    private func removeFavorite() {
-        favs.removeColor(item)
-        withAnimation(.easeInOut(duration: 0.3)) {
-            UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+        // ✅ Presenta SOLO cuando hay item; igual que Browse (ColorDetailView usa favs)
+        .sheet(item: $selectedColor) { named in
+            ColorDetailView(color: named)
+                .environmentObject(favs)
         }
     }
 }
