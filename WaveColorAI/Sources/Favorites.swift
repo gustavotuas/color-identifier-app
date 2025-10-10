@@ -1,6 +1,29 @@
 import SwiftUI
 import Combine
 
+// MARK: - Helpers de performance
+
+/// Cache muy simple para no recalcular nearestName(to:) en cada render.
+final class NearestNameCache {
+    static let shared = NearestNameCache()
+    private var cache: [String: String] = [:] // key: HEX normalizado, value: nombre
+    private init() {}
+
+    private func normalize(_ hex: String) -> String {
+        var s = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        if s.hasPrefix("#") { s.removeFirst() }
+        return s
+    }
+
+    func name(for rgb: RGB, catalog: Catalog) -> String? {
+        let key = normalize(rgb.hex)
+        if let hit = cache[key] { return hit }
+        let name = catalog.nearestName(to: rgb)?.name
+        if let name { cache[key] = name }
+        return name
+    }
+}
+
 // MARK: - Models
 
 struct FavoriteColor: Identifiable, Codable, Equatable {
@@ -106,22 +129,42 @@ struct FavoritesScreen: View {
         Array(repeating: GridItem(.flexible(), spacing: 10), count: 3)
     }
 
+    // ⚡️ Filtra por name, hex y RGB; usa cache y precomputa claves de orden.
     private var filteredColors: [FavoriteColor] {
+        let q = query.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+
+        // nameMap: hex -> nombre (si existe). Se llenará al filtrar.
+        var nameMap: [String: String] = [:]
+        nameMap.reserveCapacity(favs.colors.count)
+
+        // 1) Filtrado (barato) por name/hex/rgb
         let filtered = favs.colors.filter { fav in
-            query.isEmpty
-            || fav.color.hex.lowercased().contains(query.lowercased())
-            || fav.color.rgbText.lowercased().contains(query.lowercased())
+            let hexLC = fav.color.hex.lowercased()
+            let rgbLC = fav.color.rgbText.lowercased()
+            let name   = NearestNameCache.shared.name(for: fav.color, catalog: catalog)
+            if let name { nameMap[fav.color.hex] = name } // guarda para el sort
+
+            return q.isEmpty
+                || hexLC.contains(q)
+                || rgbLC.contains(q)
+                || (name?.lowercased().contains(q) ?? false)  // 🔎 por nombre
         }
+
+        // 2) Orden usando la clave precomputada (nombre si hay, si no hex)
         return filtered.sorted { a, b in
-            let na = catalog.nearestName(to: a.color)?.name ?? a.color.hex
-            let nb = catalog.nearestName(to: b.color)?.name ?? b.color.hex
+            let na = nameMap[a.color.hex] ?? a.color.hex
+            let nb = nameMap[b.color.hex] ?? b.color.hex
             return ascending ? (na < nb) : (na > nb)
         }
     }
 
     private var filteredPalettes: [FavoritePalette] {
         favs.palettes.filter { pal in
-            query.isEmpty || pal.colors.contains { $0.hex.lowercased().contains(query.lowercased()) }
+            query.isEmpty || pal.colors.contains {
+                // filtra por hex y rgb; si quieres incluir nombres, puedo extenderlo
+                $0.hex.lowercased().contains(query.lowercased()) ||
+                $0.rgbText.lowercased().contains(query.lowercased())
+            }
         }
     }
 
@@ -234,7 +277,7 @@ struct FavoritesScreen: View {
             } message: {
                 Text("This will permanently delete all your favorite colors and palettes.")
             }
-            .searchable(text: $query, prompt: "Search favorites by hex or RGB")
+            .searchable(text: $query, prompt: "Search favorites by name or hex")
         }
     }
 }
@@ -284,7 +327,8 @@ struct FavoriteColorTile: View {
             }
 
             VStack(spacing: 2) {
-                if let name = catalog.nearestName(to: item.color)?.name {
+                // Usa la cache: si está, lo toma; si no, lo calcula una vez y queda guardado
+                if let name = NearestNameCache.shared.name(for: item.color, catalog: catalog) {
                     Text(name)
                         .font(.caption.bold())
                         .lineLimit(1)
