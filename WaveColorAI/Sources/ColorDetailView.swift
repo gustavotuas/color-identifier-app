@@ -117,13 +117,43 @@ struct ColorDetailView: View {
                 .cornerRadius(14)
                 .padding(.horizontal)
 
-                // MARK: - Theme
-                if let theme = color.theme {
+                // MARK: - Vendor (reemplaza la antigua sección Theme)
+                if let v = color.vendor {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("Theme").font(.headline)
-                        Text(theme).foregroundColor(.secondary)
+                        Text("Vendor").font(.headline)
+
+                        if let brand = v.brand, !brand.isEmpty {
+                            InfoRow(label: "Brand", value: brand)
+                        }
+                        if let code = v.code, !code.isEmpty {
+                            HStack(spacing: 8) {
+                                InfoRow(label: "Code", value: code)
+                                Button {
+                                    UIPasteboard.general.string = code
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                } label: {
+                                    Image(systemName: "doc.on.doc")
+                                        .foregroundColor(.gray)
+                                }
+                            }
+                        }
+                        if let locator = v.locator, !locator.isEmpty, locator.uppercased() != "N/A" {
+                            InfoRow(label: "Locator", value: locator)
+                        }
+                        if let line = v.line, !line.isEmpty {
+                            InfoRow(label: "Line", value: line)
+                        }
+                        if let domain = v.domain, !domain.isEmpty {
+                            InfoRow(label: "Domain", value: domain)
+                        }
+                        if let source = v.source, !source.isEmpty {
+                            InfoRow(label: "Source", value: source)
+                        }
                     }
                     .padding()
+                    .background(Color(.systemBackground))
+                    .cornerRadius(14)
+                    .padding(.horizontal)
                 }
 
                 Spacer(minLength: 40)
@@ -162,10 +192,8 @@ struct ColorDetailView: View {
         let target = hexToRGB(color.hex)
         withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
             if isFavorite {
-                // elimina por hex normalizado (evita duplicados #/case)
                 favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(target.hex) }
             } else {
-                // evita duplicados y agrega
                 let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(target.hex) }
                 if !exists { favs.add(color: target) }
             }
@@ -201,6 +229,19 @@ struct ColorDetailView: View {
 }
 
 // MARK: - Subviews
+
+private struct InfoRow: View {
+    let label: String
+    let value: String
+    var body: some View {
+        HStack {
+            Text(label).foregroundColor(.secondary)
+            Spacer()
+            Text(value).multilineTextAlignment(.trailing)
+        }
+        .font(.subheadline)
+    }
+}
 
 private struct ValueRow: View {
     let label: String

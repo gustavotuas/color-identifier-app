@@ -63,14 +63,17 @@ extension RGB {
 }
 
 // MARK: - NamedColor MODEL
-struct NamedColor: Identifiable, Codable, Hashable {
-    var id: String { hex }
-    let name: String
-    let hex: String
-    let rgb: String?
-    let group: String?
-    let theme: String?
-}
+// struct NamedColor: Identifiable, Codable, Hashable {
+//     var id: String { hex }
+//     let name: String
+//     let hex: String
+//     let rgb: String?
+//     let group: String?
+//     let theme: String?
+//     let brand: String?
+//     let line: String?
+//     let code: String?
+// }
 
 // MARK: - PaintColor MODEL
 struct PaintColor: Codable, Identifiable {

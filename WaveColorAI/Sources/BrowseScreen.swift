@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 // MARK: - Utils
 
@@ -14,7 +15,6 @@ final class UIColorCache {
     static let shared = UIColorCache()
     private let cache = NSCache<NSString, UIColor>()
     private init() {}
-
     func color(for hex: String) -> UIColor {
         let key = normalizeHex(hex) as NSString
         if let cached = cache.object(forKey: key) { return cached }
@@ -23,17 +23,15 @@ final class UIColorCache {
         return ui
     }
 }
+@inline(__always)
+private func uiColor(for hex: String) -> UIColor { UIColorCache.shared.color(for: hex) }
 
-private func uiColor(for hex: String) -> UIColor {
-    UIColorCache.shared.color(for: hex)
-}
-
-// MARK: - Búsqueda incremental con GCD (sin Swift Concurrency)
+// MARK: - Search engine (incremental, GCD)
 
 final class ColorSearchEngine {
-    private let all: [NamedColor]
-    private var lastQueryLower: String = ""
-    private var lastQueryHex: String = ""
+    private var all: [NamedColor]
+    private var lastQueryLower = ""
+    private var lastQueryHex = ""
     private var lastResults: [NamedColor]
     private let queue = DispatchQueue(label: "ColorSearchEngine.queue", qos: .userInitiated)
 
@@ -41,8 +39,10 @@ final class ColorSearchEngine {
         self.all = allColors
         self.lastResults = allColors
     }
+    func replaceAll(_ colors: [NamedColor]) {
+        self.all = colors; lastQueryLower = ""; lastQueryHex = ""; lastResults = colors
+    }
 
-    /// Ejecuta búsqueda incremental en background y entrega en main thread.
     func search(query raw: String, ascending: Bool, completion: @escaping ([NamedColor]) -> Void) {
         let qRaw   = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         let qLower = qRaw.lowercased()
@@ -53,11 +53,8 @@ final class ColorSearchEngine {
 
             if qLower.isEmpty && qHex.isEmpty {
                 let base = self.all.sorted { ascending ? $0.name < $1.name : $0.name > $1.name }
-                self.lastQueryLower = qLower
-                self.lastQueryHex   = qHex
-                self.lastResults    = base
-                DispatchQueue.main.async { completion(base) }
-                return
+                self.lastQueryLower = qLower; self.lastQueryHex = qHex; self.lastResults = base
+                return DispatchQueue.main.async { completion(base) }
             }
 
             let extendsLower = qLower.hasPrefix(self.lastQueryLower) && qLower.count >= self.lastQueryLower.count
@@ -67,14 +64,13 @@ final class ColorSearchEngine {
             var filtered = base.filter { nc in
                 if !qLower.isEmpty, nc.name.lowercased().contains(qLower) { return true }
                 if !qHex.isEmpty, normalizeHex(nc.hex).contains(qHex) { return true }
+                if let brand = nc.vendor?.brand?.lowercased(), !qLower.isEmpty, brand.contains(qLower) { return true }
+                if let code = nc.vendor?.code?.lowercased(), !qLower.isEmpty, code.contains(qLower) { return true }
                 return false
             }
             filtered.sort { ascending ? $0.name < $1.name : $0.name > $1.name }
 
-            self.lastQueryLower = qLower
-            self.lastQueryHex   = qHex
-            self.lastResults    = filtered
-
+            self.lastQueryLower = qLower; self.lastQueryHex = qHex; self.lastResults = filtered
             DispatchQueue.main.async { completion(filtered) }
         }
     }
@@ -83,13 +79,17 @@ final class ColorSearchEngine {
 // MARK: - BrowseScreen
 
 struct BrowseScreen: View {
-    @EnvironmentObject var catalog: Catalog
+    @EnvironmentObject var catalog: Catalog            // catálogo genérico (tus NamedColors locales)
     @EnvironmentObject var store: StoreVM
     @EnvironmentObject var favs: FavoritesStore
+    @EnvironmentObject var catalogs: CatalogStore      // vendors JSON
 
     @State private var query = ""
     @State private var layout: LayoutMode = .grid2
     @State private var ascending = true
+
+    @State private var selection: CatalogSelection = .all
+    @State private var showVendorSheet = false
 
     // Lazy loading
     @State private var visibleCount = 100
@@ -98,14 +98,13 @@ struct BrowseScreen: View {
     // Search
     @State private var filteredColors: [NamedColor] = []
     @State private var searchEngine: ColorSearchEngine?
-    @State private var pendingSearchWorkItem: DispatchWorkItem?   // debounce cancelable
+    @State private var pendingSearchWorkItem: DispatchWorkItem?
 
     enum LayoutMode: CaseIterable {
         case list, grid2, grid3, wheel
-
         var icon: String {
             switch self {
-            case .list: return "list.bullet"
+            case .list:  return "list.bullet"
             case .grid2: return "square.grid.2x2"
             case .grid3: return "square.grid.3x2"
             case .wheel: return "circle.grid.cross"
@@ -113,44 +112,87 @@ struct BrowseScreen: View {
         }
     }
 
+    private var vendorIDs: [CatalogID] { CatalogID.allCases.filter { $0 != .generic } }
+
     var body: some View {
         NavigationStack {
             ZStack {
-                Group {
-                    switch layout {
-                    case .list:
-                        List(filteredColors.prefix(visibleCount)) { color in
-                            ColorRow(color: color)
-                                .listRowSeparator(.hidden)
-                                .listRowBackground(Color.clear)
-                                .onAppear { handlePagination(color) }
-                        }
-                        .listStyle(.plain)
+                VStack(spacing: 10) {
 
-                    case .grid2, .grid3:
-                        ScrollView {
-                            LazyVGrid(columns: gridColumns, spacing: 16) {
-                                ForEach(filteredColors.prefix(visibleCount)) { color in
-                                    ColorTile(color: color, layout: layout)
-                                        .onAppear { handlePagination(color) }
+                    // Banner/Pill de filtro activo — más notorio (indigo + borde)
+                    // Banner/Pill de filtro activo — estilo teal con buen contraste
+                        if selection.isFiltered {
+                            HStack(spacing: 8) {
+                                Image(systemName: "line.3.horizontal.decrease.circle")
+                                Text(selection.filterSubtitle).lineLimit(1)
+                                Spacer()
+                                Button("Clear") {
+                                    withAnimation(.easeInOut) {
+                                        selection = .all
+                                        VendorSelectionStorage.save(selection)
+                                    }
                                 }
+                                .buttonStyle(.bordered)    // 👈 outlined, no relleno sólido
+                                .tint(.blue)               // color del borde y texto
+                                .font(.caption.bold())
                             }
-                            .padding()
+                            .font(.footnote)
+                            .padding(10)
+                            .background(Color.blue.opacity(0.12)) // 👈 fondo suave
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(Color.blue.opacity(0.5), lineWidth: 1) // 👈 borde
+                            )
+                            .foregroundColor(.blue)         // ícono y texto del banner
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                            .padding(.horizontal)
+                            .transition(.move(edge: .top).combined(with: .opacity))
                         }
 
-                    case .wheel:
-                        ColorWheelView(colors: filteredColors.prefix(visibleCount).map { $0 })
-                            .padding(.vertical, 60)
+
+                    Group {
+                        switch layout {
+                        case .list:
+                            List(filteredColors.prefix(visibleCount)) { color in
+                                ColorRow(color: color)
+                                    .listRowSeparator(.hidden)
+                                    .listRowBackground(Color.clear)
+                                    .onAppear { handlePagination(color) }
+                            }
+                            .listStyle(.plain)
+
+                        case .grid2, .grid3:
+                            ScrollView {
+                                LazyVGrid(columns: gridColumns, spacing: 16) {
+                                    ForEach(filteredColors.prefix(visibleCount)) { color in
+                                        ColorTile(color: color, layout: layout)
+                                            .onAppear { handlePagination(color) }
+                                    }
+                                }
+                                .padding()
+                            }
+
+                        case .wheel:
+                            ColorWheelView(colors: filteredColors.prefix(visibleCount).map { $0 })
+                                .padding(.vertical, 60)
+                        }
                     }
+                    .animation(.easeInOut, value: layout)
                 }
-                .animation(.easeInOut, value: layout)
             }
-            .navigationTitle("Colors")
+            .navigationTitle("Colors") // 👈 fijo, no cambia
             .toolbar {
+                ToolbarItemGroup(placement: .navigationBarLeading) {
+                    Button { showVendorSheet = true } label: {
+                        Image(systemName: "slider.horizontal.3")
+                    }
+                    .accessibilityLabel("Select vendor")
+                }
+
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Button {
                         ascending.toggle()
-                        sortFiltered()
+                        sortFilteredInPlace()
                     } label: {
                         Image(systemName: ascending ? "arrow.up" : "arrow.down")
                     }
@@ -181,30 +223,104 @@ struct BrowseScreen: View {
                     }
                 }
             }
-            .searchable(text: $query,
-                        placement: .navigationBarDrawer(displayMode: .always),
-                        prompt: "Search by name or hex")
-            .onAppear {
-                setupSearchBar()
-                filteredColors = sortedCatalog()
-                if searchEngine == nil {
-                    searchEngine = ColorSearchEngine(allColors: catalog.names)
+            .sheet(isPresented: $showVendorSheet) {
+                VendorListSheet(
+                    selection: $selection,
+                    candidates: vendorIDs,
+                    catalogs: catalogs
+                )
+                .presentationDetents([.medium, .large])
+                .onDisappear {
+                    preloadForSelection()
+                    rebuildEngineAndRefilter()
                 }
             }
+            .searchable(text: $query,
+                        placement: .navigationBarDrawer(displayMode: .always),
+                        prompt: "Search by name, hex, brand or code")
+            .onAppear {
+                setupSearchBar()
+                if let saved = VendorSelectionStorage.load() {
+                    selection = saved
+                }
+                preloadForSelection()
+                let all = makeColors(for: selection)
+                filteredColors = all.sorted { ascending ? $0.name < $1.name : $0.name > $1.name }
+                if searchEngine == nil { searchEngine = ColorSearchEngine(allColors: all) }
+                else { searchEngine?.replaceAll(all) }
+            }
+            .onReceive(catalogs.$loaded) { _ in
+                rebuildEngineAndRefilter()
+            }
+            .onChange(of: selection) { _ in
+                VendorSelectionStorage.save(selection)
+                preloadForSelection()
+                rebuildEngineAndRefilter()
+            }
             .onChange(of: query) { newValue in
-                performAsyncFilter(newValue)    // debounce + background
+                performAsyncFilter(newValue)
             }
         }
     }
 
     // MARK: - Helpers
 
+    /// Carga perezosa según la selección
+    private func preloadForSelection() {
+        switch selection {
+        case .all:
+            catalogs.load(.generic)
+            vendorIDs.forEach { catalogs.load($0) }
+        case .genericOnly:
+            catalogs.load(.generic)
+        case .vendor(let id):
+            catalogs.load(id)
+        }
+    }
+
+    /// Construye el dataset acorde a la selección
+    private func makeColors(for sel: CatalogSelection) -> [NamedColor] {
+        func genericColors() -> [NamedColor] {
+            catalog.names.map { n in NamedColor(name: n.name, hex: n.hex, vendor: nil, rgb: nil) }
+        }
+        switch sel {
+        case .all:
+            let generic = genericColors()
+            let vendors = catalogs.colors(for: Set(vendorIDs))
+            return mergeUnique([generic, vendors])
+        case .genericOnly:
+            return genericColors()
+        case .vendor(let id):
+            return catalogs.colors(for: [id])
+        }
+    }
+
+    private func mergeUnique(_ arrays: [[NamedColor]]) -> [NamedColor] {
+        var seen = Set<String>()
+        var out: [NamedColor] = []
+        for arr in arrays {
+            for x in arr {
+                let key = x.vendor?.code ?? "\(x.name)|\(x.hex.lowercased())"
+                if seen.insert(key).inserted { out.append(x) }
+            }
+        }
+        return out
+    }
+
+    private func rebuildEngineAndRefilter() {
+        let all = makeColors(for: selection)
+        if searchEngine == nil { searchEngine = ColorSearchEngine(allColors: all) }
+        else { searchEngine?.replaceAll(all) }
+        performAsyncFilter(query)
+        visibleCount = batchSize
+    }
+
     private func toggleLayout() {
         switch layout {
         case .list: layout = .grid2
         case .grid2: layout = .grid3
         case .grid3: layout = .wheel
-        case .wheel: layout = .list
+        case .wheel: return layout = .list
         }
     }
 
@@ -212,16 +328,13 @@ struct BrowseScreen: View {
         switch layout {
         case .grid2: return Array(repeating: GridItem(.flexible(), spacing: 16), count: 2)
         case .grid3: return Array(repeating: GridItem(.flexible(), spacing: 10), count: 3)
-        default: return [GridItem(.flexible())]
+        default:     return [GridItem(.flexible())]
         }
     }
 
     private func handlePagination(_ color: NamedColor) {
-        if color.id == filteredColors.prefix(visibleCount).last?.id {
-            loadMore()
-        }
+        if color.id == filteredColors.prefix(visibleCount).last?.id { loadMore() }
     }
-
     private func loadMore() {
         guard visibleCount < filteredColors.count else { return }
         visibleCount += batchSize
@@ -231,46 +344,41 @@ struct BrowseScreen: View {
         UISearchBar.appearance().searchTextField.backgroundColor = UIColor.systemGray5
         UISearchBar.appearance().searchTextField.textColor = .white
         UISearchBar.appearance().searchTextField.attributedPlaceholder =
-            NSAttributedString(string: "Search by name or hex",
+            NSAttributedString(string: "Search by name, hex, brand or code",
                                attributes: [.foregroundColor: UIColor.lightGray])
     }
 
-    /// Debounce + búsqueda incremental en background (GCD) + actualización en main.
     private func performAsyncFilter(_ query: String) {
-        // Cancela debounce previo
         pendingSearchWorkItem?.cancel()
-
         let work = DispatchWorkItem { [query, ascending] in
             guard let engine = searchEngine else { return }
             engine.search(query: query, ascending: ascending) { result in
-                // Estamos ya en main (engine asegura main para completion)
                 self.filteredColors = result
+                // Reaplica el orden vigente por si el motor devolvió sincrónico/rápido:
+                self.sortFilteredInPlace()        // 👈 asegura consistencia
                 self.visibleCount = self.batchSize
             }
         }
         pendingSearchWorkItem = work
-
-        // Debounce 150ms
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: work)
     }
 
-    /// Re-usa el motor para reordenar sin recalcular todo el catálogo.
-    private func sortFiltered() {
-        pendingSearchWorkItem?.cancel()
-        let work = DispatchWorkItem { [query, ascending] in
-            guard let engine = searchEngine else { return }
-            engine.search(query: query, ascending: ascending) { result in
-                self.filteredColors = result
-                // No toco visibleCount para evitar “saltos” visuales.
-            }
+
+    /// Ordena en sitio lo que ya está en pantalla (sin invocar al motor).
+    private func sortFilteredInPlace() {
+        // Puedes ajustar la “clave” de orden acá (name, luego brand, luego code, luego hex).
+        func key(_ c: NamedColor) -> String {
+            let brand = c.vendor?.brand ?? ""
+            let code  = c.vendor?.code  ?? ""
+            return "\(c.name)|\(brand)|\(code)|\(normalizeHex(c.hex))"
         }
-        pendingSearchWorkItem = work
-        DispatchQueue.main.async(execute: work)
+        if ascending {
+            filteredColors.sort { key($0) < key($1) }
+        } else {
+            filteredColors.sort { key($0) > key($1) }
+        }
     }
 
-    private func sortedCatalog() -> [NamedColor] {
-        catalog.names.sorted { ascending ? $0.name < $1.name : $0.name > $1.name }
-    }
 }
 
 // MARK: - ColorRow
@@ -283,16 +391,17 @@ struct ColorRow: View {
     var body: some View {
         HStack(spacing: 12) {
             RoundedRectangle(cornerRadius: 8)
-                .fill(Color(uiColor(for: color.hex)))   // cacheado
+                .fill(Color(uiColor(for: color.hex)))
                 .frame(width: 45, height: 45)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(color.name)
-                    .font(.headline)
-                    .lineLimit(1)
-                Text(color.hex)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                Text(color.name).font(.headline).lineLimit(1)
+                HStack(spacing: 6) {
+                    Text(color.hex).font(.caption).foregroundColor(.secondary)
+                    if let brand = color.vendor?.brand, let code = color.vendor?.code {
+                        Text("• \(brand) \(code)").font(.caption).foregroundColor(.secondary)
+                    }
+                }
             }
 
             Spacer()
@@ -345,7 +454,7 @@ struct ColorTile: View {
         VStack(spacing: 6) {
             ZStack(alignment: .topTrailing) {
                 RoundedRectangle(cornerRadius: 10)
-                    .fill(Color(uiColor(for: color.hex)))  // cacheado
+                    .fill(Color(uiColor(for: color.hex)))
                     .frame(height: layout == .grid3 ? 90 : 120)
                     .onTapGesture {
                         showDetail = true
@@ -358,7 +467,7 @@ struct ColorTile: View {
                                 favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
                             } else {
                                 let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
-                                if (!exists) { favs.add(color: rgb) }
+                                if !exists { favs.add(color: rgb) }
                             }
                             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                         } label: {
@@ -374,7 +483,7 @@ struct ColorTile: View {
                             favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
                         } else {
                             let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
-                            if (!exists) { favs.add(color: rgb) }
+                            if !exists { favs.add(color: rgb) }
                         }
                     }
                     UIImpactFeedbackGenerator(style: .medium).impactOccurred()
@@ -392,13 +501,13 @@ struct ColorTile: View {
             }
 
             VStack(spacing: 2) {
-                Text(color.name)
-                    .font(.caption.bold())
-                    .foregroundColor(.primary)
-                    .lineLimit(1)
-                Text(color.hex)
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
+                Text(color.name).font(.caption.bold()).lineLimit(1)
+                HStack(spacing: 4) {
+                    Text(color.hex).font(.caption2).foregroundColor(.secondary)
+                    if let brand = color.vendor?.brand, let code = color.vendor?.code {
+                        Text("• \(brand) \(code)").font(.caption2).foregroundColor(.secondary).lineLimit(1)
+                    }
+                }
             }
         }
         .background(Color.white.opacity(0.7))
@@ -419,7 +528,6 @@ struct ColorTile: View {
             return brightness < 0.5 ? .white.opacity(0.9) : .black.opacity(0.7)
         }
     }
-
     private var isFavoriteNormalized: Bool {
         let key = normalizeHex(color.hex)
         return favs.colors.contains { normalizeHex($0.color.hex) == key }

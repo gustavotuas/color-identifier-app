@@ -7,12 +7,16 @@ struct WaveColorAIApp: App {
     @StateObject var favs = FavoritesStore()
     @Environment(\.scenePhase) private var scenePhase
 
+    // Pre-carga los catálogos que quieras tener listos al abrir la app.
+    @StateObject private var catalogs = CatalogStore(preload: [.generic, .sherwinWilliams])
+
     var body: some Scene {
         WindowGroup {
             MainTabs()
                 .environmentObject(store)
                 .environmentObject(catalog)
                 .environmentObject(favs)
+                .environmentObject(catalogs) // <- necesario para usar filtros por vendor en Search, etc.
                 .task {
                     await store.load()
                     // Primer arranque: muestra paywall si no es PRO
@@ -33,7 +37,8 @@ struct WaveColorAIApp: App {
                 }
                 // ÚNICO presentador del Paywall en toda la app
                 .fullScreenCover(isPresented: $store.showPaywall) {
-                    PaywallView().environmentObject(store)
+                    PaywallView()
+                        .environmentObject(store)
                 }
         }
     }
