@@ -1,7 +1,14 @@
 import SwiftUI
 import Combine
 
-// MARK: - Helpers de performance
+// MARK: - Helpers
+
+/// Normaliza HEX: quita espacios, "#", y lo pone en UPPERCASE.
+private func normalizeHex(_ hex: String) -> String {
+    var s = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+    if s.hasPrefix("#") { s.removeFirst() }
+    return s
+}
 
 /// Cache muy simple para no recalcular nearestName(to:) en cada render.
 final class NearestNameCache {
@@ -9,14 +16,8 @@ final class NearestNameCache {
     private var cache: [String: String] = [:] // key: HEX normalizado, value: nombre
     private init() {}
 
-    private func normalize(_ hex: String) -> String {
-        var s = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
-        if s.hasPrefix("#") { s.removeFirst() }
-        return s
-    }
-
     func name(for rgb: RGB, catalog: Catalog) -> String? {
-        let key = normalize(rgb.hex)
+        let key = normalizeHex(rgb.hex)
         if let hit = cache[key] { return hit }
         let name = catalog.nearestName(to: rgb)?.name
         if let name { cache[key] = name }
@@ -292,6 +293,12 @@ struct FavoriteColorTile: View {
 
     @State private var selectedColor: NamedColor?
 
+    // rojo si es favorito (compara con hex normalizado)
+    private var isFavorite: Bool {
+        let key = normalizeHex(item.color.hex)
+        return favs.colors.contains { normalizeHex($0.color.hex) == key }
+    }
+
     var body: some View {
         VStack(spacing: 4) {
             ZStack(alignment: .topTrailing) {
@@ -314,20 +321,32 @@ struct FavoriteColorTile: View {
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     }
 
+                // ❤️ Heart rojo si es favorito; tap = toggle (quita/añade) + vibración
                 Button {
-                    favs.removeColor(item)
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                        if isFavorite {
+                            favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(item.color.hex) }
+                        } else {
+                            let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(item.color.hex) }
+                            if !exists { favs.add(color: item.color) }
+                        }
+                    }
+                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                 } label: {
-                    Image(systemName: "heart.fill")
+                    Image(systemName: isFavorite ? "heart.fill" : "heart")
                         .font(.system(size: 12))
+                        .foregroundColor(isFavorite ? .red : .white) // 🔴 rojo cuando es fav
                         .padding(6)
-                        .foregroundColor(.white)
                         .background(.ultraThinMaterial, in: Circle())
                         .padding(6)
+                        .scaleEffect(isFavorite ? 1.15 : 1.0)
+                        .animation(.spring(response: 0.3, dampingFraction: 0.5), value: isFavorite)
                 }
+                .buttonStyle(.plain)
             }
 
             VStack(spacing: 2) {
-                // Usa la cache: si está, lo toma; si no, lo calcula una vez y queda guardado
+                // Usa cache para nombre
                 if let name = NearestNameCache.shared.name(for: item.color, catalog: catalog) {
                     Text(name)
                         .font(.caption.bold())
