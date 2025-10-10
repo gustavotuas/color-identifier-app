@@ -5,51 +5,71 @@ struct ColorWheelView: View {
     @Namespace private var animation
     @EnvironmentObject var favs: FavoritesStore
 
+    // Selección y detalle
     @State private var selectedColor: NamedColor? = nil
     @State private var showDetail = false
     @State private var generatedPalette: [RGB] = []
 
+    // Interacción: zoom, pan, rotación
+    @State private var scale: CGFloat = 1.0
+    @State private var lastScale: CGFloat = 1.0
+    @State private var offset: CGSize = .zero
+    @State private var lastOffset: CGSize = .zero
+    @State private var rotation: Angle = .zero
+    @State private var lastRotation: Angle = .zero
+
+    // Doble-tap anchoring
+    @State private var wheelSize: CGSize = .zero
+
+    // Límite de puntos para rendimiento
+    private let maxDots = 240
+
     var body: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 20) {
+
+            // Contenedor con gestos compuestos
             GeometryReader { geo in
-                let radius = min(geo.size.width, geo.size.height) / 2.3
+                let side = min(geo.size.width, geo.size.height)
+                let baseRadius = side / 2.3
                 let center = CGPoint(x: geo.size.width / 2, y: geo.size.height / 2)
 
                 ZStack {
                     // Base ring
                     Circle()
                         .stroke(Color.gray.opacity(0.25), lineWidth: 2)
-                        .frame(width: radius * 2, height: radius * 2)
+                        .frame(width: baseRadius * 2, height: baseRadius * 2)
 
-                    // Harmony lines when selected
+                    // Líneas de armonía (rotan junto con la rueda)
                     if let selected = selectedColor {
-                        let rgb = hexToRGB(selected.hex)
-                        let hue = rgbToHue(rgb)
-                        let harmonyAngles = harmonyAngles(for: hue)
+                        let rgbSel = hexToRGB(selected.hex)
+                        let hueSel = rgbToHue(rgbSel)
+                        let harmonyAngles = harmonyAngles(for: hueSel).map { $0 + rotation }
 
                         ForEach(harmonyAngles, id: \.self) { angle in
-                            let x = center.x + CGFloat(cos(angle.radians)) * radius
-                            let y = center.y + CGFloat(sin(angle.radians)) * radius
+                            let x = center.x + CGFloat(cos(angle.radians)) * baseRadius
+                            let y = center.y + CGFloat(sin(angle.radians)) * baseRadius
 
                             Path { path in
                                 path.move(to: center)
                                 path.addLine(to: CGPoint(x: x, y: y))
                             }
-                            .stroke(Color.white.opacity(0.5), lineWidth: 1.5)
+                            .stroke(Color.white.opacity(0.55), lineWidth: 1.5)
                         }
                     }
 
-                    // Organized color wheel (Hue–Saturation mapping)
-                    ForEach(Array(colors.prefix(100).enumerated()), id: \.offset) { i, color in
+                    // Puntos organizados por Hue/Sat (rotados)
+                    let sample = Array(colors.prefix(maxDots)).enumerated().map { $0 }
+                    ForEach(sample, id: \.offset) { i, color in
                         let rgb = hexToRGB(color.hex)
                         let (h, s, _) = rgbToHSL(rgb)
-                        
-                        let angle = Angle(degrees: h)
-                        let normalizedSat = max(0.15, s) // evita que los 0 se junten al centro
-                        let radius = min(geo.size.width, geo.size.height) / 2.3 * normalizedSat
 
-                        let x = center.x + CGFloat(cos(angle.radians)) * radius
-                        let y = center.y + CGFloat(sin(angle.radians)) * radius
+                        // aplica rotación global
+                        let angle = Angle(degrees: h) + rotation
+                        let normalizedSat = max(0.15, s)
+                        let r = baseRadius * normalizedSat
+
+                        let x = center.x + CGFloat(cos(angle.radians)) * r
+                        let y = center.y + CGFloat(sin(angle.radians)) * r
 
                         Circle()
                             .fill(Color(rgb.uiColor))
@@ -71,9 +91,7 @@ struct ColorWheelView: View {
                             }
                     }
 
-
-
-                    // Highlight center info
+                    // Centro con preview del seleccionado
                     if let selected = selectedColor {
                         VStack(spacing: 6) {
                             RoundedRectangle(cornerRadius: 14)
@@ -109,52 +127,39 @@ struct ColorWheelView: View {
                     }
                 }
                 .frame(width: geo.size.width, height: geo.size.height)
-            }
-            .padding()
-
-            // 🎨 Generated Palette Section
-            if !generatedPalette.isEmpty {
-                VStack(spacing: 16) {
-                    Text("Generated Palette")
-                        .font(.headline)
-                        .padding(.top, 4)
-
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 12) {
-                            ForEach(generatedPalette, id: \.hex) { rgb in
-                                VStack {
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .fill(Color(rgb.uiColor))
-                                        .frame(width: 60, height: 60)
-                                        .shadow(radius: 2)
-                                    Text(rgb.hex)
-                                        .font(.caption2)
-                                        .foregroundColor(.secondary)
-                                }
-                            }
+                .background(
+                    GeometryReader { inner in
+                        Color.clear.onAppear {
+                            wheelSize = inner.size
                         }
-                        .padding(.horizontal)
                     }
-
-                    Button(action: savePalette) {
-                        HStack {
-                            Image(systemName: "heart.fill")
-                            Text("Save Palette to Favorites")
-                                .fontWeight(.semibold)
-                        }
-                        .padding(.vertical, 10)
-                        .padding(.horizontal, 20)
-                        .background(LinearGradient(colors: [.purple, .pink],
-                                                   startPoint: .topLeading,
-                                                   endPoint: .bottomTrailing))
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                        .shadow(radius: 3)
+                )
+                // Gestos (rotación + pinch + pan)
+                .gesture(
+                    simultaneousGestures()
+                )
+                // Transformaciones (primero rotación -> luego zoom -> luego pan para sensación natural)
+                .rotationEffect(rotation)
+                .scaleEffect(scale, anchor: .center)
+                .offset(offset)
+                // Doble tap: toggle zoom 1x/2x tratando de centrar hacia el toque
+                .contentShape(Rectangle())
+                .onTapGesture(count: 2) {
+                    withAnimation(.spring()) {
+                        toggleDoubleTapZoom()
                     }
-                    .padding(.bottom, 10)
+                    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
                 }
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-                .animation(.spring(), value: generatedPalette)
+            }
+            .padding(.horizontal)
+            .frame(height: 360)
+
+            // Controles flotantes
+            controlBar
+
+            // 🎨 Paleta generada
+            if !generatedPalette.isEmpty {
+                paletteSection
             }
         }
         .sheet(isPresented: $showDetail) {
@@ -170,7 +175,184 @@ struct ColorWheelView: View {
         }
     }
 
-    // MARK: - Helpers
+    // MARK: - Control Bar
+
+    private var controlBar: some View {
+        HStack(spacing: 10) {
+            Button {
+                withAnimation(.spring()) { resetTransforms() }
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            } label: {
+                Label("Reset", systemImage: "arrow.counterclockwise")
+                    .labelStyle(.iconOnly)
+                    .frame(width: 38, height: 38)
+            }
+            .buttonStyle(.bordered)
+
+            Button {
+                withAnimation(.spring()) { nudgeScale(by: -0.2) }
+            } label: {
+                Image(systemName: "minus.magnifyingglass")
+                    .frame(width: 38, height: 38)
+            }
+            .buttonStyle(.bordered)
+
+            Button {
+                withAnimation(.spring()) { nudgeScale(by: 0.2) }
+            } label: {
+                Image(systemName: "plus.magnifyingglass")
+                    .frame(width: 38, height: 38)
+            }
+            .buttonStyle(.bordered)
+
+            Spacer()
+
+            // Indicadores compactos
+            HStack(spacing: 10) {
+                HStack(spacing: 4) {
+                    Image(systemName: "arrow.left.and.right")
+                    Text("\(Int(scale * 100))%")
+                }
+                .font(.caption2)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 6)
+                .background(Color.blue.opacity(0.1))
+                .clipShape(Capsule())
+
+                HStack(spacing: 4) {
+                    Image(systemName: "goforward")
+                    Text("\(Int((rotation.degrees.truncatingRemainder(dividingBy: 360) + 360).truncatingRemainder(dividingBy: 360)))°")
+                }
+                .font(.caption2)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 6)
+                .background(Color.blue.opacity(0.1))
+                .clipShape(Capsule())
+            }
+        }
+        .padding(.horizontal)
+    }
+
+    // MARK: - Palette Section
+
+    private var paletteSection: some View {
+        VStack(spacing: 16) {
+            Text("Generated Palette")
+                .font(.headline)
+                .padding(.top, 4)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    ForEach(generatedPalette, id: \.hex) { rgb in
+                        VStack {
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color(rgb.uiColor))
+                                .frame(width: 60, height: 60)
+                                .shadow(radius: 2)
+                            Text(rgb.hex)
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+                .padding(.horizontal)
+            }
+
+            Button(action: savePalette) {
+                HStack {
+                    Image(systemName: "heart.fill")
+                    Text("Save Palette to Favorites").fontWeight(.semibold)
+                }
+                .padding(.vertical, 10)
+                .padding(.horizontal, 20)
+                .background(LinearGradient(colors: [.purple, .pink],
+                                           startPoint: .topLeading,
+                                           endPoint: .bottomTrailing))
+                .foregroundColor(.white)
+                .cornerRadius(10)
+                .shadow(radius: 3)
+            }
+            .padding(.bottom, 10)
+        }
+        .transition(.move(edge: .bottom).combined(with: .opacity))
+        .animation(.spring(), value: generatedPalette)
+    }
+
+    // MARK: - Gestures
+
+    private func simultaneousGestures() -> some Gesture {
+        // Magnify
+        let magnify = MagnificationGesture()
+            .onChanged { value in
+                let newScale = (lastScale * value).clamped(to: 1.0...3.0)
+                scale = newScale
+            }
+            .onEnded { _ in
+                lastScale = scale
+            }
+
+        // Rotate
+        let rotate = RotationGesture()
+            .onChanged { value in
+                rotation = lastRotation + value
+            }
+            .onEnded { _ in
+                lastRotation = rotation
+            }
+
+        // Pan (solo si hay zoom > 1)
+        let pan = DragGesture(minimumDistance: 2)
+            .onChanged { value in
+                guard scale > 1.02 else { offset = .zero; return }
+                offset = CGSize(width: lastOffset.width + value.translation.width,
+                                height: lastOffset.height + value.translation.height)
+            }
+            .onEnded { _ in
+                // un pequeño clamp para que no se vaya “demasiado” lejos
+                let maxOffset: CGFloat = 400
+                offset = CGSize(width: offset.width.clamped(to: -maxOffset...maxOffset),
+                                height: offset.height.clamped(to: -maxOffset...maxOffset))
+                lastOffset = offset
+            }
+
+        // Combínalos simultáneamente
+        return SimultaneousGesture(SimultaneousGesture(magnify, rotate), pan)
+    }
+
+    private func toggleDoubleTapZoom() {
+        if scale < 1.5 {
+            scale = 2.0
+            lastScale = scale
+        } else {
+            scale = 1.0
+            lastScale = scale
+            offset = .zero
+            lastOffset = .zero
+        }
+    }
+
+    private func nudgeScale(by delta: CGFloat) {
+        let new = (scale + delta).clamped(to: 1.0...3.0)
+        scale = new
+        lastScale = new
+        if new <= 1.02 {
+            withAnimation(.easeInOut) {
+                offset = .zero
+                lastOffset = .zero
+            }
+        }
+    }
+
+    private func resetTransforms() {
+        scale = 1.0
+        lastScale = 1.0
+        rotation = .zero
+        lastRotation = .zero
+        offset = .zero
+        lastOffset = .zero
+    }
+
+    // MARK: - Color Math
 
     private func rgbToHue(_ rgb: RGB) -> Double {
         let r = Double(rgb.r) / 255
@@ -210,9 +392,7 @@ struct ColorWheelView: View {
     // 🎨 Generate related palette
     private func generatePalette(from base: RGB) -> [RGB] {
         let hues = [0, 30, -30, 120, 180]
-        return hues.map {
-            hueShift(rgb: base, degrees: Double($0))
-        }
+        return hues.map { hueShift(rgb: base, degrees: Double($0)) }
     }
 
     private func hueShift(rgb: RGB, degrees: Double) -> RGB {
@@ -246,7 +426,6 @@ struct ColorWheelView: View {
 
         let l = (maxVal + minVal) / 2
         let s = delta == 0 ? 0 : delta / (1 - abs(2 * l - 1))
-
         return (h, s, l)
     }
 
@@ -278,5 +457,13 @@ struct ColorWheelView: View {
         withAnimation(.easeInOut) {
             generatedPalette = []
         }
+    }
+}
+
+// MARK: - Helpers
+
+private extension Comparable {
+    func clamped(to range: ClosedRange<Self>) -> Self {
+        min(max(self, range.lowerBound), range.upperBound)
     }
 }

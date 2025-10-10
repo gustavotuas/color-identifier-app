@@ -173,8 +173,9 @@ struct BrowseScreen: View {
                             }
 
                         case .wheel:
-                            ColorWheelView(colors: filteredColors.prefix(visibleCount).map { $0 })
-                                .padding(.vertical, 60)
+                                ColorAtlasView(colors: filteredColors)
+                                    .environmentObject(favs)
+                                    .padding(.vertical, 8)
                         }
                     }
                     .animation(.easeInOut, value: layout)
