@@ -100,7 +100,7 @@ struct FavoritesScreen: View {
 
     @State private var query = ""
     @State private var ascending = true
-    @State private var showConfirmClear = false
+    @State private var showClearAlert = false
 
     private var gridColumns: [GridItem] {
         Array(repeating: GridItem(.flexible(), spacing: 10), count: 3)
@@ -112,7 +112,6 @@ struct FavoritesScreen: View {
             || fav.color.hex.lowercased().contains(query.lowercased())
             || fav.color.rgbText.lowercased().contains(query.lowercased())
         }
-        // Orden por nombre (como Browse); si no hay nombre, usa HEX
         return filtered.sorted { a, b in
             let na = catalog.nearestName(to: a.color)?.name ?? a.color.hex
             let nb = catalog.nearestName(to: b.color)?.name ?? b.color.hex
@@ -163,7 +162,7 @@ struct FavoritesScreen: View {
                         .padding(.horizontal)
                     }
 
-                    // Vacío
+                    // Empty state
                     if filteredColors.isEmpty && filteredPalettes.isEmpty {
                         VStack(spacing: 20) {
                             Image(systemName: "heart.slash")
@@ -184,7 +183,6 @@ struct FavoritesScreen: View {
             .navigationTitle("Favorites")
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
-
                     // 🔁 Sort
                     if !filteredColors.isEmpty {
                         Button {
@@ -195,16 +193,16 @@ struct FavoritesScreen: View {
                         }
                     }
 
-                    // 🧹 Clear All
+                    // 🧹 Clear All (Centered alert)
                     if !favs.colors.isEmpty || !favs.palettes.isEmpty {
                         Button(role: .destructive) {
-                            showConfirmClear = true
+                            showClearAlert = true
                         } label: {
                             Image(systemName: "trash")
                         }
                     }
 
-                    // 💎 PRO
+                    // 💎 PRO Button
                     if !store.isPro {
                         Button {
                             store.showPaywall = true
@@ -224,16 +222,17 @@ struct FavoritesScreen: View {
                     }
                 }
             }
-            .confirmationDialog("Clear all favorites?",
-                                isPresented: $showConfirmClear,
-                                titleVisibility: .visible) {
-                Button("Delete All", role: .destructive) {
+            // ✅ Centered alert with “Yes / No”
+            .alert("Clear all favorites?", isPresented: $showClearAlert) {
+                Button("Yes", role: .destructive) {
                     withAnimation {
                         favs.clearAll()
                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                     }
                 }
-                Button("Cancel", role: .cancel) {}
+                Button("No", role: .cancel) {}
+            } message: {
+                Text("This will permanently delete all your favorite colors and palettes.")
             }
             .searchable(text: $query, prompt: "Search favorites by hex or RGB")
         }
@@ -248,7 +247,6 @@ struct FavoriteColorTile: View {
     @EnvironmentObject var store: StoreVM
     let item: FavoriteColor
 
-    // Usamos .sheet(item:) → evita presentar con contenido vacío
     @State private var selectedColor: NamedColor?
 
     var body: some View {
@@ -258,11 +256,9 @@ struct FavoriteColorTile: View {
                     .fill(Color(item.color.uiColor))
                     .frame(height: 90)
                     .onTapGesture {
-                        // 1) Intentamos con el catálogo (como en Browse)
                         if let found = catalog.nearestName(to: item.color) {
                             selectedColor = found
                         } else {
-                            // 2) Fallback SIEMPRE válido (asegura '#')
                             let fixedHex = item.color.hex.hasPrefix("#") ? item.color.hex : "#\(item.color.hex)"
                             selectedColor = NamedColor(
                                 name: "Custom Color",
@@ -275,7 +271,6 @@ struct FavoriteColorTile: View {
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     }
 
-                // ❤️ remove favorite
                 Button {
                     favs.removeColor(item)
                 } label: {
@@ -307,7 +302,6 @@ struct FavoriteColorTile: View {
         .background(Color.white.opacity(0.7))
         .cornerRadius(10)
         .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
-        // ✅ Presenta SOLO cuando hay item; igual que Browse (ColorDetailView usa favs)
         .sheet(item: $selectedColor) { named in
             ColorDetailView(color: named)
                 .environmentObject(favs)
