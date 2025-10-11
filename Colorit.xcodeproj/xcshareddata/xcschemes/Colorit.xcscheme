@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "604226C52E925709006A0BE8"
-               BuildableName = "WaveColorAI.app"
-               BlueprintName = "WaveColorAI"
-               ReferencedContainer = "container:WaveColorAI.xcodeproj">
+               BuildableName = "Colorit.app"
+               BlueprintName = "Colorit"
+               ReferencedContainer = "container:Colorit.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -45,13 +45,13 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "604226C52E925709006A0BE8"
-            BuildableName = "WaveColorAI.app"
-            BlueprintName = "WaveColorAI"
-            ReferencedContainer = "container:WaveColorAI.xcodeproj">
+            BuildableName = "Colorit.app"
+            BlueprintName = "Colorit"
+            ReferencedContainer = "container:Colorit.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <StoreKitConfigurationFileReference
-         identifier = "../../WaveColorAI/StoreKit/WaveColorAI.storekit">
+         identifier = "../../Colorit/StoreKit/Colorit.storekit">
       </StoreKitConfigurationFileReference>
    </LaunchAction>
    <ProfileAction
@@ -65,9 +65,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "604226C52E925709006A0BE8"
-            BuildableName = "WaveColorAI.app"
-            BlueprintName = "WaveColorAI"
-            ReferencedContainer = "container:WaveColorAI.xcodeproj">
+            BuildableName = "Colorit.app"
+            BlueprintName = "Colorit"
+            ReferencedContainer = "container:Colorit.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

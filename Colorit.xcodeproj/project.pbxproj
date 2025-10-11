@@ -12,26 +12,26 @@
 
 /* Begin PBXFileReference section */
 		603DF2662E92586D00E4B304 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
-		604226C62E925709006A0BE8 /* WaveColorAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WaveColorAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		604226C62E925709006A0BE8 /* Colorit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Colorit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		60150A6B2E925B9A00997265 /* Exceptions for "WaveColorAI" folder in "WaveColorAI" target */ = {
+		60150A6B2E925B9A00997265 /* Exceptions for "Colorit" folder in "Colorit" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Resources/Info.plist,
 			);
-			target = 604226C52E925709006A0BE8 /* WaveColorAI */;
+			target = 604226C52E925709006A0BE8 /* Colorit */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		604226C82E925709006A0BE8 /* WaveColorAI */ = {
+		604226C82E925709006A0BE8 /* Colorit */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				60150A6B2E925B9A00997265 /* Exceptions for "WaveColorAI" folder in "WaveColorAI" target */,
+				60150A6B2E925B9A00997265 /* Exceptions for "Colorit" folder in "Colorit" target */,
 			);
-			path = WaveColorAI;
+			path = Colorit;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -59,7 +59,7 @@
 		604226BD2E925709006A0BE8 = {
 			isa = PBXGroup;
 			children = (
-				604226C82E925709006A0BE8 /* WaveColorAI */,
+				604226C82E925709006A0BE8 /* Colorit */,
 				603DF2652E92586D00E4B304 /* Frameworks */,
 				604226C72E925709006A0BE8 /* Products */,
 			);
@@ -68,7 +68,7 @@
 		604226C72E925709006A0BE8 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				604226C62E925709006A0BE8 /* WaveColorAI.app */,
+				604226C62E925709006A0BE8 /* Colorit.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -76,9 +76,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		604226C52E925709006A0BE8 /* WaveColorAI */ = {
+		604226C52E925709006A0BE8 /* Colorit */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 604226D12E92570C006A0BE8 /* Build configuration list for PBXNativeTarget "WaveColorAI" */;
+			buildConfigurationList = 604226D12E92570C006A0BE8 /* Build configuration list for PBXNativeTarget "Colorit" */;
 			buildPhases = (
 				604226C22E925709006A0BE8 /* Sources */,
 				604226C32E925709006A0BE8 /* Frameworks */,
@@ -89,13 +89,13 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				604226C82E925709006A0BE8 /* WaveColorAI */,
+				604226C82E925709006A0BE8 /* Colorit */,
 			);
-			name = WaveColorAI;
+			name = Colorit;
 			packageProductDependencies = (
 			);
-			productName = WaveColorAI;
-			productReference = 604226C62E925709006A0BE8 /* WaveColorAI.app */;
+			productName = Colorit;
+			productReference = 604226C62E925709006A0BE8 /* Colorit.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -113,7 +113,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 604226C12E925709006A0BE8 /* Build configuration list for PBXProject "WaveColorAI" */;
+			buildConfigurationList = 604226C12E925709006A0BE8 /* Build configuration list for PBXProject "Colorit" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -163,7 +163,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				604226C52E925709006A0BE8 /* WaveColorAI */,
+				604226C52E925709006A0BE8 /* Colorit */,
 			);
 		};
 /* End PBXProject section */
@@ -316,22 +316,34 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = N4Q6CC2YAQ;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_CAMERA = YES;
+				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "$(SRCROOT)/WaveColorAI/Resources/Info.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/Colorit/Resources/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = Colorit;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.graphics-design";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.getscodes.wavecolorai.WaveColorAI;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bundle.colorit.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -351,20 +363,26 @@
 				DEVELOPMENT_TEAM = N4Q6CC2YAQ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "$(SRCROOT)/WaveColorAI/Resources/Info.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/Colorit/Resources/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = Colorit;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.graphics-design";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.getscodes.wavecolorai.WaveColorAI;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bundle.colorit.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -377,7 +395,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		604226C12E925709006A0BE8 /* Build configuration list for PBXProject "WaveColorAI" */ = {
+		604226C12E925709006A0BE8 /* Build configuration list for PBXProject "Colorit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				604226CF2E92570C006A0BE8 /* Debug */,
@@ -386,7 +404,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		604226D12E92570C006A0BE8 /* Build configuration list for PBXNativeTarget "WaveColorAI" */ = {
+		604226D12E92570C006A0BE8 /* Build configuration list for PBXNativeTarget "Colorit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				604226D22E92570C006A0BE8 /* Debug */,
