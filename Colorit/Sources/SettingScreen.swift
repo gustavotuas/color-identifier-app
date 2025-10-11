@@ -8,7 +8,7 @@ struct SettingScreen: View {
     private var appVersion: String {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"
-        return "v\(version) (\(build))"
+        return "\(version) (\(build))"
     }
 
     var body: some View {
@@ -57,6 +57,23 @@ struct SettingScreen: View {
             Section(header: Text("Help")) {
                 SettingRow(icon: "envelope.fill", iconColor: .blue, text: "Send feedback", link: "mailto:getscodes@gmail.com")
             }
+
+            // MARK: - Footer (Versión centrada)
+            Section {
+                HStack {
+                    Spacer()
+                    VStack(spacing: 4) {
+                        Text("Colorit")
+                            .font(.footnote)
+                            .foregroundColor(.secondary)
+                        Text(appVersion)
+                            .font(.footnote)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                }
+                .listRowBackground(Color.clear)
+            }
         }
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
@@ -69,7 +86,7 @@ struct SettingScreen: View {
 }
 
 //
-// MARK: - SettingRow (fila clásica de ajustes)
+// MARK: - SettingRow
 //
 struct SettingRow: View {
     let icon: String
