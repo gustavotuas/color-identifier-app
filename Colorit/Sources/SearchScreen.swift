@@ -78,7 +78,7 @@ final class ColorSearchEngine {
 
 // MARK: - BrowseScreen
 
-struct BrowseScreen: View {
+struct SearchScreen: View {
     @EnvironmentObject var catalog: Catalog            // catálogo genérico (tus NamedColors locales)
     @EnvironmentObject var store: StoreVM
     @EnvironmentObject var favs: FavoritesStore
@@ -126,12 +126,15 @@ struct BrowseScreen: View {
                                 Image(systemName: "line.3.horizontal.decrease.circle")
                                 Text(selection.filterSubtitle).lineLimit(1)
                                 Spacer()
-                                Button("Clear") {
+                                Button{
                                     withAnimation(.easeInOut) {
                                         selection = .all
                                         VendorSelectionStorage.save(selection)
                                     }
-                                }
+                                }label: {
+                                        Label("Clear", systemImage: "xmark.circle.fill")
+                                            .labelStyle(.titleAndIcon)
+                                    }
                                 .buttonStyle(.bordered)    // 👈 outlined, no relleno sólido
                                 .tint(.blue)               // color del borde y texto
                                 .font(.caption.bold())
@@ -448,7 +451,7 @@ struct ColorRow: View {
 struct ColorTile: View {
     @EnvironmentObject var favs: FavoritesStore
     let color: NamedColor
-    let layout: BrowseScreen.LayoutMode
+    let layout: SearchScreen.LayoutMode
     @State private var showDetail = false
 
     var body: some View {

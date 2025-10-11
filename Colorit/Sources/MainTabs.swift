@@ -51,7 +51,7 @@ struct MainTabs: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            NavigationStack { BrowseScreen() }
+            NavigationStack { SearchScreen() }
                 .tabItem {
                     Label(NSLocalizedString("search", comment: ""), systemImage: "magnifyingglass")
                 }
