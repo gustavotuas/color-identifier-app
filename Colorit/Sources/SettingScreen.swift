@@ -1,0 +1,111 @@
+import SwiftUI
+import UIKit
+
+struct SettingScreen: View {
+    @EnvironmentObject var store: StoreVM
+
+    var body: some View {
+        List {
+            // MARK: - Get Pro
+            Section {
+                Button {
+                    Haptic.tap()
+                    store.showPaywall = true
+                } label: {
+                    HStack(spacing: 15) {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(Color.yellow.opacity(0.15))
+                                .frame(width: 36, height: 36)
+                            Image(systemName: "crown.fill")
+                                .foregroundColor(.yellow)
+                                .font(.system(size: 18))
+                        }
+                        Text("Get Pro")
+                            .foregroundColor(.primary)
+                            .fontWeight(.semibold)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .foregroundColor(.gray)
+                            .font(.system(size: 13))
+                    }
+                    .padding(.vertical, 6)
+                }
+                .buttonStyle(.plain)
+            }
+
+            // MARK: - About
+            Section(header: Text("About")) {
+                SettingRow(icon: "info.circle.fill", iconColor: .gray, text: "Version: 1.0.0", link: nil)
+                //SettingRow(icon: "globe", iconColor: .blue, text: "Website", link: "https://example.com")
+                //SettingRow(icon: "camera.fill", iconColor: .pink, text: "Follow on Instagram", link: "https://instagram.com/yourpage")
+                //SettingRow(icon: "music.note", iconColor: .black, text: "Follow on TikTok", link: "https://tiktok.com/@yourpage")
+                //SettingRow(icon: "bird.fill", iconColor: .black, text: "Follow on X", link: "https://x.com/yourpage")
+                //SettingRow(icon: "doc.text.fill", iconColor: .gray, text: "Terms of Use", link: "https://example.com/terms")
+                //SettingRow(icon: "lock.shield.fill", iconColor: .teal, text: "Privacy Policy", link: "https://example.com/privacy")
+                SettingRow(icon: "star.fill", iconColor: .orange, text: "Rate the app", link: "https://apps.apple.com/app/idXXXXXXXXX?action=write-review")
+            }
+
+            // MARK: - Help
+            Section(header: Text("Help")) {
+                SettingRow(icon: "envelope.fill", iconColor: .blue, text: "Send feedback", link: "mailto:getscodes@gmail.com")
+            }
+        }
+        .listStyle(.insetGrouped) // 👈 Este es el estilo exacto de iOS Settings
+        .scrollContentBackground(.hidden)
+        .background(Color(.systemGroupedBackground))
+        .navigationTitle("Settings")
+        .sheet(isPresented: $store.showPaywall) {
+            PaywallView().environmentObject(store)
+        }
+    }
+}
+
+//
+// MARK: - SettingRow (fila clásica de ajustes)
+//
+struct SettingRow: View {
+    let icon: String
+    let iconColor: Color
+    let text: String
+    let link: String?
+
+    var body: some View {
+        HStack(spacing: 15) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(iconColor.opacity(0.15))
+                    .frame(width: 32, height: 32)
+                Image(systemName: icon)
+                    .foregroundColor(iconColor)
+                    .font(.system(size: 16))
+            }
+
+            Text(text)
+                .foregroundColor(.primary)
+
+            Spacer()
+
+            if let link = link {
+                Image(systemName: "chevron.right")
+                    .foregroundColor(.gray)
+                    .font(.system(size: 13))
+                    .onTapGesture {
+                        Haptic.tap()
+                        openLink(link)
+                    }
+            }
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            Haptic.tap()
+            if let link = link { openLink(link) }
+        }
+    }
+
+    private func openLink(_ urlString: String) {
+        guard let url = URL(string: urlString) else { return }
+        UIApplication.shared.open(url)
+    }
+}
+

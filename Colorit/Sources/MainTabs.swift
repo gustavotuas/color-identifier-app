@@ -45,22 +45,6 @@ struct HomeScreen: View {
     }
 }
 
-// MARK: - Perfil / Settings
-struct SettingScreen: View {
-    var body: some View {
-        Form {
-            Section("Legal") {
-                Link("Terms", destination: URL(string: "https://example.com/terms")!)
-                Link("Privacy", destination: URL(string: "https://example.com/privacy")!)
-            }
-            Section("Support") {
-                Link("Contact", destination: URL(string: "mailto:support@example.com")!)
-            }
-        }
-        .navigationTitle(NSLocalizedString("Settings", comment: ""))
-    }
-}
-
 // MARK: - Pestañas principales
 struct MainTabs: View {
     @State private var selectedTab = 0
