@@ -1,5 +1,15 @@
 import SwiftUI
+import UIKit
 
+// MARK: - Helper para Haptic Feedback
+final class Haptic {
+    static func tap() {
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.impactOccurred()
+    }
+}
+
+// MARK: - Home Screen
 struct HomeScreen: View {
     @EnvironmentObject var store: StoreVM
 
@@ -22,7 +32,6 @@ struct HomeScreen: View {
 
                 if !store.isPro {
                     Button(NSLocalizedString("unlock_pro", comment: "")) {
-                        // Solo cambiamos el flag global
                         store.showPaywall = true
                     }
                     .buttonStyle(.borderedProminent)
@@ -36,8 +45,8 @@ struct HomeScreen: View {
     }
 }
 
-// MARK: - Perfil
-struct ProfileScreen: View {
+// MARK: - Perfil / Settings
+struct SettingScreen: View {
     var body: some View {
         Form {
             Section("Legal") {
@@ -48,40 +57,48 @@ struct ProfileScreen: View {
                 Link("Contact", destination: URL(string: "mailto:support@example.com")!)
             }
         }
-        .navigationTitle(NSLocalizedString("profile", comment: ""))
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationTitle(NSLocalizedString("Settings", comment: ""))
     }
 }
 
 // MARK: - Pestañas principales
 struct MainTabs: View {
-    var body: some View {
-        TabView {
+    @State private var selectedTab = 0
 
+    var body: some View {
+        TabView(selection: $selectedTab) {
             NavigationStack { BrowseScreen() }
                 .tabItem {
                     Label(NSLocalizedString("search", comment: ""), systemImage: "magnifyingglass")
                 }
+                .tag(0)
 
             NavigationStack { FavoritesScreen() }
                 .tabItem {
                     Label(NSLocalizedString("favorites", comment: ""), systemImage: "heart")
                 }
+                .tag(1)
 
             NavigationStack { CameraScreen() }
                 .tabItem {
                     Label(NSLocalizedString("camera", comment: ""), systemImage: "camera")
                 }
+                .tag(2)
 
             NavigationStack { PhotosScreen() }
                 .tabItem {
                     Label(NSLocalizedString("photo", comment: ""), systemImage: "photo")
                 }
+                .tag(3)
 
-            NavigationStack { ProfileScreen() }
+            NavigationStack { SettingScreen() }
                 .tabItem {
-                    Label(NSLocalizedString("profile", comment: ""), systemImage: "person.crop.circle")
+                    Label(NSLocalizedString("settings", comment: ""), systemImage: "gearshape")
                 }
+                .tag(4)
+        }
+        .onChange(of: selectedTab) { _ in
+            Haptic.tap() // 💥 vibra cada vez que cambias de pestaña
         }
     }
 }
