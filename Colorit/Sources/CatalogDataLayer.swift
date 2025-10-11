@@ -1,6 +1,6 @@
 //
 //  CatalogDataLayer.swift
-//  WaveColorAI
+//  Colorit
 //
 //  Data layer: loader & registry for NamedColor catalogs.
 //

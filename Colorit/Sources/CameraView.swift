@@ -1,21 +1,3 @@
-//  CameraView.swift
-//  WaveColorAI
-//
-//  Camera with black frame; centered target; island INSIDE the camera.
-//
-//  Changes in this revision:
-//  • Torch icon now uses SF Symbol (white): "bolt.fill".
-//  • ColorIsland is overlaid *inside* the framed camera (top/bottom = 0).
-//  • No gap between the preview and the island; island sits within the clipped area.
-//  • Buttons remain near the edges; toasts preserved.
-//
-//  Requirements in your project:
-//  - struct RGB { r,g,b:Int ; var hex:String ; var uiColor:UIColor ; var rgbText:String ; var cmykText:String ; func distance(to:RGB)->Double }
-//  - func hexToRGB(_ hex:String) -> RGB
-//  - class FavoritesStore: ObservableObject { func add(color: RGB); func add(palette: [RGB]) }
-//  - class Catalog: ObservableObject { func nearestName(to:RGB)->NamedColor? ; func nearestPaint(to:RGB)->PaintColor? }
-//  - enum KMeans { static func palette(from: UIImage, k: Int) -> [RGB] }
-//
 import SwiftUI
 import AVFoundation
 import UIKit
@@ -750,7 +732,7 @@ enum LocalPDFExporter {
                 ctx.beginPage()
                 guard let cgctx = UIGraphicsGetCurrentContext() else { return }
 
-                let title = "WaveColorAI – Colour Palette"
+                let title = "Colorit – Colour Palette"
                 (title as NSString).draw(at: CGPoint(x: 36, y: 50),
                                          withAttributes: [.font: UIFont.boldSystemFont(ofSize: 18)])
 

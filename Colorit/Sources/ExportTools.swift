@@ -10,7 +10,7 @@ enum ExportTools {
             try pdf.writePDF(to: url, withActions: { ctx in
                 ctx.beginPage()
                 
-                let title = "WaveColorAI Palette"
+                let title = "Colorit Palette"
                 let attrs: [NSAttributedString.Key: Any] = [
                     .font: UIFont.boldSystemFont(ofSize: 24)
                 ]

@@ -1,6 +1,6 @@
 //
 //  StoreVM.swift
-//  WaveColorAI
+//  Colorit
 //
 //  Created by Gustavo  Tua on 9/10/25.
 //

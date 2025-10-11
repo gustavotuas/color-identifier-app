@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct WaveColorAIApp: App {
+struct ColoritApp: App {
     @StateObject var store = StoreVM()
     @StateObject var catalog = Catalog()
     @StateObject var favs = FavoritesStore()

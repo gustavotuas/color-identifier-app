@@ -7,7 +7,7 @@ struct HomeScreen: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
 
-                Text("WaveColorAI")
+                Text("Colorit")
                     .font(.largeTitle)
                     .bold()
 
