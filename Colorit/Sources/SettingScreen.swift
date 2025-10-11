@@ -4,6 +4,13 @@ import UIKit
 struct SettingScreen: View {
     @EnvironmentObject var store: StoreVM
 
+    // 🔹 Lee la versión automáticamente desde Info.plist
+    private var appVersion: String {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"
+        return "v\(version) (\(build))"
+    }
+
     var body: some View {
         List {
             // MARK: - Get Pro
@@ -36,7 +43,7 @@ struct SettingScreen: View {
 
             // MARK: - About
             Section(header: Text("About")) {
-                SettingRow(icon: "info.circle.fill", iconColor: .gray, text: "Version: 1.0.0", link: nil)
+                SettingRow(icon: "info.circle.fill", iconColor: .gray, text: "Version: \(appVersion)", link: nil)
                 //SettingRow(icon: "globe", iconColor: .blue, text: "Website", link: "https://example.com")
                 //SettingRow(icon: "camera.fill", iconColor: .pink, text: "Follow on Instagram", link: "https://instagram.com/yourpage")
                 //SettingRow(icon: "music.note", iconColor: .black, text: "Follow on TikTok", link: "https://tiktok.com/@yourpage")
@@ -51,7 +58,7 @@ struct SettingScreen: View {
                 SettingRow(icon: "envelope.fill", iconColor: .blue, text: "Send feedback", link: "mailto:getscodes@gmail.com")
             }
         }
-        .listStyle(.insetGrouped) // 👈 Este es el estilo exacto de iOS Settings
+        .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Settings")
