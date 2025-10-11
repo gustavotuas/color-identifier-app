@@ -61,7 +61,7 @@
               "locale" : "en_US"
             }
           ],
-          "productID" : "com.wavecolorai.yearly",
+          "productID" : "com.colorit.app.yearly",
           "recurringSubscriptionPeriod" : "P1Y",
           "referenceName" : "Yearly Pro Subscription",
           "subscriptionGroupID" : "7255DC99",
@@ -89,7 +89,7 @@
               "locale" : "en_US"
             }
           ],
-          "productID" : "com.wavecolorai.weekly",
+          "productID" : "com.colorit.app.weekly",
           "recurringSubscriptionPeriod" : "P1W",
           "referenceName" : "Weekly Pro Subscription",
           "subscriptionGroupID" : "7255DC99",

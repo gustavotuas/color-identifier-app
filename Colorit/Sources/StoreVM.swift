@@ -2,7 +2,7 @@
 //  StoreVM.swift
 //  Colorit
 //
-//  Created by Gustavo  Tua on 9/10/25.
+//  Updated by Gustavo Tua on 11/10/25.
 //
 
 import SwiftUI
@@ -11,69 +11,127 @@ import Combine
 
 @MainActor
 final class StoreVM: ObservableObject {
-    @Published var isPro = false
+    // ✅ Persistente: se guarda entre sesiones
+    @AppStorage("isPro") var isPro = false
+
     @Published var showPaywall = false
-    @Published var products:[Product] = []
+    @Published var products: [Product] = []
     @Published var selectedID: String? = nil
     @Published var isLaunchPromo = true
+    @Published var isLoading = false
 
-    let weekly = "com.wavecolorai.weekly"
-    let monthly = "com.wavecolorai.monthly"
-    let yearly = "com.wavecolorai.yearly"
+    // 🔑 IDs de tus productos reales
+    let weekly = "com.colorit.app.weekly"
+    let yearly = "com.colorit.app.yearly"
 
     init() {
-        Task { await load() }
-    }
-
-    func load() async {
-        do {
-            products = try await Product.products(for: [weekly, monthly, yearly])
-            if selectedID == nil { selectedID = monthly }
-            try await refresh()
-        } catch { print("Store load:", error) }
-    }
-
-    func refresh() async throws {
-        for await res in Transaction.currentEntitlements {
-            if case .verified(let t) = res, [weekly, monthly, yearly].contains(t.productID) {
-                isPro = true
-            }
+        Task {
+            await load()
+            await refreshEntitlements()
         }
     }
 
+    // MARK: - Cargar productos desde App Store
+    func load() async {
+        guard !isLoading else { return }
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            products = try await Product.products(for: [weekly, yearly])
+            if selectedID == nil {
+                selectedID = yearly // 👈 Plan por defecto
+            }
+        } catch {
+            print("❌ Store load error:", error)
+        }
+    }
+
+    // MARK: - Verificar compras activas
+    func refreshEntitlements() async {
+        do {
+            var hasActive = false
+            for await result in Transaction.currentEntitlements {
+                if case .verified(let transaction) = result {
+                    if [weekly, yearly].contains(transaction.productID),
+                       transaction.revocationDate == nil {
+                        hasActive = true
+                    }
+                }
+            }
+            isPro = hasActive
+            print("🔁 Entitlements refreshed → isPro =", isPro)
+        } catch {
+            print("❌ Error checking entitlements:", error)
+        }
+    }
+
+    // MARK: - Comprar producto seleccionado
     func buySelected() async {
-        guard let id = selectedID, let p = products.first(where: { $0.id == id }) else { return }
-        await buy(p)
+        guard let id = selectedID,
+              let product = products.first(where: { $0.id == id }) else { return }
+        await buy(product)
     }
 
     @MainActor
-    func buy(_ p: Product) async {
+    func buy(_ product: Product) async {
         do {
-            let r = try await p.purchase()
-            switch r {
+            let result = try await product.purchase()
+
+            switch result {
             case .success(let verification):
                 if case .verified(let transaction) = verification {
+                    // ✅ Compra verificada correctamente
                     isPro = true
-                    await transaction.finish()
-                    // 🔥 Nueva línea: cierra el Paywall automáticamente
                     showPaywall = false
+                    await transaction.finish()
+                    print("✅ Purchase successful:", product.id)
                 }
+
             case .userCancelled:
-                print("User cancelled purchase")
+                print("🟡 Purchase cancelled by user")
             default:
-                break
+                print("⚠️ Purchase result:", result)
             }
         } catch {
-            print("Purchase failed:", error)
+            print("❌ Purchase failed:", error)
         }
     }
 
+    // MARK: - Restaurar compras
+    func restorePurchases() async {
+        do {
+            var restored = false
+            for await result in Transaction.currentEntitlements {
+                if case .verified(let transaction) = result,
+                   [weekly, yearly].contains(transaction.productID) {
+                    isPro = true
+                    restored = true
+                    print("♻️ Restored:", transaction.productID)
+                }
+            }
+            if !restored {
+                print("ℹ️ No purchases to restore.")
+            }
+        } catch {
+            print("❌ Restore failed:", error)
+        }
+    }
 
-    func hasTrial(_ p: Product) -> Bool { p.id == monthly || p.id == yearly }
-    func hasLaunchDiscount(_ p: Product) -> Bool { isLaunchPromo && (p.id == monthly || p.id == yearly) }
+    // MARK: - Utilidades
+    func hasTrial(_ p: Product) -> Bool {
+        // Si quieres habilitar prueba gratis, ajusta aquí
+        return p.id == yearly
+    }
+
+    func hasLaunchDiscount(_ p: Product) -> Bool {
+        isLaunchPromo && (p.id == yearly)
+    }
+
     func regularPriceText(_ p: Product) -> String {
-        if p.id == monthly { return NSLocalizedString("regular_price_monthly", comment: "") }
-        if p.id == yearly { return NSLocalizedString("regular_price_yearly", comment: "") }
+        if p.id == yearly {
+            return NSLocalizedString("regular_price_yearly", comment: "")
+        }
         return ""
     }
 }

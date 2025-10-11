@@ -8,7 +8,7 @@ struct PaywallView: View {
     @State private var showClose = false
     @State private var canDismiss = false
     @State private var currentReview = 0
-    @State private var pulse = false // 👈 Nuevo: para animación del plan Yearly
+    @State private var pulse = false
 
     // ✅ Reviews embebidas en memoria
     private let reviews: [(stars: String, text: String)] = [
@@ -50,9 +50,9 @@ struct PaywallView: View {
                             Text("Unlock Pro Features")
                                 .font(.system(size: 26, weight: .bold))
                                 .multilineTextAlignment(.center)
-                                .padding(.top, 0) // 👈 Removido el exceso de padding
+                                .padding(.top, 0)
                         }
-                        .padding(.top, 12) // 👈 Más ajustado visualmente
+                        .padding(.top, 12)
 
                         // REVIEWS SECTION
                         TabView(selection: $currentReview) {
@@ -85,7 +85,7 @@ struct PaywallView: View {
                                 SelectablePlanCard(
                                     product: product,
                                     isSelected: store.selectedID == product.id,
-                                    pulse: pulse && product.id == store.yearly // 👈 pasa animación
+                                    pulse: pulse && product.id == store.yearly
                                 )
                                 .onTapGesture {
                                     withAnimation(.spring()) {
@@ -115,8 +115,8 @@ struct PaywallView: View {
                     .padding(.bottom, 30)
                 }
 
-                // FIXED CTA BUTTON
-                VStack(spacing: 8) {
+                // FIXED CTA BUTTON + RESTORE
+                VStack(spacing: 10) {
                     Button {
                         Task { await store.buySelected() }
                     } label: {
@@ -135,6 +135,24 @@ struct PaywallView: View {
                             .shadow(color: .orange.opacity(0.3), radius: 4, x: 0, y: 2)
                     }
 
+                    // ✅ Restore Purchases Button
+                    Button {
+                        Task {
+                            await store.restorePurchases()
+                            if store.isPro {
+                                store.showPaywall = false
+                                dismiss()
+                            }
+                        }
+                    } label: {
+                        Text("Restore Purchases")
+                            .font(.caption)
+                            .underline()
+                            .foregroundColor(.blue)
+                    }
+                    .padding(.top, 2)
+
+                    // INFO LABELS
                     HStack {
                         Label("Cancel anytime", systemImage: "checkmark.circle")
                         Spacer()
@@ -181,12 +199,6 @@ struct PaywallView: View {
             return "Subscribe for \(p.displayPrice)"
         }
     }
-
-    private func topSafeAreaInset() -> CGFloat {
-        UIApplication.shared.connectedScenes
-            .compactMap { ($0 as? UIWindowScene)?.windows.first?.safeAreaInsets.top }
-            .first ?? 44
-    }
 }
 
 // MARK: - SelectablePlanCard
@@ -194,7 +206,7 @@ struct SelectablePlanCard: View {
     @EnvironmentObject var store: StoreVM
     let product: Product
     let isSelected: Bool
-    let pulse: Bool // 👈 Nuevo parámetro
+    let pulse: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -210,13 +222,13 @@ struct SelectablePlanCard: View {
                         .background(Color.blue)
                         .foregroundColor(.white)
                         .cornerRadius(6)
-                        .scaleEffect(pulse ? 1.15 : 1.0) // 👈 efecto de latido
+                        .scaleEffect(pulse ? 1.15 : 1.0)
                         .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: pulse)
                 }
                 if isSelected {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundColor(.blue)
-                        .scaleEffect(pulse ? 1.1 : 1.0) // 👈 efecto de latido para check
+                        .scaleEffect(pulse ? 1.1 : 1.0)
                         .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: pulse)
                 }
             }
@@ -251,7 +263,7 @@ struct SelectablePlanCard: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(isSelected ? Color.blue : Color.gray.opacity(0.2),
                         lineWidth: isSelected ? 3 : 1)
-                .scaleEffect(pulse && isSelected ? 1.05 : 1.0) // 👈 efecto de pulso en borde
+                .scaleEffect(pulse && isSelected ? 1.05 : 1.0)
                 .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: pulse)
         )
     }

@@ -1,3 +1,10 @@
+//
+//  ColoritApp.swift
+//  Colorit
+//
+//  Updated by ChatGPT on 11/10/25.
+//
+
 import SwiftUI
 
 @main
@@ -16,24 +23,33 @@ struct ColoritApp: App {
                 .environmentObject(catalog)
                 .environmentObject(favs)
                 .environmentObject(catalogs)
-                .task {
-                    await store.load()
 
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                // ✅ Ya no necesitas llamar a store.load(), se hace en el init
+                .task {
+                    // Pequeña espera para refrescar la UI si el usuario no es Pro
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                         if !store.isPro {
                             store.showPaywall = true
                         }
                     }
                 }
 
+                // ✅ Al volver a la app, revalidar estado Pro (por si restauró compras o cambió dispositivo)
                 .onChange(of: scenePhase) { phase in
-                    if phase == .active && !store.isPro {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                            store.showPaywall = true
+                    if phase == .active {
+                        Task {
+                            await store.refreshEntitlements()
+                        }
+
+                        if !store.isPro {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                store.showPaywall = true
+                            }
                         }
                     }
                 }
-            
+
+                // ✅ Paywall full screen
                 .fullScreenCover(isPresented: $store.showPaywall) {
                     PaywallView()
                         .environmentObject(store)
