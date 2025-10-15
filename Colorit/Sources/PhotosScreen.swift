@@ -1,6 +1,48 @@
 import SwiftUI
 import PhotosUI
+import UIKit
 
+// MARK: - UIKit PHPicker wrapper
+private struct SystemPhotoPicker: UIViewControllerRepresentable {
+    @Binding var isPresented: Bool
+    @Binding var image: UIImage?
+    let onPicked: (UIImage) -> Void
+
+    func makeUIViewController(context: Context) -> PHPickerViewController {
+        var config = PHPickerConfiguration(photoLibrary: .shared())
+        config.selectionLimit = 1
+        config.filter = .images
+        let vc = PHPickerViewController(configuration: config)
+        vc.delegate = context.coordinator
+        return vc
+    }
+
+    func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
+
+    func makeCoordinator() -> Coordinator { Coordinator(self) }
+
+    final class Coordinator: NSObject, PHPickerViewControllerDelegate {
+        private let parent: SystemPhotoPicker
+        init(_ parent: SystemPhotoPicker) { self.parent = parent }
+
+        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+            defer { parent.isPresented = false }
+            guard let provider = results.first?.itemProvider else { return }
+            if provider.canLoadObject(ofClass: UIImage.self) {
+                provider.loadObject(ofClass: UIImage.self) { object, _ in
+                    if let uiimg = object as? UIImage {
+                        DispatchQueue.main.async {
+                            self.parent.image = uiimg
+                            self.parent.onPicked(uiimg)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Main View
 struct PhotosScreen: View {
     // MARK: - Environment
     @EnvironmentObject var store: StoreVM
@@ -9,13 +51,13 @@ struct PhotosScreen: View {
     @EnvironmentObject var catalogs: CatalogStore
 
     // MARK: - State
-    @State private var item: PhotosPickerItem?
     @State private var image: UIImage?
     @State private var palette: [RGB] = []
     @State private var matches: [MatchedSwatch] = []
 
     @State private var selection: CatalogSelection = .all
     @State private var showVendorSheet = false
+    @State private var showSystemPicker = false
 
     @State private var showToast = false
     @State private var toastMessage = ""
@@ -25,55 +67,52 @@ struct PhotosScreen: View {
     // MARK: - Body
     var body: some View {
         NavigationStack {
-            ZStack {
-                VStack(spacing: 10) {
+            VStack(spacing: 10) {
 
-                    // Banner de filtro activo — idéntico a SearchScreen
-                    if selection.isFiltered {
-                        HStack(spacing: 8) {
-                            Image(systemName: "line.3.horizontal.decrease.circle")
-                            Text(selection.filterSubtitle).lineLimit(1)
-                            Spacer()
-                            Button {
-                                withAnimation(.easeInOut) {
-                                    selection = .all
-                                    VendorSelectionStorage.save(selection)
-                                }
-                            } label: {
-                                Label("Clear", systemImage: "xmark.circle.fill")
-                                    .labelStyle(.titleAndIcon)
+                // Banner de filtro activo
+                if selection.isFiltered {
+                    HStack(spacing: 8) {
+                        Image(systemName: "line.3.horizontal.decrease.circle")
+                        Text(selection.filterSubtitle).lineLimit(1)
+                        Spacer()
+                        Button {
+                            withAnimation(.easeInOut) {
+                                selection = .all
+                                VendorSelectionStorage.save(selection)
                             }
-                            .buttonStyle(.bordered)
-                            .tint(.blue)
-                            .font(.caption.bold())
+                        } label: {
+                            Label("Clear", systemImage: "xmark.circle.fill")
+                                .labelStyle(.titleAndIcon)
                         }
-                        .font(.footnote)
-                        .padding(10)
-                        .background(Color.blue.opacity(0.12))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.blue.opacity(0.5), lineWidth: 1)
-                        )
-                        .foregroundColor(.blue)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
-                        .padding(.horizontal)
-                        .transition(.move(edge: .top).combined(with: .opacity))
+                        .buttonStyle(.bordered)
+                        .tint(.blue)
+                        .font(.caption.bold())
                     }
+                    .font(.footnote)
+                    .padding(10)
+                    .background(Color.blue.opacity(0.12))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.blue.opacity(0.5), lineWidth: 1)
+                    )
+                    .foregroundColor(.blue)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .padding(.horizontal)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                }
 
-                    // MARK: - Main content
-                    ScrollView {
-                        VStack(spacing: 18) {
-                            if let _ = image {
-                                paletteCard
-                                savePaletteButton
-                            }
-
-                            imageSection
-
-                            Spacer(minLength: 60)
+                // Contenido principal
+                ScrollView {
+                    VStack(spacing: 18) {
+                        if image != nil {
+                            paletteCard
+                            savePaletteButton
                         }
-                        .padding(.top, 10)
+
+                        imageSection
+                        Spacer(minLength: 60)
                     }
+                    .padding(.top, 10)
                 }
             }
             .navigationTitle("Photo Colours")
@@ -121,6 +160,14 @@ struct PhotosScreen: View {
             .sheet(isPresented: $store.showPaywall) {
                 PaywallView().environmentObject(store)
             }
+            .fullScreenCover(isPresented: $showSystemPicker) {
+                SystemPhotoPicker(isPresented: $showSystemPicker, image: $image) { uiimg in
+                    palette = KMeans.palette(from: uiimg, k: 10)
+                    rebuildMatches()
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                }
+                .ignoresSafeArea()
+            }
             .onAppear {
                 if let saved = VendorSelectionStorage.load() { selection = saved }
                 preloadForSelection()
@@ -131,16 +178,6 @@ struct PhotosScreen: View {
                 preloadForSelection()
                 rebuildMatches()
             }
-            .onChange(of: item) { _, newValue in
-                Task {
-                    guard let data = try? await newValue?.loadTransferable(type: Data.self),
-                          let img = UIImage(data: data) else { return }
-                    image = img
-                    palette = KMeans.palette(from: img, k: 10)
-                    rebuildMatches()
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                }
-            }
             .overlay(alignment: .top) {
                 if showToast {
                     Text(toastMessage)
@@ -150,9 +187,70 @@ struct PhotosScreen: View {
                         .cornerRadius(12)
                         .padding(.top, 60)
                         .transition(.move(edge: .top).combined(with: .opacity))
+                        .allowsHitTesting(false)
                 }
             }
             .animation(.easeInOut(duration: 0.25), value: showToast)
+        }
+    }
+
+    // MARK: - Image Section
+    private var imageSection: some View {
+        VStack(spacing: 14) {
+            if let img = image {
+                ZStack(alignment: .topTrailing) {
+                    Image(uiImage: img)
+                        .resizable()
+                        .scaledToFit()
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                        .shadow(radius: 6)
+                        .padding(.horizontal, 12)
+                        .padding(.top, 6)
+                        .onTapGesture {
+                            // 👆 Tap en la imagen también abre la galería
+                            showSystemPicker = true
+                        }
+
+                    // 🔹 Botón "Change Photo" encima de la imagen
+                    Button {
+                        showSystemPicker = true
+                    } label: {
+                        Label("Change", systemImage: "photo.on.rectangle")
+                            .font(.footnote.bold())
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(.black.opacity(0.5))
+                            .foregroundColor(.white)
+                            .clipShape(Capsule())
+                    }
+                    .padding(.top, 12)
+                    .padding(.trailing, 24)
+                }
+            } else {
+                VStack(spacing: 14) {
+                    Image(systemName: "photo.on.rectangle.angled")
+                        .font(.system(size: 60))
+                        .foregroundColor(.secondary)
+                    Text("Select a photo to discover its colors")
+                        .multilineTextAlignment(.center)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal, 24)
+
+                    Button {
+                        showSystemPicker = true
+                    } label: {
+                        Text("Choose Photo")
+                            .font(.headline)
+                            .padding(.horizontal, 30)
+                            .padding(.vertical, 12)
+                            .background(Color.accentColor)
+                            .foregroundColor(.white)
+                            .cornerRadius(12)
+                    }
+                }
+                .frame(maxWidth: .infinity, minHeight: 300)
+            }
         }
     }
 
@@ -168,7 +266,6 @@ struct PhotosScreen: View {
                     .fill(.ultraThinMaterial)
                     .frame(height: 150)
                     .padding(.horizontal, 16)
-                    .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 3)
 
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
@@ -177,7 +274,6 @@ struct PhotosScreen: View {
                                 RoundedRectangle(cornerRadius: 12)
                                     .fill(Color(uiColor: m.color.uiColor))
                                     .frame(width: 82, height: 82)
-                                    .clipped()
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 12)
                                             .stroke(.white.opacity(0.22), lineWidth: 1)
@@ -185,7 +281,6 @@ struct PhotosScreen: View {
                                     .onTapGesture {
                                         if store.isPro {
                                             UIPasteboard.general.string = "\(m.color.hex) | \(m.color.rgbText)"
-                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                             showToast("Copied: \(m.color.hex)")
                                         } else {
                                             store.showPaywall = true
@@ -196,8 +291,7 @@ struct PhotosScreen: View {
                                     if store.isPro {
                                         Text(m.closest?.name ?? m.color.hex)
                                     } else {
-                                        Text(m.color.hex)
-                                            .redacted(reason: .placeholder)
+                                        Text(m.color.hex).redacted(reason: .placeholder)
                                     }
                                 }
                                 .font(.caption2)
@@ -210,10 +304,11 @@ struct PhotosScreen: View {
                     .padding(.horizontal, 22)
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 18))
-                .allowsHitTesting(store.isPro)
+                .disabled(!store.isPro)
 
                 if !store.isPro {
-                    VisualEffectBlur(style: .systemThinMaterialLight)
+                    VisualEffectBlur(style: UIBlurEffect.Style.systemThinMaterialLight)
+                        .allowsHitTesting(false)
                         .clipShape(RoundedRectangle(cornerRadius: 18))
                         .frame(height: 150)
                         .padding(.horizontal, 16)
@@ -230,7 +325,7 @@ struct PhotosScreen: View {
                                 .padding(.horizontal, 24)
                                 .padding(.vertical, 10)
                                 .background(
-                                    LinearGradient(colors: [.purple, .pink],
+                                    LinearGradient(colors: [.blue, .purple],
                                                    startPoint: .topLeading,
                                                    endPoint: .bottomTrailing)
                                 )
@@ -254,7 +349,7 @@ struct PhotosScreen: View {
             } else if store.isPro {
                 Button {
                     favs.add(palette: palette)
-                    showToast("Palette saved to Favorites")
+                    showToast("Palette saved")
                 } label: {
                     Label("Save Palette", systemImage: "heart.fill")
                         .font(.headline)
@@ -275,53 +370,7 @@ struct PhotosScreen: View {
         }
     }
 
-    // MARK: - Image Section
-    private var imageSection: some View {
-        VStack(spacing: 14) {
-            if let img = image {
-                Image(uiImage: img)
-                    .resizable()
-                    .scaledToFit()
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
-                    .shadow(radius: 6)
-                    .padding(.horizontal, 12)
-                    .padding(.top, 6)
-
-                PhotosPicker(selection: $item, matching: .images) {
-                    Label("Change Photo", systemImage: "photo.on.rectangle")
-                        .font(.subheadline.bold())
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 10)
-                        .background(Color(.secondarySystemBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
-            } else {
-                VStack(spacing: 14) {
-                    Image(systemName: "photo.on.rectangle.angled")
-                        .font(.system(size: 60))
-                        .foregroundColor(.secondary)
-                    Text("Select a photo to discover its colors")
-                        .multilineTextAlignment(.center)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .padding(.horizontal, 24)
-
-                    PhotosPicker(selection: $item, matching: .images) {
-                        Text("Choose Photo")
-                            .font(.headline)
-                            .padding(.horizontal, 30)
-                            .padding(.vertical, 12)
-                            .background(Color.accentColor)
-                            .foregroundColor(.white)
-                            .cornerRadius(12)
-                    }
-                }
-                .frame(maxWidth: .infinity, minHeight: 300)
-            }
-        }
-    }
-
-    // MARK: - Data / Matching
+    // MARK: - Helpers
     private struct MatchedSwatch {
         let color: RGB
         let closest: NamedColor?
@@ -372,19 +421,11 @@ struct PhotosScreen: View {
         guard !palette.isEmpty else { matches = []; return }
         let pool = activeColors()
         matches = palette.map { rgb in
-            let closest = nearest(in: pool, to: rgb)
+            let closest = pool.min(by: {
+                hexToRGB($0.hex).distance(to: rgb) < hexToRGB($1.hex).distance(to: rgb)
+            })
             return MatchedSwatch(color: rgb, closest: closest)
         }
-    }
-
-    private func nearest(in pool: [NamedColor], to target: RGB) -> NamedColor? {
-        var best: NamedColor?
-        var bestD = Double.greatestFiniteMagnitude
-        for nc in pool {
-            let d = hexToRGB(nc.hex).distance(to: target)
-            if d < bestD { bestD = d; best = nc }
-        }
-        return best
     }
 
     private func showToast(_ msg: String) {
