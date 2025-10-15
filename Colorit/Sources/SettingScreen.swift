@@ -13,49 +13,54 @@ struct SettingScreen: View {
 
     var body: some View {
         List {
-            // MARK: - Get Pro
-            Section {
-                Button {
-                    Haptic.tap()
-                    store.showPaywall = true
-                } label: {
-                    HStack(spacing: 15) {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 8)
-                                .fill(Color.yellow.opacity(0.15))
-                                .frame(width: 36, height: 36)
-                            Image(systemName: "crown.fill")
-                                .foregroundColor(.yellow)
-                                .font(.system(size: 18))
+            // MARK: - Get Pro (solo si NO es Pro)
+            if !store.isPro {
+                Section {
+                    Button {
+                        Haptic.tap()
+                        store.showPaywall = true
+                    } label: {
+                        HStack(spacing: 15) {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(Color.yellow.opacity(0.15))
+                                    .frame(width: 36, height: 36)
+                                Image(systemName: "crown.fill")
+                                    .foregroundColor(.yellow)
+                                    .font(.system(size: 18))
+                            }
+                            Text("Get Pro")
+                                .foregroundColor(.primary)
+                                .fontWeight(.semibold)
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .foregroundColor(.gray)
+                                .font(.system(size: 13))
                         }
-                        Text("Get Pro")
-                            .foregroundColor(.primary)
-                            .fontWeight(.semibold)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundColor(.gray)
-                            .font(.system(size: 13))
+                        .padding(.vertical, 6)
                     }
-                    .padding(.vertical, 6)
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
 
             // MARK: - About
             Section(header: Text("About")) {
-                SettingRow(icon: "info.circle.fill", iconColor: .gray, text: "Version: \(appVersion)", link: nil)
-                //SettingRow(icon: "globe", iconColor: .blue, text: "Website", link: "https://example.com")
-                //SettingRow(icon: "camera.fill", iconColor: .pink, text: "Follow on Instagram", link: "https://instagram.com/yourpage")
-                //SettingRow(icon: "music.note", iconColor: .black, text: "Follow on TikTok", link: "https://tiktok.com/@yourpage")
-                //SettingRow(icon: "bird.fill", iconColor: .black, text: "Follow on X", link: "https://x.com/yourpage")
-                //SettingRow(icon: "doc.text.fill", iconColor: .gray, text: "Terms of Use", link: "https://example.com/terms")
-                //SettingRow(icon: "lock.shield.fill", iconColor: .teal, text: "Privacy Policy", link: "https://example.com/privacy")
-                SettingRow(icon: "star.fill", iconColor: .orange, text: "Rate the app", link: "https://apps.apple.com/app/idXXXXXXXXX?action=write-review")
+                SettingRow(icon: "info.circle.fill",
+                           iconColor: .gray,
+                           text: "Version: \(appVersion)",
+                           link: nil)
+                SettingRow(icon: "star.fill",
+                           iconColor: .orange,
+                           text: "Rate the app",
+                           link: "https://apps.apple.com/app/idXXXXXXXXX?action=write-review")
             }
 
             // MARK: - Help
             Section(header: Text("Help")) {
-                SettingRow(icon: "envelope.fill", iconColor: .blue, text: "Send feedback", link: "mailto:getscodes@gmail.com")
+                SettingRow(icon: "envelope.fill",
+                           iconColor: .blue,
+                           text: "Send feedback",
+                           link: "mailto:getscodes@gmail.com")
             }
 
             // MARK: - Footer (Versión centrada)
@@ -132,4 +137,3 @@ struct SettingRow: View {
         UIApplication.shared.open(url)
     }
 }
-
