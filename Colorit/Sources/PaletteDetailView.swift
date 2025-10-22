@@ -3,22 +3,31 @@ import SwiftUI
 struct PaletteDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var favs: FavoritesStore
-    @State var palette: FavoritePalette
+    @EnvironmentObject var catalog: Catalog
+    @EnvironmentObject var catalogs: CatalogStore
 
+    @State var palette: FavoritePalette
+    @State private var isEditing = false
+    @State private var showAddColorSheet = false
     @State private var showDeleteConfirm = false
-    @State private var showRenameAlert = false
-    @State private var tempName = ""
+    @State private var selectedColor: NamedColor?
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 18) {
 
-                    // MARK: - Nombre de la paleta
-                    Text(palette.name ?? "")
-                        .font(.system(size: 26, weight: .bold))
-                        .padding(.top, 10)
-                        .id(palette.id)
+                    // MARK: - Paleta nombre
+                    if isEditing {
+                        TextField("Palette name", text: $palette.name.bound)
+                            .font(.system(size: 26, weight: .bold))
+                            .textFieldStyle(.roundedBorder)
+                            .padding(.horizontal)
+                    } else {
+                        Text(palette.name ?? "")
+                            .font(.system(size: 26, weight: .bold))
+                            .padding(.horizontal)
+                    }
 
                     // MARK: - Franja de colores
                     HStack(spacing: 0) {
@@ -32,34 +41,66 @@ struct PaletteDetailView: View {
                     .padding(.horizontal)
                     .shadow(color: .black.opacity(0.08), radius: 2, x: 0, y: 1)
 
-                    Divider()
+                    Divider().padding(.horizontal)
+
+                    // MARK: - Add color button
+                    if isEditing {
+                        HStack(spacing: 8) {
+                            Button {
+                                showAddColorSheet = true
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            } label: {
+                                Label("Add Color", systemImage: "plus.circle.fill")
+                                    .font(.headline)
+                            }
+                            Spacer()
+                        }
                         .padding(.horizontal)
+                        .padding(.top, 4)
+                    }
 
                     // MARK: - Lista de colores
                     VStack(spacing: 12) {
                         ForEach(palette.colors, id: \.hex) { color in
+                            let named = makeNamedColor(from: color)
                             HStack(spacing: 14) {
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(Color(color.uiColor))
-                                    .frame(width: 70, height: 70)
-                                    .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
-
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(color.hex)
-                                        .font(.headline)
-                                    Text(color.rgbText)
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
+                                if isEditing {
+                                    Button {
+                                        removeColor(color)
+                                    } label: {
+                                        Image(systemName: "minus.circle.fill")
+                                            .foregroundColor(.red)
+                                            .font(.system(size: 22))
+                                    }
                                 }
 
-                                Spacer()
-
                                 Button {
-                                    removeColor(color)
+                                    selectedColor = named
+                                    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
                                 } label: {
-                                    Image(systemName: "xmark.circle.fill")
-                                        .foregroundColor(.secondary)
-                                        .font(.system(size: 20))
+                                    HStack(spacing: 14) {
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .fill(Color(color.uiColor))
+                                            .frame(width: 70, height: 70)
+                                            .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
+
+                                        VStack(alignment: .leading, spacing: 3) {
+                                            Text(named.name)
+                                                .font(.headline)
+                                                .foregroundColor(.primary)
+
+                                            Text(color.hex.uppercased())
+                                                .font(.caption)
+                                                .foregroundColor(.secondary)
+
+                                            if let vendor = named.vendor?.brand {
+                                                Text("\(vendor)")
+                                                    .font(.caption2)
+                                                    .foregroundColor(.secondary)
+                                            }
+                                        }
+                                        Spacer()
+                                    }
                                 }
                                 .buttonStyle(.plain)
                             }
@@ -75,48 +116,59 @@ struct PaletteDetailView: View {
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    // ✏️ Editar nombre
-                    Button {
-                        tempName = palette.name ?? ""
-                        showRenameAlert = true
-                    } label: {
-                        Image(systemName: "pencil")
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(isEditing ? "Cancel" : "Edit") {
+                        withAnimation(.easeInOut) {
+                            isEditing.toggle()
+                        }
+                        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
                     }
+                }
 
-                    // 🗑️ Eliminar paleta completa
-                    Button(role: .destructive) {
-                        showDeleteConfirm = true
-                    } label: {
-                        Image(systemName: "trash")
+                ToolbarItem(placement: .topBarTrailing) {
+                    if isEditing {
+                        Button {
+                            saveChanges()
+                            withAnimation { isEditing = false }
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        } label: {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.blue)
+                                .font(.system(size: 22))
+                        }
+                    } else {
+                        Button(role: .destructive) {
+                            showDeleteConfirm = true
+                        } label: {
+                            Image(systemName: "trash")
+                        }
                     }
                 }
             }
-            // MARK: - Alert para renombrar
-            .textFieldAlert(
-                title: "Rename Palette",
-                text: $tempName,
-                isPresented: $showRenameAlert,
-                placeholder: "Enter new name",
-                onSave: {
-                    let trimmed = tempName.trimmingCharacters(in: .whitespacesAndNewlines)
-                    guard !trimmed.isEmpty else { return }
-                    palette.name = trimmed
-                    favs.updatePalette(palette)
-                    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-                    dismiss() // 👈 se cierra automáticamente
-                }
-            )
-            // MARK: - Confirmación al eliminar la paleta
             .alert("Delete this palette?", isPresented: $showDeleteConfirm) {
                 Button("Delete", role: .destructive) {
                     withAnimation {
                         favs.removePalette(palette)
                     }
                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                    dismiss() // 👈 se cierra automáticamente
+                    dismiss()
                 }
                 Button("Cancel", role: .cancel) {}
+            }
+            .sheet(isPresented: $showAddColorSheet) {
+                AddColorsToPaletteSheet(
+                    palette: $palette,
+                    showSheet: $showAddColorSheet
+                )
+                .environmentObject(favs)
+                .presentationDetents([.medium, .large])
+            }
+            .sheet(item: $selectedColor) { color in
+                ColorDetailView(color: color)
+                    .environmentObject(favs)
+                    .environmentObject(catalog)
+                    .environmentObject(catalogs)
+                    .presentationDetents([.large])
             }
         }
         .presentationDetents([.large])
@@ -124,43 +176,19 @@ struct PaletteDetailView: View {
     }
 
     // MARK: - Helpers
-
-    private func makeNamedColor(from rgb: RGB) -> NamedColor {
-        let fixedHex = "#" + rgb.hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
-        let normalized = fixedHex.replacingOccurrences(of: "#", with: "")
-        let rgbValues = hexToRGB(fixedHex)
-
-        // Buscar primero en catálogo principal
-        if let exact = catalog.names.first(where: { $0.hex.replacingOccurrences(of: "#", with: "").uppercased() == normalized }) {
-            return exact
-        }
-
-        // Luego buscar en catálogos de vendors
-        for id in CatalogID.allCases where id != .generic {
-            let vendorColors = catalogs.colors(for: [id])
-            if let exact = vendorColors.first(where: { $0.hex.replacingOccurrences(of: "#", with: "").uppercased() == normalized }) {
-                return exact
-            }
-        }
-
-        // Si no existe en ningún catálogo
-        return NamedColor(
-            name: rgb.hex.uppercased(),
-            hex: fixedHex,
-            vendor: nil,
-            rgb: [rgbValues.r, rgbValues.g, rgbValues.b]
-        )
+    private func saveChanges() {
+        favs.updatePalette(palette)
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
     }
 
     private func removeColor(_ color: RGB) {
         if let idx = palette.colors.firstIndex(of: color) {
-            withAnimation(.easeInOut(duration: 0.2)) {
+            withAnimation(.easeInOut(duration: 0.25)) {
                 palette.colors.remove(at: idx)
             }
             favs.updatePalette(palette)
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
 
-            // 👇 Si ya no quedan colores, cerrar automáticamente
             if palette.colors.isEmpty {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                     favs.removePalette(palette)
@@ -169,70 +197,192 @@ struct PaletteDetailView: View {
             }
         }
     }
-}
 
-// MARK: - UIViewControllerRepresentable helper para alerta con campo de texto
-extension View {
-    func textFieldAlert(
-        title: String,
-        text: Binding<String>,
-        isPresented: Binding<Bool>,
-        placeholder: String = "",
-        onSave: @escaping () -> Void
-    ) -> some View {
-        TextFieldAlertHelper(
-            title: title,
-            text: text,
-            isPresented: isPresented,
-            placeholder: placeholder,
-            onSave: onSave,
-            presenting: self
+    private func makeNamedColor(from rgb: RGB) -> NamedColor {
+        let fixedHex = "#" + rgb.hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        let normalized = fixedHex.replacingOccurrences(of: "#", with: "")
+        let rgbValues = hexToRGB(fixedHex)
+
+        if let exact = catalog.names.first(where: { $0.hex.replacingOccurrences(of: "#", with: "").uppercased() == normalized }) {
+            return exact
+        }
+
+        for id in CatalogID.allCases where id != .generic {
+            let vendorColors = catalogs.colors(for: [id])
+            if let exact = vendorColors.first(where: { $0.hex.replacingOccurrences(of: "#", with: "").uppercased() == normalized }) {
+                return exact
+            }
+        }
+
+        return NamedColor(
+            name: rgb.hex.uppercased(),
+            hex: fixedHex,
+            vendor: nil,
+            rgb: [rgbValues.r, rgbValues.g, rgbValues.b]
         )
     }
 }
 
-private struct TextFieldAlertHelper<Presenting>: UIViewControllerRepresentable where Presenting: View {
-    let title: String
-    @Binding var text: String
-    @Binding var isPresented: Bool
-    let placeholder: String
-    let onSave: () -> Void
-    let presenting: Presenting
+// MARK: - Add Colors Sheet
+struct AddColorsToPaletteSheet: View {
+    @EnvironmentObject var favs: FavoritesStore
+    @EnvironmentObject var catalog: Catalog
+    @EnvironmentObject var catalogs: CatalogStore
+    @Binding var palette: FavoritePalette
+    @Binding var showSheet: Bool
+    @State private var selectedColors: Set<String> = []
 
-    func makeUIViewController(context: Context) -> UIViewController {
-        UIHostingController(rootView: presenting)
+    private var availableColors: [FavoriteColor] {
+        favs.colors.filter { fav in
+            !palette.colors.contains(where: { $0.hex == fav.color.hex })
+        }
     }
 
-    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
-        guard isPresented else { return }
+    private var gridColumns: [GridItem] {
+        Array(repeating: GridItem(.flexible(), spacing: 10), count: 2)
+    }
 
-        let alert = UIAlertController(title: title, message: nil, preferredStyle: .alert)
-        alert.addTextField { textField in
-            textField.text = text
-            textField.placeholder = placeholder
-            //textField.backgroundColor = UIColor.systemGray6
-            textField.layer.cornerRadius = 6
-            textField.clearButtonMode = .whileEditing
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 20) {
+                if availableColors.isEmpty {
+                    VStack(spacing: 12) {
+                        Image(systemName: "checkmark.circle")
+                            .font(.largeTitle)
+                            .foregroundColor(.green)
+                        Text("All colors already added.")
+                            .font(.headline)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.top, 40)
+                } else {
+                    Text("Select colors to add")
+                        .font(.headline)
+                        .padding(.top)
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                textField.becomeFirstResponder()
+                    ScrollView {
+                        LazyVGrid(columns: gridColumns, spacing: 16) {
+                            ForEach(availableColors) { fav in
+                                let isSelected = selectedColors.contains(fav.color.hex)
+                                let named = makeNamedColor(from: fav.color)
+
+                                ZStack(alignment: .topTrailing) {
+                                    VStack(spacing: 6) {
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .fill(Color(fav.color.uiColor))
+                                            .frame(height: 100)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 10)
+                                                    .stroke(isSelected ? Color.accentColor : .clear, lineWidth: 3)
+                                            )
+                                            .onTapGesture {
+                                                toggleSelection(fav.color.hex)
+                                            }
+
+                                        VStack(spacing: 2) {
+                                            Text(named.name)
+                                                .font(.caption.bold())
+                                                .foregroundColor(.primary)
+                                                .lineLimit(1)
+
+                                            Text(fav.color.hex.uppercased())
+                                                .font(.caption2)
+                                                .foregroundColor(.secondary)
+
+                                            if let brand = named.vendor?.brand {
+                                                Text(brand)
+                                                    .font(.caption2)
+                                                    .foregroundColor(.secondary)
+                                            }
+                                        }
+                                        .padding(.bottom, 4)
+                                    }
+
+                                    if isSelected {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .font(.system(size: 18))
+                                            .foregroundColor(.accentColor)
+                                            .padding(6)
+                                    }
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+
+                    Button(action: addSelectedColors) {
+                        Label("Add \(selectedColors.count) Color\(selectedColors.count == 1 ? "" : "s")",
+                              systemImage: "plus.circle.fill")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(selectedColors.isEmpty ? Color.gray.opacity(0.3) : Color.accentColor)
+                            .foregroundColor(.white)
+                            .cornerRadius(12)
+                            .padding(.horizontal)
+                    }
+                    .disabled(selectedColors.isEmpty)
+                }
+
+                Spacer()
+            }
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        showSheet = false
+                    }
+                }
+            }
+        }
+    }
+
+    private func toggleSelection(_ hex: String) {
+        if selectedColors.contains(hex) {
+            selectedColors.remove(hex)
+        } else {
+            selectedColors.insert(hex)
+        }
+    }
+
+    private func addSelectedColors() {
+        let selected = favs.colors
+            .filter { selectedColors.contains($0.color.hex) }
+            .map { $0.color }
+        palette.colors.append(contentsOf: selected)
+        favs.updatePalette(palette)
+        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+        showSheet = false
+    }
+
+    private func makeNamedColor(from rgb: RGB) -> NamedColor {
+        let fixedHex = "#" + rgb.hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        let normalized = fixedHex.replacingOccurrences(of: "#", with: "")
+        let rgbValues = hexToRGB(fixedHex)
+
+        if let exact = catalog.names.first(where: { $0.hex.replacingOccurrences(of: "#", with: "").uppercased() == normalized }) {
+            return exact
+        }
+
+        for id in CatalogID.allCases where id != .generic {
+            let vendorColors = catalogs.colors(for: [id])
+            if let exact = vendorColors.first(where: { $0.hex.replacingOccurrences(of: "#", with: "").uppercased() == normalized }) {
+                return exact
             }
         }
 
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { _ in
-            isPresented = false
-        })
+        return NamedColor(
+            name: rgb.hex.uppercased(),
+            hex: fixedHex,
+            vendor: nil,
+            rgb: [rgbValues.r, rgbValues.g, rgbValues.b]
+        )
+    }
+}
 
-        alert.addAction(UIAlertAction(title: "Save", style: .default) { _ in
-            if let newText = alert.textFields?.first?.text {
-                text = newText
-                onSave()
-            }
-            isPresented = false
-        })
 
-        DispatchQueue.main.async {
-            uiViewController.present(alert, animated: true)
-        }
+extension Optional where Wrapped == String {
+    var bound: String {
+        get { self ?? "" }
+        set { self = newValue }
     }
 }
