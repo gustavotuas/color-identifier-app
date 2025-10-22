@@ -1,10 +1,9 @@
 import SwiftUI
 import Combine
-import UIKit   // <- necesario para UIColor y NSCache
+import UIKit
 
 // MARK: - Helpers
 
-/// Normaliza HEX: quita espacios, "#", y lo pone en UPPERCASE.
 private func normalizeHex(_ hex: String) -> String {
     var s = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
     if s.hasPrefix("#") { s.removeFirst() }
@@ -42,13 +41,17 @@ struct FavoriteColor: Identifiable, Codable, Equatable {
 
 struct FavoritePalette: Identifiable, Codable, Equatable {
     let id: String
-    let colors: [RGB]
+    var name: String?
+    var colors: [RGB]
     let date: Date
 
-    init(colors: [RGB]) {
-        self.id = colors.map { $0.hex }.joined(separator: "-")
-        self.colors = colors
+    init(colors: [RGB], name: String? = nil) {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm"
         self.date = Date()
+        self.id = colors.map { $0.hex }.joined(separator: "-") + formatter.string(from: date)
+        self.colors = colors
+        self.name = name ?? "Palette \(formatter.string(from: date))"
     }
 }
 
@@ -73,9 +76,15 @@ final class FavoritesStore: ObservableObject {
 
     func add(palette: [RGB]) {
         let pal = FavoritePalette(colors: palette)
-        if !palettes.contains(pal) {
-            palettes.insert(pal, at: 0)
+        palettes.insert(pal, at: 0)
+        persist()
+    }
+
+    func updatePalette(_ pal: FavoritePalette) {
+        if let idx = palettes.firstIndex(where: { $0.id == pal.id }) {
+            palettes[idx] = pal
             persist()
+            objectWillChange.send()
         }
     }
 
@@ -128,7 +137,7 @@ struct FavoritesScreen: View {
     @EnvironmentObject var favs: FavoritesStore
     @EnvironmentObject var store: StoreVM
     @EnvironmentObject var catalog: Catalog
-    @EnvironmentObject var catalogs: CatalogStore     // para vendors
+    @EnvironmentObject var catalogs: CatalogStore
 
     @State private var ascending = true
     @State private var showClearAlert = false
@@ -138,10 +147,9 @@ struct FavoritesScreen: View {
     }
 
     private var sortedColors: [FavoriteColor] {
-        let result = favs.colors.sorted {
+        favs.colors.sorted {
             ascending ? $0.color.hex < $1.color.hex : $0.color.hex > $1.color.hex
         }
-        return result
     }
 
     var body: some View {
@@ -173,7 +181,7 @@ struct FavoritesScreen: View {
                             .font(.headline)
                             .padding(.horizontal)
 
-                        VStack(spacing: 16) {
+                        VStack(spacing: 20) {
                             ForEach(favs.palettes) { pal in
                                 FavoritePaletteTile(palette: pal)
                                     .environmentObject(favs)
@@ -182,7 +190,7 @@ struct FavoritesScreen: View {
                         .padding(.horizontal)
                     }
 
-                    // Empty state
+                    // Empty State
                     if sortedColors.isEmpty && favs.palettes.isEmpty {
                         VStack(spacing: 20) {
                             Image(systemName: "heart.slash")
@@ -255,7 +263,6 @@ struct FavoritesScreen: View {
 }
 
 // MARK: - FavoriteColorTile
-
 struct FavoriteColorTile: View {
     @EnvironmentObject var favs: FavoritesStore
     @EnvironmentObject var catalog: Catalog
@@ -275,7 +282,6 @@ struct FavoriteColorTile: View {
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     }
 
-                // ❎ Botón discreto para eliminar favorito
                 Button {
                     removeFavorite()
                 } label: {
@@ -305,26 +311,18 @@ struct FavoriteColorTile: View {
         }
     }
 
-    // MARK: - Helpers
-
     private func makeNamedColor(from item: FavoriteColor) -> NamedColor {
         let fixedHex = "#" + normalizeHex(item.color.hex)
         let rgb = hexToRGB(fixedHex)
-
-        // Buscar en catálogo genérico
         if let exact = catalog.names.first(where: { normalizeHex($0.hex) == normalizeHex(fixedHex) }) {
             return exact
         }
-
-        // Buscar en todos los catálogos de vendors
         for id in CatalogID.allCases where id != .generic {
             let vendorColors = catalogs.colors(for: [id])
             if let exact = vendorColors.first(where: { normalizeHex($0.hex) == normalizeHex(fixedHex) }) {
                 return exact
             }
         }
-
-        // Si no se encuentra
         return NamedColor(
             name: item.color.hex.uppercased(),
             hex: fixedHex,
@@ -337,42 +335,63 @@ struct FavoriteColorTile: View {
         withAnimation(.easeInOut(duration: 0.25)) {
             favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(item.color.hex) }
         }
+        favs.objectWillChange.send()
         UIImpactFeedbackGenerator(style: .soft).impactOccurred()
     }
 }
 
 // MARK: - FavoritePaletteTile
-
 struct FavoritePaletteTile: View {
     @EnvironmentObject var favs: FavoritesStore
     let palette: FavoritePalette
+    @State private var showDetail = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(palette.colors, id: \.hex) { c in
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(Color(c.uiColor))
-                            .frame(width: 48, height: 48)
-                    }
+        VStack(alignment: .leading, spacing: 10) {
+
+            // Nombre de la paleta
+            Text(palette.name ?? "Unnamed Palette")
+                .font(.headline)
+                .foregroundColor(.primary)
+                .padding(.horizontal, 6)
+
+            // Barra de colores continua
+            HStack(spacing: 0) {
+                ForEach(palette.colors, id: \.hex) { c in
+                    Rectangle()
+                        .fill(Color(c.uiColor))
+                }
+            }
+            .frame(height: 60)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .contentShape(Rectangle())
+            .onTapGesture {
+                withAnimation(.easeInOut(duration: 0.15)) {
+                    showDetail = true
                 }
             }
 
-            HStack {
-                Spacer()
-                Button(role: .destructive) {
-                    favs.removePalette(palette)
-                    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-                } label: {
-                    Image(systemName: "trash")
-                        .foregroundColor(.red)
-                }
+            // Cantidad de colores
+            Text("\(palette.colors.count) \(palette.colors.count == 1 ? "Color" : "Colors")")
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .padding(.horizontal, 6)
+        }
+        .padding(.vertical, 10)
+        .padding(.horizontal, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.white.opacity(0.85))
+                .shadow(color: .black.opacity(0.06), radius: 3, x: 0, y: 1)
+        )
+        .onTapGesture {
+            withAnimation(.easeInOut(duration: 0.15)) {
+                showDetail = true
             }
         }
-        .padding()
-        .background(Color.white.opacity(0.7))
-        .cornerRadius(12)
-        .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
+        .sheet(isPresented: $showDetail) {
+            PaletteDetailView(palette: palette)
+                .environmentObject(favs)
+        }
     }
 }
