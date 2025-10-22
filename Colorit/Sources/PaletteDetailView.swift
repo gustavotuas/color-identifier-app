@@ -13,41 +13,69 @@ struct PaletteDetailView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 18) {
-                    // Nombre de la paleta
+                    // MARK: - Nombre de la paleta
                     Text(palette.name ?? "")
                         .font(.system(size: 26, weight: .bold))
                         .padding(.top, 10)
 
-                    // Lista de colores vertical
-                    ForEach(palette.colors, id: \.hex) { color in
-                        HStack {
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(Color(color.uiColor))
-                                .frame(width: 70, height: 70)
-                            Text(color.hex)
-                                .font(.body)
-                                .foregroundColor(.primary)
-                            Spacer()
-                            Button {
-                                removeColor(color)
-                            } label: {
-                                Image(systemName: "xmark.circle.fill")
-                                    .foregroundColor(.secondary)
-                                    .font(.system(size: 20))
-                            }
+                    // MARK: - Franja superior con todos los colores
+                    HStack(spacing: 0) {
+                        ForEach(palette.colors, id: \.hex) { c in
+                            Rectangle()
+                                .fill(Color(c.uiColor))
                         }
-                        .padding(.horizontal)
                     }
+                    .frame(height: 60)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .padding(.horizontal)
+                    .shadow(color: .black.opacity(0.08), radius: 2, x: 0, y: 1)
+
+                    Divider()
+                        .padding(.horizontal)
+
+                    // MARK: - Lista de colores vertical
+                    VStack(spacing: 12) {
+                        ForEach(palette.colors, id: \.hex) { color in
+                            HStack(spacing: 14) {
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color(color.uiColor))
+                                    .frame(width: 70, height: 70)
+                                    .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
+
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(color.hex)
+                                        .font(.headline)
+                                    Text(color.rgbText)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+
+                                Spacer()
+
+                                Button {
+                                    removeColor(color)
+                                } label: {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundColor(.secondary)
+                                        .font(.system(size: 20))
+                                }
+                                .buttonStyle(.plain)
+                            }
+                            .padding(.horizontal)
+                        }
+                    }
+                    .padding(.top, 8)
 
                     Spacer(minLength: 40)
                 }
                 .padding(.bottom)
             }
-            .navigationTitle("Palette Detail")
+            // ⬇️ Título dinámico con el nombre de la paleta
+            .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItemGroup(placement: .topBarTrailing) {
-                    // ✏️ Botón de editar nombre
+                    // ✏️ Editar nombre
                     Button {
                         tempName = palette.name ?? ""
                         editingName = true
@@ -55,7 +83,7 @@ struct PaletteDetailView: View {
                         Image(systemName: "pencil")
                     }
 
-                    // 🗑️ Botón de eliminar paleta
+                    // 🗑️ Eliminar paleta
                     Button(role: .destructive) {
                         showDeleteAlert = true
                     } label: {
@@ -82,8 +110,10 @@ struct PaletteDetailView: View {
     private var renameSheet: some View {
         NavigationStack {
             Form {
-                TextField("Palette name", text: $tempName)
-                    .textInputAutocapitalization(.words)
+                Section(header: Text("Palette Name")) {
+                    TextField("Enter new name", text: $tempName)
+                        .textInputAutocapitalization(.words)
+                }
             }
             .navigationTitle("Rename Palette")
             .toolbar {
@@ -92,8 +122,11 @@ struct PaletteDetailView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
-                        palette.name = tempName.trimmingCharacters(in: .whitespacesAndNewlines)
-                        favs.updatePalette(palette)
+                        let trimmed = tempName.trimmingCharacters(in: .whitespacesAndNewlines)
+                        if !trimmed.isEmpty {
+                            palette.name = trimmed
+                            favs.updatePalette(palette)
+                        }
                         editingName = false
                     }
                 }
