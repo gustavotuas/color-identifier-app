@@ -348,7 +348,7 @@ struct PhotosScreen: View {
                 EmptyView()
             } else if store.isPro {
                 Button {
-                    favs.add(palette: palette)
+                    favs.addPalette(name: nil, colors: palette)
                     showToast("Palette saved")
                 } label: {
                     Label("Save Palette", systemImage: "heart.fill")

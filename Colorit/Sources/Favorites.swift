@@ -3,17 +3,15 @@ import Combine
 import UIKit
 
 // MARK: - Helpers
-
 private func normalizeHex(_ hex: String) -> String {
     var s = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
     if s.hasPrefix("#") { s.removeFirst() }
     return s
 }
 
-/// Cache muy simple para no recalcular nearestName(to:) en cada render.
 final class NearestNameCache {
     static let shared = NearestNameCache()
-    private var cache: [String: String] = [:] // key: HEX normalizado, value: nombre
+    private var cache: [String: String] = [:]
     private init() {}
 
     func name(for rgb: RGB, catalog: Catalog) -> String? {
@@ -25,14 +23,12 @@ final class NearestNameCache {
     }
 }
 
-/// Helper global para obtener UIColor desde HEX (con cache).
 @inline(__always)
 private func uiColor(for hex: String) -> UIColor {
     UIColorCache.shared.color(for: hex)
 }
 
 // MARK: - Models
-
 struct FavoriteColor: Identifiable, Codable, Equatable {
     var id: String { color.hex }
     let color: RGB
@@ -56,7 +52,6 @@ struct FavoritePalette: Identifiable, Codable, Equatable {
 }
 
 // MARK: - Store
-
 @MainActor
 final class FavoritesStore: ObservableObject {
     @Published var colors: [FavoriteColor] = []
@@ -74,8 +69,8 @@ final class FavoritesStore: ObservableObject {
         }
     }
 
-    func add(palette: [RGB]) {
-        let pal = FavoritePalette(colors: palette)
+    func addPalette(name: String?, colors: [RGB]) {
+        let pal = FavoritePalette(colors: colors, name: name)
         palettes.insert(pal, at: 0)
         persist()
     }
@@ -89,17 +84,13 @@ final class FavoritesStore: ObservableObject {
     }
 
     func removeColor(_ color: FavoriteColor) {
-        if let index = colors.firstIndex(of: color) {
-            colors.remove(at: index)
-            persist()
-        }
+        colors.removeAll { $0 == color }
+        persist()
     }
 
     func removePalette(_ pal: FavoritePalette) {
-        if let index = palettes.firstIndex(of: pal) {
-            palettes.remove(at: index)
-            persist()
-        }
+        palettes.removeAll { $0.id == pal.id }
+        persist()
     }
 
     func clearAll() {
@@ -132,19 +123,18 @@ final class FavoritesStore: ObservableObject {
 }
 
 // MARK: - FavoritesScreen
-
 struct FavoritesScreen: View {
     @EnvironmentObject var favs: FavoritesStore
-    @EnvironmentObject var store: StoreVM
     @EnvironmentObject var catalog: Catalog
     @EnvironmentObject var catalogs: CatalogStore
+    @EnvironmentObject var store: StoreVM
 
     @State private var ascending = true
     @State private var showClearAlert = false
+    @State private var showNewPaletteSheet = false
+    @State private var selectedFilter: FavoritesFilter = .all
 
-    private var gridColumns: [GridItem] {
-        Array(repeating: GridItem(.flexible(), spacing: 10), count: 3)
-    }
+    private var gridColumns: [GridItem] { Array(repeating: GridItem(.flexible(), spacing: 10), count: 3) }
 
     private var sortedColors: [FavoriteColor] {
         favs.colors.sorted {
@@ -152,37 +142,74 @@ struct FavoritesScreen: View {
         }
     }
 
+    private var filteredColors: [FavoriteColor] {
+        selectedFilter == .all || selectedFilter == .colors ? sortedColors : []
+    }
+
+    private var filteredPalettes: [FavoritePalette] {
+        selectedFilter == .all || selectedFilter == .palettes ? favs.palettes : []
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
 
+                    // MARK: Filter Bar (dentro del scroll)
+                    HStack(spacing: 8) {
+                        ForEach(FavoritesFilter.allCases, id: \.self) { filter in
+                            Button {
+                                withAnimation(.easeInOut(duration: 0.25)) {
+                                    selectedFilter = filter
+                                }
+                                UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+                            } label: {
+                                Text(filter.rawValue)
+                                    .font(.subheadline.bold())
+                                    .padding(.vertical, 6)
+                                    .padding(.horizontal, 16)
+                                    .background(
+                                        Capsule()
+                                            .fill(selectedFilter == filter
+                                                  ? Color.secondary.opacity(0.2)
+                                                  : Color.clear)
+                                            .overlay(
+                                                Capsule()
+                                                    .stroke(Color.secondary.opacity(0.3), lineWidth: 1)
+                                            )
+                                    )
+                                    .foregroundColor(selectedFilter == filter ? .primary : .secondary)
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
+                    .padding(.top, 10)
+
                     // 🎨 Favorite Colors
-                    if !sortedColors.isEmpty {
-                        Text("Favorite Colors")
+                    if !filteredColors.isEmpty {
+                        Text("Colors")
                             .font(.headline)
                             .padding(.horizontal)
 
                         LazyVGrid(columns: gridColumns, spacing: 10) {
-                            ForEach(sortedColors) { item in
+                            ForEach(filteredColors) { item in
                                 FavoriteColorTile(item: item)
+                                    .environmentObject(favs)
                                     .environmentObject(catalog)
                                     .environmentObject(catalogs)
-                                    .environmentObject(favs)
-                                    .environmentObject(store)
                             }
                         }
                         .padding(.horizontal)
                     }
 
                     // 🧩 Favorite Palettes
-                    if !favs.palettes.isEmpty {
-                        Text("Favorite Palettes")
+                    if !filteredPalettes.isEmpty {
+                        Text("Palettes")
                             .font(.headline)
                             .padding(.horizontal)
 
                         VStack(spacing: 20) {
-                            ForEach(favs.palettes) { pal in
+                            ForEach(filteredPalettes) { pal in
                                 FavoritePaletteTile(palette: pal)
                                     .environmentObject(favs)
                             }
@@ -191,19 +218,19 @@ struct FavoritesScreen: View {
                     }
 
                     // Empty State
-                    if sortedColors.isEmpty && favs.palettes.isEmpty {
+                    if filteredColors.isEmpty && filteredPalettes.isEmpty {
                         VStack(spacing: 20) {
                             Image(systemName: "heart.slash")
                                 .font(.largeTitle)
                                 .foregroundColor(.secondary)
                             Text("No favorites yet")
                                 .font(.headline)
-                                .foregroundColor(.secondary)
                             Text("Save colors and palettes to revisit them here.")
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
                         }
-                        .padding(.top, 100)
+                        .padding(.top, 80)
+                        .frame(maxWidth: .infinity)
                     }
                 }
                 .padding(.top)
@@ -211,6 +238,7 @@ struct FavoritesScreen: View {
             .navigationTitle("Favorites")
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    // Orden asc/desc
                     if !sortedColors.isEmpty {
                         Button {
                             ascending.toggle()
@@ -220,6 +248,19 @@ struct FavoritesScreen: View {
                         }
                     }
 
+                    // Nueva paleta (solo si es Pro)
+                    Button {
+                        if store.isPro {
+                            showNewPaletteSheet = true
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        } else {
+                            store.showPaywall = true
+                        }
+                    } label: {
+                        Image(systemName: "square.on.square")
+                    }
+
+                    // Limpiar todo
                     if !favs.colors.isEmpty || !favs.palettes.isEmpty {
                         Button(role: .destructive) {
                             showClearAlert = true
@@ -228,6 +269,7 @@ struct FavoritesScreen: View {
                         }
                     }
 
+                    // PRO badge
                     if !store.isPro {
                         Button {
                             store.showPaywall = true
@@ -248,66 +290,181 @@ struct FavoritesScreen: View {
                 }
             }
             .alert("Clear all favorites?", isPresented: $showClearAlert) {
-                Button("Yes", role: .destructive) {
-                    withAnimation {
-                        favs.clearAll()
-                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                    }
-                }
+                Button("Yes", role: .destructive) { favs.clearAll() }
                 Button("No", role: .cancel) {}
-            } message: {
-                Text("This will permanently delete all your favorite colors and palettes.")
+            }
+            .sheet(isPresented: $showNewPaletteSheet) {
+                NewPaletteSheet(showSheet: $showNewPaletteSheet)
+                    .environmentObject(favs)
+                    .environmentObject(catalog)
+                    .presentationDetents([.medium, .large])
+                    .presentationDragIndicator(.visible)
             }
         }
     }
 }
 
+// MARK: - Filter Enum
+enum FavoritesFilter: String, CaseIterable {
+    case all = "All"
+    case colors = "Colors"
+    case palettes = "Palettes"
+}
+
+
+// MARK: - New Palette Sheet
+struct NewPaletteSheet: View {
+    @EnvironmentObject var favs: FavoritesStore
+    @EnvironmentObject var catalog: Catalog
+    @Binding var showSheet: Bool
+
+    @State private var selectedColors: Set<String> = []
+    @State private var paletteName = ""
+    @FocusState private var nameFieldFocused: Bool
+
+    private var gridColumns: [GridItem] { Array(repeating: GridItem(.flexible(), spacing: 10), count: 3) }
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 20) {
+                TextField("Palette name (optional)", text: $paletteName)
+                    .textFieldStyle(.roundedBorder)
+                    .padding(.horizontal)
+                    .focused($nameFieldFocused)
+                    .submitLabel(.done)
+                    .onSubmit { hideKeyboard() }
+
+                ScrollView {
+                    LazyVGrid(columns: gridColumns, spacing: 10) {
+                        ForEach(favs.colors) { fav in
+                            let isSelected = selectedColors.contains(fav.color.hex)
+                            ZStack(alignment: .topTrailing) {
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color(uiColor(for: fav.color.hex)))
+                                    .frame(height: 90)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .stroke(isSelected ? Color.accentColor : .clear, lineWidth: 3)
+                                    )
+                                    .onTapGesture {
+                                        hideKeyboard()
+                                        toggleSelection(fav.color.hex)
+                                    }
+
+                                if isSelected {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .font(.system(size: 18))
+                                        .foregroundColor(.accentColor)
+                                        .padding(6)
+                                }
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+
+                Button(action: createPalette) {
+                    Text("Create Palette")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(selectedColors.isEmpty ? Color.gray.opacity(0.3) : Color.accentColor)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                        .padding(.horizontal)
+                }
+                .disabled(selectedColors.isEmpty)
+
+                Spacer()
+            }
+            .navigationTitle("New Palette")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        hideKeyboard()
+                        showSheet = false
+                    }
+                }
+            }
+            .onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    nameFieldFocused = true
+                }
+            }
+        }
+    }
+
+    private func toggleSelection(_ hex: String) {
+        if selectedColors.contains(hex) {
+            selectedColors.remove(hex)
+        } else {
+            selectedColors.insert(hex)
+        }
+    }
+
+    private func createPalette() {
+        hideKeyboard()
+        let selected = favs.colors.filter { selectedColors.contains($0.color.hex) }.map { $0.color }
+        favs.addPalette(name: paletteName.isEmpty ? nil : paletteName, colors: selected)
+        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+        showSheet = false
+    }
+
+    private func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+}
+
 // MARK: - FavoriteColorTile
 struct FavoriteColorTile: View {
+    let item: FavoriteColor
     @EnvironmentObject var favs: FavoritesStore
     @EnvironmentObject var catalog: Catalog
     @EnvironmentObject var catalogs: CatalogStore
+
     @State private var selectedColor: NamedColor?
 
-    let item: FavoriteColor
-
     var body: some View {
-        VStack(spacing: 4) {
+        VStack(spacing: 6) {
             ZStack(alignment: .topTrailing) {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(Color(uiColor(for: item.color.hex)))
                     .frame(height: 90)
                     .onTapGesture {
                         selectedColor = makeNamedColor(from: item)
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
                     }
 
                 Button {
-                    removeFavorite()
+                    withAnimation {
+                        favs.removeColor(item)
+                    }
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 } label: {
                     Image(systemName: "xmark.circle.fill")
                         .font(.system(size: 14))
-                        .foregroundColor(.white.opacity(0.8))
-                        .padding(6)
-                        .background(Color.black.opacity(0.15), in: Circle())
+                        .foregroundColor(.white.opacity(0.9))
                         .padding(6)
                 }
-                .buttonStyle(.plain)
             }
 
+            // Nombre y HEX
             VStack(spacing: 2) {
                 Text(makeNamedColor(from: item).name)
                     .font(.caption.bold())
                     .foregroundColor(.primary)
                     .lineLimit(1)
-
                 Text(item.color.rgbText)
                     .font(.caption2)
                     .foregroundColor(.secondary)
             }
         }
-        .sheet(item: $selectedColor) { c in
-            ColorDetailView(color: c)
+        .sheet(item: $selectedColor) { color in
+            ColorDetailView(color: color)
+                .environmentObject(favs)
+                .environmentObject(catalog)
+                .environmentObject(catalogs)
+                .presentationDetents([.large])
         }
     }
 
@@ -330,68 +487,44 @@ struct FavoriteColorTile: View {
             rgb: [rgb.r, rgb.g, rgb.b]
         )
     }
-
-    private func removeFavorite() {
-        withAnimation(.easeInOut(duration: 0.25)) {
-            favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(item.color.hex) }
-        }
-        favs.objectWillChange.send()
-        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-    }
 }
 
 // MARK: - FavoritePaletteTile
 struct FavoritePaletteTile: View {
-    @EnvironmentObject var favs: FavoritesStore
     let palette: FavoritePalette
+    @EnvironmentObject var favs: FavoritesStore
+
     @State private var showDetail = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-
-            // Nombre de la paleta
-            Text(palette.name ?? "Unnamed Palette")
+        VStack(alignment: .leading, spacing: 8) {
+            Text(palette.name ?? "Untitled Palette")
                 .font(.headline)
-                .foregroundColor(.primary)
-                .padding(.horizontal, 6)
+                .padding(.horizontal, 4)
 
-            // Barra de colores continua
             HStack(spacing: 0) {
                 ForEach(palette.colors, id: \.hex) { c in
                     Rectangle()
                         .fill(Color(c.uiColor))
                 }
             }
-            .frame(height: 60)
+            .frame(height: 70)
             .clipShape(RoundedRectangle(cornerRadius: 12))
-            .contentShape(Rectangle())
             .onTapGesture {
-                withAnimation(.easeInOut(duration: 0.15)) {
-                    showDetail = true
-                }
+                UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+                showDetail = true
+            }
+            .sheet(isPresented: $showDetail) {
+                PaletteDetailView(palette: palette)
+                    .environmentObject(favs)
+                    .presentationDetents([.large])
+                    .presentationDragIndicator(.visible)
             }
 
-            // Cantidad de colores
             Text("\(palette.colors.count) \(palette.colors.count == 1 ? "Color" : "Colors")")
                 .font(.caption)
                 .foregroundColor(.secondary)
-                .padding(.horizontal, 6)
-        }
-        .padding(.vertical, 10)
-        .padding(.horizontal, 12)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white.opacity(0.85))
-                .shadow(color: .black.opacity(0.06), radius: 3, x: 0, y: 1)
-        )
-        .onTapGesture {
-            withAnimation(.easeInOut(duration: 0.15)) {
-                showDetail = true
-            }
-        }
-        .sheet(isPresented: $showDetail) {
-            PaletteDetailView(palette: palette)
-                .environmentObject(favs)
+                .padding(.horizontal, 4)
         }
     }
 }

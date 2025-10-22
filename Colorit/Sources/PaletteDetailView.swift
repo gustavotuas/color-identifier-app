@@ -3,27 +3,24 @@ import SwiftUI
 struct PaletteDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var favs: FavoritesStore
-    @EnvironmentObject var catalog: Catalog
-    @EnvironmentObject var catalogs: CatalogStore
-
     @State var palette: FavoritePalette
 
     @State private var showDeleteConfirm = false
     @State private var showRenameAlert = false
     @State private var tempName = ""
-    @State private var selectedColor: NamedColor?
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 18) {
-                    // MARK: - Nombre dinámico de la paleta
+
+                    // MARK: - Nombre de la paleta
                     Text(palette.name ?? "")
                         .font(.system(size: 26, weight: .bold))
                         .padding(.top, 10)
-                        .id(palette.id) // fuerza refresco visual al actualizar nombre
+                        .id(palette.id)
 
-                    // MARK: - Franja superior con todos los colores
+                    // MARK: - Franja de colores
                     HStack(spacing: 0) {
                         ForEach(palette.colors, id: \.hex) { c in
                             Rectangle()
@@ -38,7 +35,7 @@ struct PaletteDetailView: View {
                     Divider()
                         .padding(.horizontal)
 
-                    // MARK: - Lista de colores vertical
+                    // MARK: - Lista de colores
                     VStack(spacing: 12) {
                         ForEach(palette.colors, id: \.hex) { color in
                             HStack(spacing: 14) {
@@ -46,10 +43,6 @@ struct PaletteDetailView: View {
                                     .fill(Color(color.uiColor))
                                     .frame(width: 70, height: 70)
                                     .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
-                                    .onTapGesture {
-                                        selectedColor = makeNamedColor(from: color)
-                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                    }
 
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(color.hex)
@@ -83,7 +76,7 @@ struct PaletteDetailView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItemGroup(placement: .topBarTrailing) {
-                    // ✏️ Editar nombre (alerta nativa centrada)
+                    // ✏️ Editar nombre
                     Button {
                         tempName = palette.name ?? ""
                         showRenameAlert = true
@@ -91,7 +84,7 @@ struct PaletteDetailView: View {
                         Image(systemName: "pencil")
                     }
 
-                    // 🗑️ Eliminar paleta (alerta nativa)
+                    // 🗑️ Eliminar paleta completa
                     Button(role: .destructive) {
                         showDeleteConfirm = true
                     } label: {
@@ -99,7 +92,7 @@ struct PaletteDetailView: View {
                     }
                 }
             }
-            // 🧠 Alerta nativa centrada para editar nombre
+            // MARK: - Alert para renombrar
             .textFieldAlert(
                 title: "Rename Palette",
                 text: $tempName,
@@ -110,26 +103,20 @@ struct PaletteDetailView: View {
                     guard !trimmed.isEmpty else { return }
                     palette.name = trimmed
                     favs.updatePalette(palette)
-
-                    // Refrescar la vista al instante
-                    withAnimation(.easeInOut) {
-                        self.palette = favs.palettes.first(where: { $0.id == palette.id }) ?? palette
-                    }
+                    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+                    dismiss() // 👈 se cierra automáticamente
                 }
             )
-            // ⚠️ Confirmación de eliminación
+            // MARK: - Confirmación al eliminar la paleta
             .alert("Delete this palette?", isPresented: $showDeleteConfirm) {
                 Button("Delete", role: .destructive) {
                     withAnimation {
                         favs.removePalette(palette)
                     }
-                    dismiss()
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                    dismiss() // 👈 se cierra automáticamente
                 }
                 Button("Cancel", role: .cancel) {}
-            }
-            // 🎨 ColorDetailView
-            .sheet(item: $selectedColor) { c in
-                ColorDetailView(color: c)
             }
         }
         .presentationDetents([.large])
@@ -167,13 +154,24 @@ struct PaletteDetailView: View {
 
     private func removeColor(_ color: RGB) {
         if let idx = palette.colors.firstIndex(of: color) {
-            palette.colors.remove(at: idx)
+            withAnimation(.easeInOut(duration: 0.2)) {
+                palette.colors.remove(at: idx)
+            }
             favs.updatePalette(palette)
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+
+            // 👇 Si ya no quedan colores, cerrar automáticamente
+            if palette.colors.isEmpty {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    favs.removePalette(palette)
+                    dismiss()
+                }
+            }
         }
     }
 }
 
-// MARK: - UIViewControllerRepresentable helper para alerta nativa con TextField
+// MARK: - UIViewControllerRepresentable helper para alerta con campo de texto
 extension View {
     func textFieldAlert(
         title: String,
@@ -212,8 +210,9 @@ private struct TextFieldAlertHelper<Presenting>: UIViewControllerRepresentable w
         alert.addTextField { textField in
             textField.text = text
             textField.placeholder = placeholder
+            //textField.backgroundColor = UIColor.systemGray6
+            textField.layer.cornerRadius = 6
             textField.clearButtonMode = .whileEditing
-            textField.autocapitalizationType = .words
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 textField.becomeFirstResponder()

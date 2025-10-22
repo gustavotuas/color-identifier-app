@@ -606,7 +606,7 @@ struct MatchesView: View {
                     // Actions
                     HStack {
                         Button {
-                            favs.add(palette: payload.colors)
+                            favs.addPalette(name: nil, colors: payload.colors)
                         } label: {
                             Label("Save Palette", systemImage: "square.and.arrow.down").frame(maxWidth: .infinity)
                         }
