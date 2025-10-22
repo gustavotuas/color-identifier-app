@@ -3,11 +3,15 @@ import SwiftUI
 struct PaletteDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var favs: FavoritesStore
+    @EnvironmentObject var catalog: Catalog
+    @EnvironmentObject var catalogs: CatalogStore
+
     @State var palette: FavoritePalette
 
     @State private var showDeleteConfirm = false
     @State private var showRenameAlert = false
     @State private var tempName = ""
+    @State private var selectedColor: NamedColor?
 
     var body: some View {
         NavigationStack {
@@ -42,6 +46,10 @@ struct PaletteDetailView: View {
                                     .fill(Color(color.uiColor))
                                     .frame(width: 70, height: 70)
                                     .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
+                                    .onTapGesture {
+                                        selectedColor = makeNamedColor(from: color)
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                    }
 
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(color.hex)
@@ -119,12 +127,44 @@ struct PaletteDetailView: View {
                 }
                 Button("Cancel", role: .cancel) {}
             }
+            // 🎨 ColorDetailView
+            .sheet(item: $selectedColor) { c in
+                ColorDetailView(color: c)
+            }
         }
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
     }
 
     // MARK: - Helpers
+
+    private func makeNamedColor(from rgb: RGB) -> NamedColor {
+        let fixedHex = "#" + rgb.hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        let normalized = fixedHex.replacingOccurrences(of: "#", with: "")
+        let rgbValues = hexToRGB(fixedHex)
+
+        // Buscar primero en catálogo principal
+        if let exact = catalog.names.first(where: { $0.hex.replacingOccurrences(of: "#", with: "").uppercased() == normalized }) {
+            return exact
+        }
+
+        // Luego buscar en catálogos de vendors
+        for id in CatalogID.allCases where id != .generic {
+            let vendorColors = catalogs.colors(for: [id])
+            if let exact = vendorColors.first(where: { $0.hex.replacingOccurrences(of: "#", with: "").uppercased() == normalized }) {
+                return exact
+            }
+        }
+
+        // Si no existe en ningún catálogo
+        return NamedColor(
+            name: rgb.hex.uppercased(),
+            hex: fixedHex,
+            vendor: nil,
+            rgb: [rgbValues.r, rgbValues.g, rgbValues.b]
+        )
+    }
+
     private func removeColor(_ color: RGB) {
         if let idx = palette.colors.firstIndex(of: color) {
             palette.colors.remove(at: idx)
@@ -175,7 +215,6 @@ private struct TextFieldAlertHelper<Presenting>: UIViewControllerRepresentable w
             textField.clearButtonMode = .whileEditing
             textField.autocapitalizationType = .words
 
-            // 👇 Autofoco inmediato
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 textField.becomeFirstResponder()
             }
