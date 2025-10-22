@@ -85,7 +85,7 @@ struct SearchScreen: View {
     @EnvironmentObject var catalogs: CatalogStore      // vendors JSON
 
     @State private var query = ""
-    @State private var layout: LayoutMode = .grid2
+    @State private var layout: LayoutMode = .grid3
     @State private var ascending = true
 
     @State private var selection: CatalogSelection = .all
