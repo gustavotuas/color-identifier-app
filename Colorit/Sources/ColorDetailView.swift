@@ -15,15 +15,11 @@ struct ColorDetailView: View {
     @State private var selectedTab = "RGB"
     @State private var copiedText: String? = nil
     @State private var showCopyAlert = false
+    @State private var isFavorite = false
+    @State private var heartPulse = false
 
     private var rgb: RGB { hexToRGB(color.hex) }
     private let tabs = ["RGB", "HEX", "HSB", "CMYK"]
-
-    // ✅ Estado de favorito (normalizado) sin depender de helpers del store
-    private var isFavorite: Bool {
-        let key = normalizeHex(color.hex)
-        return favs.colors.contains { normalizeHex($0.color.hex) == key }
-    }
 
     var body: some View {
         ScrollView {
@@ -61,14 +57,21 @@ struct ColorDetailView: View {
                     CopyButton(label: "Copy RGB", value: "\(rgb.r),\(rgb.g),\(rgb.b)", copiedText: $copiedText)
 
                     Button(action: toggleFavorite) {
-                        Image(systemName: isFavorite ? "heart.fill" : "heart")
-                            .font(.title2)
-                            .foregroundColor(isFavorite ? .red : .gray) // 🔴 rojo si es favorito
-                            .frame(width: 44, height: 44)
-                            .background(.ultraThinMaterial, in: Circle())
-                            .scaleEffect(isFavorite ? 1.12 : 1.0)
-                            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isFavorite)
+                        Group {
+                            if #available(iOS 17.0, *) {
+                                Image(systemName: isFavorite ? "heart.fill" : "heart")
+                                    .symbolEffect(.bounce, value: isFavorite)
+                            } else {
+                                Image(systemName: isFavorite ? "heart.fill" : "heart")
+                                    .scaleEffect(heartPulse ? 1.25 : 1.0)
+                            }
+                        }
+                        .font(.title2)
+                        .foregroundColor(isFavorite ? .red : .gray)
+                        .frame(width: 44, height: 44)
+                        .background(.ultraThinMaterial, in: Circle())
                     }
+                    .animation(.spring(response: 0.3, dampingFraction: 0.6), value: heartPulse)
                 }
                 .padding(.top, 8)
 
@@ -84,13 +87,13 @@ struct ColorDetailView: View {
                     UIImpactFeedbackGenerator(style: .soft).impactOccurred()
                 }
 
-                // MARK: - Values
-                VStack(spacing: 10) {
+                // MARK: - Tab content
+                VStack(spacing: 12) {
                     switch selectedTab {
                     case "RGB":
-                        ColorComponentRow(label: "Red", value: rgb.r, color: .red)
-                        ColorComponentRow(label: "Green", value: rgb.g, color: .green)
-                        ColorComponentRow(label: "Blue", value: rgb.b, color: .blue)
+                        ValueRow(label: "Red", value: "\(rgb.r)", color: .red)
+                        ValueRow(label: "Green", value: "\(rgb.g)", color: .green)
+                        ValueRow(label: "Blue", value: "\(rgb.b)", color: .blue)
 
                     case "HEX":
                         ValueRow(label: "Hex", value: color.hex, color: .gray)
@@ -117,11 +120,10 @@ struct ColorDetailView: View {
                 .cornerRadius(14)
                 .padding(.horizontal)
 
-                // MARK: - Vendor (reemplaza la antigua sección Theme)
+                // MARK: - Vendor Info
                 if let v = color.vendor {
                     VStack(alignment: .leading, spacing: 6) {
                         Text("Vendor").font(.headline)
-
                         if let brand = v.brand, !brand.isEmpty {
                             InfoRow(label: "Brand", value: brand)
                         }
@@ -161,10 +163,8 @@ struct ColorDetailView: View {
             .padding(.bottom, 60)
         }
         .background(Color(.systemGroupedBackground))
-        .onChange(of: copiedText) { _ in
-            if copiedText != nil {
-                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-            }
+        .onAppear {
+            isFavorite = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(color.hex) }
         }
         .overlay(alignment: .bottom) {
             if let copied = copiedText {
@@ -186,102 +186,67 @@ struct ColorDetailView: View {
         }
     }
 
-    // MARK: - Helpers
-
+    // MARK: - Favorite toggle
     private func toggleFavorite() {
-        let target = hexToRGB(color.hex)
-        withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-            if isFavorite {
-                favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(target.hex) }
-            } else {
-                let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(target.hex) }
-                if !exists { favs.add(color: target) }
-            }
+        let rgb = hexToRGB(color.hex)
+        if isFavorite {
+            favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
+            isFavorite = false
+        } else {
+            let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
+            if !exists { favs.add(color: rgb) }
+            isFavorite = true
         }
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-    }
 
-    // Convert RGB → HSB
-    private func rgbToHSB(_ rgb: RGB) -> (CGFloat, CGFloat, CGFloat) {
-        let r = CGFloat(rgb.r) / 255, g = CGFloat(rgb.g) / 255, b = CGFloat(rgb.b) / 255
-        var h: CGFloat = 0, s: CGFloat = 0, v: CGFloat = 0
-        let maxVal = max(r, g, b), minVal = min(r, g, b)
-        v = maxVal
-        let delta = maxVal - minVal
-        s = maxVal == 0 ? 0 : delta / maxVal
-        if delta == 0 { h = 0 }
-        else if maxVal == r { h = (g - b) / delta + (g < b ? 6 : 0) }
-        else if maxVal == g { h = (b - r) / delta + 2 }
-        else { h = (r - g) / delta + 4 }
-        h /= 6
-        return (h * 360, s * 100, v * 100)
-    }
-
-    // Convert RGB → CMYK
-    private func rgbToCMYK(_ rgb: RGB) -> (CGFloat, CGFloat, CGFloat, CGFloat) {
-        let r = CGFloat(rgb.r) / 255, g = CGFloat(rgb.g) / 255, b = CGFloat(rgb.b) / 255
-        let k = 1 - max(r, max(g, b))
-        let c = (1 - r - k) / (1 - k)
-        let m = (1 - g - k) / (1 - k)
-        let y = (1 - b - k) / (1 - k)
-        return (c * 100, m * 100, y * 100, k * 100)
+        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+        heartPulse = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) { heartPulse = false }
     }
 }
 
+// MARK: - Helpers
+private func rgbToHSB(_ rgb: RGB) -> (h: CGFloat, s: CGFloat, b: CGFloat) {
+    var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0
+    UIColor(red: CGFloat(rgb.r) / 255, green: CGFloat(rgb.g) / 255, blue: CGFloat(rgb.b) / 255, alpha: 1)
+        .getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: nil)
+    return (hue * 360, saturation * 100, brightness * 100)
+}
+
+private func rgbToCMYK(_ rgb: RGB) -> (c: CGFloat, m: CGFloat, y: CGFloat, k: CGFloat) {
+    let r = CGFloat(rgb.r) / 255, g = CGFloat(rgb.g) / 255, b = CGFloat(rgb.b) / 255
+    let k = 1 - max(r, max(g, b))
+    if k == 1 { return (0, 0, 0, 100) }
+    let c = (1 - r - k) / (1 - k)
+    let m = (1 - g - k) / (1 - k)
+    let y = (1 - b - k) / (1 - k)
+    return (c * 100, m * 100, y * 100, k * 100)
+}
+
 // MARK: - Subviews
+private struct ValueRow: View {
+    let label: String
+    let value: String
+    let color: Color
+
+    var body: some View {
+        HStack {
+            Circle().fill(color).frame(width: 12, height: 12)
+            Text(label).font(.subheadline)
+            Spacer()
+            Text(value).font(.body.monospaced())
+        }
+    }
+}
 
 private struct InfoRow: View {
     let label: String
     let value: String
     var body: some View {
         HStack {
-            Text(label).foregroundColor(.secondary)
+            Text(label).font(.subheadline.weight(.medium))
             Spacer()
-            Text(value).multilineTextAlignment(.trailing)
+            Text(value).font(.subheadline)
         }
-        .font(.subheadline)
-    }
-}
-
-private struct ValueRow: View {
-    let label: String
-    let value: String
-    let color: Color
-    @State private var copied = false
-
-    var body: some View {
-        HStack {
-            Circle().fill(color).frame(width: 10, height: 10)
-            Text(label).frame(width: 90, alignment: .leading)
-            Spacer()
-            Text(value).fontWeight(.medium)
-            Button {
-                UIPasteboard.general.string = value
-                withAnimation { copied = true }
-                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) { copied = false }
-            } label: {
-                Image(systemName: copied ? "checkmark.circle.fill" : "doc.on.doc")
-                    .foregroundColor(copied ? .green : .gray)
-            }
-        }
-        .padding(.vertical, 4)
-    }
-}
-
-private struct ColorComponentRow: View {
-    let label: String
-    let value: Int
-    let color: Color
-
-    var body: some View {
-        HStack {
-            Circle().fill(color).frame(width: 10, height: 10)
-            Text(label).frame(width: 90, alignment: .leading)
-            Spacer()
-            Text("\(value)").fontWeight(.medium)
-        }
-        .padding(.vertical, 4)
     }
 }
 
@@ -293,17 +258,14 @@ private struct CopyButton: View {
     var body: some View {
         Button {
             UIPasteboard.general.string = value
-            withAnimation { copiedText = label }
-            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            copiedText = label
+            UIImpactFeedbackGenerator(style: .soft).impactOccurred()
         } label: {
-            VStack {
-                Image(systemName: "doc.on.doc").font(.title3)
-                Text(label).font(.caption)
-            }
-            .frame(width: 80, height: 70)
-            .background(Color.white.opacity(0.9))
-            .cornerRadius(12)
-            .shadow(radius: 2)
+            Label(label, systemImage: "doc.on.doc")
+                .font(.caption)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(Color(.systemGray6), in: Capsule())
         }
     }
 }
