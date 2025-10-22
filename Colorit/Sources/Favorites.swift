@@ -454,7 +454,7 @@ struct FavoriteColorTile: View {
                     .font(.caption.bold())
                     .foregroundColor(.primary)
                     .lineLimit(1)
-                Text(item.color.rgbText)
+                Text(item.color.hex.uppercased())
                     .font(.caption2)
                     .foregroundColor(.secondary)
             }
