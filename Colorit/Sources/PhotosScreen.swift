@@ -91,7 +91,6 @@ struct PhotosScreen: View {
                     }
             }
             .sheet(isPresented: $showPaletteSheet) {
-                // 👇 DetectedPaletteSheet con env objects y detent más alto
                 DetectedPaletteSheet(matches: matches)
                     .environmentObject(favs)
                     .environmentObject(catalog)
@@ -101,7 +100,9 @@ struct PhotosScreen: View {
             .fullScreenCover(isPresented: $showSystemPicker) {
                 SystemPhotoPicker(isPresented: $showSystemPicker, image: $image) { uiimg in
                     let raw = KMeans.palette(from: uiimg, k: 10)
-                    palette = Array(Set(raw.map { $0.hex })).compactMap { hexToRGB($0) }
+                    // 👇 Deduplicate similar colors
+                    let filtered = removeSimilarColors(from: raw.compactMap { hexToRGB($0.hex) }, threshold: 0.02)
+                    palette = filtered
                     rebuildMatches()
                 }
                 .ignoresSafeArea()
@@ -138,39 +139,38 @@ struct PhotosScreen: View {
         }
     }
 
-// MARK: - Filter Header (versión original restaurada)
-private var filterHeader: some View {
-    HStack(spacing: 8) {
-        Image(systemName: "line.3.horizontal.decrease.circle")
-        Text(selection.filterSubtitle)
-            .lineLimit(1)
-        Spacer()
-        Button {
-            withAnimation(.easeInOut) {
-                selection = .all
-                VendorSelectionStorage.save(selection)
-                rebuildMatches()
+    // MARK: - Filter Header (versión original restaurada)
+    private var filterHeader: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "line.3.horizontal.decrease.circle")
+            Text(selection.filterSubtitle)
+                .lineLimit(1)
+            Spacer()
+            Button {
+                withAnimation(.easeInOut) {
+                    selection = .all
+                    VendorSelectionStorage.save(selection)
+                    rebuildMatches()
+                }
+            } label: {
+                Label("Clear", systemImage: "xmark.circle.fill")
+                    .labelStyle(.titleAndIcon)
             }
-        } label: {
-            Label("Clear", systemImage: "xmark.circle.fill")
-                .labelStyle(.titleAndIcon)
+            .buttonStyle(.bordered)
+            .tint(.blue)
+            .font(.caption.bold())
         }
-        .buttonStyle(.bordered)
-        .tint(.blue)
-        .font(.caption.bold())
+        .font(.footnote)
+        .padding(10)
+        .background(Color.blue.opacity(0.12))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(Color.blue.opacity(0.5), lineWidth: 1)
+        )
+        .foregroundColor(.blue)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .padding(.horizontal)
     }
-    .font(.footnote)
-    .padding(10)
-    .background(Color.blue.opacity(0.12))
-    .overlay(
-        RoundedRectangle(cornerRadius: 10)
-            .stroke(Color.blue.opacity(0.5), lineWidth: 1)
-    )
-    .foregroundColor(.blue)
-    .clipShape(RoundedRectangle(cornerRadius: 10))
-    .padding(.horizontal)
-}
-
 
     // MARK: - Image Section
     private var imageSection: some View {
@@ -191,7 +191,7 @@ private var filterHeader: some View {
                         } label: {
                             Label("Pick Color", systemImage: "eyedropper")
                                 .font(.subheadline.weight(.semibold))
-                                .foregroundColor(.white) // 👈 texto blanco
+                                .foregroundColor(.white)
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 8)
                                 .background(.ultraThinMaterial)
@@ -205,7 +205,7 @@ private var filterHeader: some View {
                         } label: {
                             Label("Change Photo", systemImage: "photo.on.rectangle")
                                 .font(.subheadline.weight(.semibold))
-                                .foregroundColor(.white) // 👈 texto blanco
+                                .foregroundColor(.white)
                                 .padding(.horizontal, 14)
                                 .padding(.vertical, 8)
                                 .background(.ultraThinMaterial)
@@ -314,13 +314,29 @@ private var filterHeader: some View {
         case .vendor(let id):
             pool = catalogs.loaded[id] ?? []
         }
-        matches = palette.map { rgb in
+
+        // Calcula los matches
+        var tempMatches = palette.map { rgb in
             let closest = pool.min(by: {
                 hexToRGB($0.hex).distance(to: rgb) < hexToRGB($1.hex).distance(to: rgb)
             })
             return MatchedSwatch(color: rgb, closest: closest)
         }
+
+        // 👇 Elimina duplicados por hex del color comercial (closest)
+        var seen: Set<String> = []
+        tempMatches.removeAll { match in
+            if let hex = match.closest?.hex, seen.contains(hex) {
+                return true
+            } else {
+                if let hex = match.closest?.hex { seen.insert(hex) }
+                return false
+            }
+        }
+
+        matches = tempMatches
     }
+
 
     private func showToast(_ msg: String) {
         toastMessage = msg
@@ -329,9 +345,20 @@ private var filterHeader: some View {
             withAnimation { showToast = false }
         }
     }
+
+    // MARK: - Remove visually similar colors
+    private func removeSimilarColors(from colors: [RGB], threshold: Double) -> [RGB] {
+        var unique: [RGB] = []
+        for color in colors {
+            if !unique.contains(where: { $0.distance(to: color) < threshold }) {
+                unique.append(color)
+            }
+        }
+        return unique
+    }
 }
 
-// MARK: - Detected Palette Sheet (horizontal like PaletteDetailView) + ColorDetailView sheet
+// MARK: - Detected Palette Sheet + ColorDetailView sheet
 private struct DetectedPaletteSheet: View {
     @EnvironmentObject var favs: FavoritesStore
     @EnvironmentObject var catalog: Catalog
@@ -356,7 +383,6 @@ private struct DetectedPaletteSheet: View {
                                     .fill(Color(display != nil ? hexToRGB(display!.hex).uiColor : m.color.uiColor))
                                     .frame(width: 80, height: 80)
                                     .shadow(color: .black.opacity(0.1), radius: 2, y: 1)
-
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(display?.name ?? "Unnamed Color")
                                         .font(.headline)
@@ -382,7 +408,6 @@ private struct DetectedPaletteSheet: View {
                 .padding(16)
             }
             .navigationTitle("Palette Colors")
-            // 👇 abre ColorDetailView como sheet modal, igual que en tus otras vistas
             .sheet(item: $selectedColor) { color in
                 ColorDetailView(color: color)
                     .environmentObject(favs)
@@ -426,7 +451,7 @@ struct ColorPickerView: View {
                     .foregroundColor(.primary)
                 Button("Save to Favorites") {
                     let rgb = hexToRGB(hexValue)
-                    favs.add(color: rgb) // 👈 usa tu método existente
+                    favs.add(color: rgb)
                     dismiss()
                 }
                 .buttonStyle(.borderedProminent)
