@@ -67,6 +67,7 @@ struct PhotosScreen: View {
             ScrollView {
                 VStack(spacing: 18) {
 
+                    // 🔹 Mantiene el mismo estilo azul del filtro activo
                     if selection.isFiltered {
                         HStack(spacing: 8) {
                             Image(systemName: "line.3.horizontal.decrease.circle")
@@ -110,12 +111,12 @@ struct PhotosScreen: View {
             }
             .navigationTitle("Photo Colours")
             .toolbar {
-                ToolbarItemGroup(placement: .navigationBarLeading) {
+                ToolbarItem(placement: .navigationBarLeading) {
                     Button { showVendorSheet = true } label: {
                         Image(systemName: "slider.horizontal.3")
                     }
                 }
-                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .navigationBarTrailing) {
                     if !store.isPro {
                         Button {
                             store.showPaywall = true
@@ -186,7 +187,7 @@ struct PhotosScreen: View {
         }
     }
 
-    // MARK: - Image section (fix tap & blur button)
+    // MARK: - Image Section (refined Change Photo)
     private var imageSection: some View {
         VStack(spacing: 14) {
             if let img = image {
@@ -198,24 +199,27 @@ struct PhotosScreen: View {
                         .shadow(radius: 6)
                         .padding(.horizontal, 12)
                         .padding(.top, 6)
-                        .contentShape(Rectangle())
                         .onTapGesture { showSystemPicker = true }
 
                     Button {
                         showSystemPicker = true
                     } label: {
                         Label("Change Photo", systemImage: "photo.on.rectangle")
-                            .font(.subheadline.bold())
+                            .font(.headline.weight(.semibold))
                             .foregroundColor(.white)
-                            .shadow(radius: 3)
-                            .padding(.horizontal, 24)
-                            .padding(.vertical, 10)
+                            .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
+                            .padding(.horizontal, 26)
+                            .padding(.vertical, 12)
                             .background(
                                 LinearGradient(
-                                    colors: [Color.purple.opacity(0.85), Color.blue.opacity(0.8)],
+                                    colors: [
+                                        Color.blue.opacity(0.85),
+                                        Color.purple.opacity(0.9)
+                                    ],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 )
+                                .blur(radius: 0.5)
                                 .overlay(
                                     VisualEffectBlur(style: .systemUltraThinMaterialDark)
                                         .clipShape(Capsule())
@@ -224,13 +228,17 @@ struct PhotosScreen: View {
                             )
                             .overlay(
                                 Capsule()
-                                    .stroke(Color.white.opacity(0.4), lineWidth: 0.6)
+                                    .stroke(LinearGradient(colors: [.white.opacity(0.6), .white.opacity(0.2)],
+                                                           startPoint: .topLeading,
+                                                           endPoint: .bottomTrailing),
+                                            lineWidth: 1)
                             )
                     }
-                    .padding(.top, 16)
-                    .allowsHitTesting(true)
+                    .buttonStyle(.plain)
+                    .padding(.top, 18)
+                    .scaleEffect(showSystemPicker ? 0.97 : 1)
+                    .animation(.spring(response: 0.3, dampingFraction: 0.7), value: showSystemPicker)
                 }
-                .contentShape(Rectangle())
             } else {
                 VStack(spacing: 14) {
                     Image(systemName: "photo.on.rectangle.angled")
@@ -271,7 +279,6 @@ struct PhotosScreen: View {
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
-                    .padding(.top, 8)
 
                     HStack(spacing: 0) {
                         ForEach(matches, id: \.color.hex) { m in
@@ -322,6 +329,7 @@ struct PhotosScreen: View {
             .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
             .padding(.horizontal)
 
+            // 🔹 Refined Unlock Full Palette
             if !store.isPro {
                 VisualEffectBlur(style: .systemUltraThinMaterialLight)
                     .clipShape(RoundedRectangle(cornerRadius: 20))
@@ -331,61 +339,63 @@ struct PhotosScreen: View {
                 Button {
                     store.showPaywall = true
                 } label: {
-                    Label("Unlock Full Palette", systemImage: "lock.fill")
-                        .font(.headline.bold())
-                        .foregroundStyle(
-                            LinearGradient(colors: [.white, .pink.opacity(0.9)],
-                                           startPoint: .topLeading,
-                                           endPoint: .bottomTrailing)
-                        )
-                        .padding(.horizontal, 34)
-                        .padding(.vertical, 14)
-                        .background(
-                            LinearGradient(colors: [.purple, .pink],
-                                           startPoint: .topLeading,
-                                           endPoint: .bottomTrailing)
+                    HStack(spacing: 8) {
+                        Image(systemName: "lock.fill")
+                        Text("Unlock Full Palette")
+                            .fontWeight(.semibold)
+                    }
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 38)
+                    .padding(.vertical, 14)
+                    .background(
+                        LinearGradient(
+                            colors: [
+                                Color.purple.opacity(0.9),
+                                Color.pink.opacity(0.9),
+                                Color.orange.opacity(0.85)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
                         )
                         .clipShape(Capsule())
-                        .shadow(color: .pink.opacity(0.5), radius: 12, x: 0, y: 4)
+                        .shadow(color: .pink.opacity(0.5), radius: 14, x: 0, y: 5)
+                    )
+                    .overlay(
+                        Capsule()
+                            .stroke(Color.white.opacity(0.6), lineWidth: 1)
+                    )
                 }
-                .padding(.top, 8)
+                .buttonStyle(.plain)
+                .padding(.top, 10)
             }
         }
     }
 
     // MARK: - Helpers
-    private struct MatchedSwatch {
-        let color: RGB
-        let closest: NamedColor?
-    }
+    private struct MatchedSwatch { let color: RGB; let closest: NamedColor? }
 
     private func preloadForSelection() {
         switch selection {
         case .all:
             catalogs.load(.generic)
             vendorIDs.forEach { catalogs.load($0) }
-        case .genericOnly:
-            catalogs.load(.generic)
-        case .vendor(let id):
-            catalogs.load(id)
+        case .genericOnly: catalogs.load(.generic)
+        case .vendor(let id): catalogs.load(id)
         }
     }
 
     private func rebuildMatches() {
         guard !palette.isEmpty else { matches = []; return }
-
         let pool: [NamedColor]
         switch selection {
         case .all:
             let generic = catalogs.loaded[.generic] ?? catalog.names
             let vendors = catalogs.colors(for: Set(vendorIDs))
             pool = generic + vendors
-        case .genericOnly:
-            pool = catalogs.loaded[.generic] ?? catalog.names
-        case .vendor(let id):
-            pool = catalogs.loaded[id] ?? []
+        case .genericOnly: pool = catalogs.loaded[.generic] ?? catalog.names
+        case .vendor(let id): pool = catalogs.loaded[id] ?? []
         }
-
         matches = palette.map { rgb in
             let closest = pool.min(by: {
                 hexToRGB($0.hex).distance(to: rgb) < hexToRGB($1.hex).distance(to: rgb)
