@@ -261,8 +261,9 @@ struct PhotosScreen: View {
         }
     }
 
-    // MARK: - Palette Card
-    private var paletteCard: some View {
+// MARK: - Palette Card
+private var paletteCard: some View {
+    ZStack {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text("Detected Palette").font(.headline)
@@ -272,46 +273,20 @@ struct PhotosScreen: View {
                     .foregroundColor(.secondary)
             }
 
-            ZStack {
-                HStack(spacing: 0) {
-                    ForEach(matches, id: \.color.hex) { m in
-                        Rectangle()
-                            .fill(m.closest != nil ? Color(hexToRGB(m.closest!.hex).uiColor) : Color(m.color.uiColor))
-                    }
-                }
-                .frame(height: 60)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .shadow(color: .black.opacity(0.1), radius: 3, y: 2)
-                .onTapGesture { showPaletteSheet = true }
-
-                // 🔒 Si no es PRO, mostrar overlay con blur y botón Unlock
-                if !store.isPro {
-                    ZStack {
-                        Rectangle()
-                            .fill(.ultraThinMaterial)
-                            .blur(radius: 6)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
-
-                        VStack(spacing: 6) {
-                            Image(systemName: "lock.fill")
-                                .font(.title3)
-                                .foregroundColor(.white)
-                            Text("Unlock Full Palette")
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(Color.purple.opacity(0.8))
-                                .clipShape(Capsule())
-                        }
-                        .onTapGesture {
-                            store.showPaywall = true
-                        }
-                    }
-                    .transition(.opacity)
+            // 🎨 Paleta de colores detectados
+            HStack(spacing: 0) {
+                ForEach(matches, id: \.color.hex) { m in
+                    Rectangle()
+                        .fill(m.closest != nil ? Color(hexToRGB(m.closest!.hex).uiColor)
+                                               : Color(m.color.uiColor))
                 }
             }
+            .frame(height: 60)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .shadow(color: .black.opacity(0.1), radius: 3, y: 2)
+            .onTapGesture { showPaletteSheet = true }
 
+            // 💾 Botón Save Palette
             Button {
                 if store.isPro {
                     let finals = matches.map { $0.closest != nil ? hexToRGB($0.closest!.hex) : $0.color }
@@ -326,7 +301,7 @@ struct PhotosScreen: View {
                     .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 10)
-                    .background(Color.white.opacity(0.8))
+                    .background(Color.white.opacity(0.85))
                     .overlay(
                         RoundedRectangle(cornerRadius: 10)
                             .stroke(Color.blue.opacity(0.3), lineWidth: 1)
@@ -340,7 +315,50 @@ struct PhotosScreen: View {
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: .black.opacity(0.1), radius: 4, y: 2)
         .padding(.horizontal)
+
+        // 🔒 Overlay difuminado que cubre toda la sección si no es PRO
+        if !store.isPro {
+            ZStack {
+                Rectangle()
+                    .fill(.ultraThinMaterial)
+                    .blur(radius: 10)
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .padding(.horizontal)
+
+                VStack(spacing: 10) {
+                    Image(systemName: "lock.open.fill")
+                        .font(.title)
+                        .foregroundColor(.white)
+                        .shadow(color: .white.opacity(0.4), radius: 4, y: 2)
+
+                    Text("Unlock Full Palette")
+                        .font(.headline.weight(.semibold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 10)
+                        .background(
+                            LinearGradient(
+                                colors: [
+                                    Color(hex: "#3C8CE7"), // azul brillante
+                                    Color(hex: "#A63DE8"), // violeta
+                                    Color(hex: "#FF61B6")  // fucsia
+                                ],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .clipShape(Capsule())
+                        .shadow(color: Color.white.opacity(0.3), radius: 6, y: 3)
+                }
+                .onTapGesture {
+                    store.showPaywall = true
+                }
+            }
+            .transition(.opacity)
+        }
     }
+}
+
 
 
     // MARK: - Helpers
@@ -704,3 +722,37 @@ extension UIColor {
         return String(format: "#%06X", rgb)
     }
 }
+
+// MARK: - RGB Luminosity Helper
+extension RGB {
+    var luminance: Double {
+        let red = Double(r)
+        let green = Double(g)
+        let blue = Double(b)
+        return (0.299 * red) + (0.587 * green) + (0.114 * blue)
+    }
+}
+
+
+// MARK: - Hex Color Initializer
+extension Color {
+    init(hex: String) {
+        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+        var int: UInt64 = 0
+        Scanner(string: hex).scanHexInt64(&int)
+        let r, g, b: UInt64
+        switch hex.count {
+        case 6:
+            (r, g, b) = ((int >> 16) & 0xFF, (int >> 8) & 0xFF, int & 0xFF)
+        default:
+            (r, g, b) = (1, 1, 0)
+        }
+        self.init(
+            .sRGB,
+            red: Double(r) / 255,
+            green: Double(g) / 255,
+            blue: Double(b) / 255
+        )
+    }
+}
+
