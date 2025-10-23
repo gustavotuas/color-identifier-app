@@ -99,9 +99,7 @@ struct PhotosScreen: View {
             }
             .fullScreenCover(isPresented: $showSystemPicker) {
                 SystemPhotoPicker(isPresented: $showSystemPicker, image: $image) { uiimg in
-                    // Extrae hasta 15 colores posibles
                     let raw = KMeans.palette(from: uiimg, k: 15)
-                    // Filtra colores muy similares visualmente
                     let filtered = removeSimilarColors(from: raw.compactMap { hexToRGB($0.hex) }, threshold: 0.02)
                     palette = filtered
                     rebuildMatches()
@@ -275,8 +273,12 @@ struct PhotosScreen: View {
                     .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 10)
-                    .background(Color.accentColor)
-                    .foregroundColor(.white)
+                    .background(Color.white)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.blue.opacity(0.3), lineWidth: 1)
+                    )
+                    .foregroundColor(.blue)
                     .cornerRadius(10)
             }
         }
@@ -417,7 +419,7 @@ private struct DetectedPaletteSheet: View {
     }
 }
 
-// MARK: - Color Picker View
+// MARK: - Color Picker View (mejorada)
 struct ColorPickerView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var favs: FavoritesStore
@@ -425,20 +427,43 @@ struct ColorPickerView: View {
 
     @State private var pickedColor: UIColor = .white
     @State private var hexValue: String = "#FFFFFF"
+    @State private var touchPoint: CGPoint? = nil
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            Image(uiImage: image)
-                .resizable()
-                .scaledToFit()
-                .overlay(
-                    ColorSamplingView(uiImage: image) { color in
-                        pickedColor = color
-                        hexValue = color.toHexString()
+        ZStack {
+            GeometryReader { geo in
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: geo.size.width, maxHeight: geo.size.height)
+                    .contentShape(Rectangle())
+                    .onTapGesture { location in
+                        touchPoint = location
+                        if let color = image.getPixelColor(at: location, in: geo.frame(in: .local)) {
+                            pickedColor = color
+                            hexValue = color.toHexString()
+                        }
                     }
-                )
-                .ignoresSafeArea()
 
+                // 🎯 Target visual con preview del color
+                if let point = touchPoint {
+                    VStack(spacing: 6) {
+                        Circle()
+                            .fill(Color(pickedColor))
+                            .frame(width: 26, height: 26)
+                            .shadow(radius: 3)
+                            .overlay(Circle().stroke(Color.white, lineWidth: 1))
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 24))
+                            .foregroundColor(.white)
+                            .shadow(radius: 2)
+                    }
+                    .position(point)
+                    .animation(.spring(response: 0.3, dampingFraction: 0.7), value: point)
+                }
+            }
+
+            // 🟣 Panel inferior visible sobre la imagen
             VStack(spacing: 10) {
                 RoundedRectangle(cornerRadius: 12)
                     .fill(Color(pickedColor))
@@ -452,48 +477,44 @@ struct ColorPickerView: View {
                     favs.add(color: rgb)
                     dismiss()
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(.accentColor)
+                .font(.headline)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 10)
+                .background(.ultraThinMaterial)
+                .cornerRadius(12)
+                .foregroundColor(.white)
             }
-            .padding(.bottom, 40)
-        }
-        .overlay(alignment: .topLeading) {
-            Button("Close") { dismiss() }
+            .padding(.bottom, 50)
+            .background(
+                LinearGradient(colors: [.black.opacity(0.3), .clear], startPoint: .bottom, endPoint: .top)
+                    .ignoresSafeArea(edges: .bottom)
+            )
+            .frame(maxHeight: .infinity, alignment: .bottom)
+
+            // 🔘 Botón “Close” visible arriba
+            VStack {
+                HStack {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 26))
+                            .foregroundColor(.white)
+                            .padding(8)
+                            .background(Color.black.opacity(0.4))
+                            .clipShape(Circle())
+                    }
+                    Spacer()
+                }
                 .padding()
+                Spacer()
+            }
         }
+        .background(Color.black.opacity(0.9))
+        .ignoresSafeArea()
     }
 }
 
-// MARK: - UIKit Color Sampling View
-struct ColorSamplingView: UIViewRepresentable {
-    let uiImage: UIImage
-    let onSample: (UIColor) -> Void
-
-    func makeUIView(context: Context) -> UIImageView {
-        let imageView = UIImageView(image: uiImage)
-        imageView.isUserInteractionEnabled = true
-        let tap = UILongPressGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handlePress(_:)))
-        imageView.addGestureRecognizer(tap)
-        return imageView
-    }
-
-    func updateUIView(_ uiView: UIImageView, context: Context) {}
-    func makeCoordinator() -> Coordinator { Coordinator(self) }
-
-    class Coordinator: NSObject {
-        let parent: ColorSamplingView
-        init(_ parent: ColorSamplingView) { self.parent = parent }
-
-        @objc func handlePress(_ gesture: UILongPressGestureRecognizer) {
-            guard let imageView = gesture.view as? UIImageView,
-                  let image = imageView.image else { return }
-
-            let point = gesture.location(in: imageView)
-            guard let color = image.getPixelColor(at: point, in: imageView.bounds) else { return }
-            parent.onSample(color)
-        }
-    }
-}
 
 // MARK: - UIImage pixel color extraction
 extension UIImage {
