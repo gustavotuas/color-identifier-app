@@ -99,8 +99,9 @@ struct PhotosScreen: View {
             }
             .fullScreenCover(isPresented: $showSystemPicker) {
                 SystemPhotoPicker(isPresented: $showSystemPicker, image: $image) { uiimg in
-                    let raw = KMeans.palette(from: uiimg, k: 10)
-                    // 👇 Deduplicate similar colors
+                    // Extrae hasta 15 colores posibles
+                    let raw = KMeans.palette(from: uiimg, k: 15)
+                    // Filtra colores muy similares visualmente
                     let filtered = removeSimilarColors(from: raw.compactMap { hexToRGB($0.hex) }, threshold: 0.02)
                     palette = filtered
                     rebuildMatches()
@@ -139,7 +140,7 @@ struct PhotosScreen: View {
         }
     }
 
-    // MARK: - Filter Header (versión original restaurada)
+    // MARK: - Filter Header
     private var filterHeader: some View {
         HStack(spacing: 8) {
             Image(systemName: "line.3.horizontal.decrease.circle")
@@ -244,7 +245,7 @@ struct PhotosScreen: View {
             HStack {
                 Text("Detected Palette").font(.headline)
                 Spacer()
-                Text("(\(palette.count) colors)")
+                Text("(\(matches.count) colors)")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -315,7 +316,6 @@ struct PhotosScreen: View {
             pool = catalogs.loaded[id] ?? []
         }
 
-        // Calcula los matches
         var tempMatches = palette.map { rgb in
             let closest = pool.min(by: {
                 hexToRGB($0.hex).distance(to: rgb) < hexToRGB($1.hex).distance(to: rgb)
@@ -323,7 +323,6 @@ struct PhotosScreen: View {
             return MatchedSwatch(color: rgb, closest: closest)
         }
 
-        // 👇 Elimina duplicados por hex del color comercial (closest)
         var seen: Set<String> = []
         tempMatches.removeAll { match in
             if let hex = match.closest?.hex, seen.contains(hex) {
@@ -337,7 +336,6 @@ struct PhotosScreen: View {
         matches = tempMatches
     }
 
-
     private func showToast(_ msg: String) {
         toastMessage = msg
         withAnimation { showToast = true }
@@ -346,7 +344,6 @@ struct PhotosScreen: View {
         }
     }
 
-    // MARK: - Remove visually similar colors
     private func removeSimilarColors(from colors: [RGB], threshold: Double) -> [RGB] {
         var unique: [RGB] = []
         for color in colors {
@@ -358,7 +355,7 @@ struct PhotosScreen: View {
     }
 }
 
-// MARK: - Detected Palette Sheet + ColorDetailView sheet
+// MARK: - Detected Palette Sheet + ColorDetailView
 private struct DetectedPaletteSheet: View {
     @EnvironmentObject var favs: FavoritesStore
     @EnvironmentObject var catalog: Catalog
@@ -383,6 +380,7 @@ private struct DetectedPaletteSheet: View {
                                     .fill(Color(display != nil ? hexToRGB(display!.hex).uiColor : m.color.uiColor))
                                     .frame(width: 80, height: 80)
                                     .shadow(color: .black.opacity(0.1), radius: 2, y: 1)
+
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(display?.name ?? "Unnamed Color")
                                         .font(.headline)
