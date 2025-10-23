@@ -74,12 +74,36 @@ struct PhotosScreen: View {
             }
             .navigationTitle("Photo Colours")
             .toolbar {
+                // ⚙️ Botón izquierdo (Filtros)
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button { showVendorSheet = true } label: {
                         Image(systemName: "slider.horizontal.3")
                     }
                 }
+
+                // ⭐ Botón PRO a la derecha si no es usuario PRO
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    if !store.isPro {
+                        Button {
+                            store.showPaywall = true
+                        } label: {
+                            Text("PRO")
+                                .font(.caption.bold())
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 6)
+                                .background(
+                                    LinearGradient(colors: [.purple, .pink],
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing)
+                                )
+                                .foregroundColor(.white)
+                                .cornerRadius(8)
+                                .shadow(color: .black.opacity(0.3), radius: 3, y: 1)
+                        }
+                    }
+                }
             }
+
             .sheet(isPresented: $showVendorSheet) {
                 VendorListSheet(selection: $selection,
                                 candidates: vendorIDs,
@@ -248,16 +272,45 @@ struct PhotosScreen: View {
                     .foregroundColor(.secondary)
             }
 
-            HStack(spacing: 0) {
-                ForEach(matches, id: \.color.hex) { m in
-                    Rectangle()
-                        .fill(m.closest != nil ? Color(hexToRGB(m.closest!.hex).uiColor) : Color(m.color.uiColor))
+            ZStack {
+                HStack(spacing: 0) {
+                    ForEach(matches, id: \.color.hex) { m in
+                        Rectangle()
+                            .fill(m.closest != nil ? Color(hexToRGB(m.closest!.hex).uiColor) : Color(m.color.uiColor))
+                    }
+                }
+                .frame(height: 60)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .shadow(color: .black.opacity(0.1), radius: 3, y: 2)
+                .onTapGesture { showPaletteSheet = true }
+
+                // 🔒 Si no es PRO, mostrar overlay con blur y botón Unlock
+                if !store.isPro {
+                    ZStack {
+                        Rectangle()
+                            .fill(.ultraThinMaterial)
+                            .blur(radius: 6)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                        VStack(spacing: 6) {
+                            Image(systemName: "lock.fill")
+                                .font(.title3)
+                                .foregroundColor(.white)
+                            Text("Unlock Full Palette")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(Color.purple.opacity(0.8))
+                                .clipShape(Capsule())
+                        }
+                        .onTapGesture {
+                            store.showPaywall = true
+                        }
+                    }
+                    .transition(.opacity)
                 }
             }
-            .frame(height: 60)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-            .shadow(color: .black.opacity(0.1), radius: 3, y: 2)
-            .onTapGesture { showPaletteSheet = true }
 
             Button {
                 if store.isPro {
@@ -273,7 +326,7 @@ struct PhotosScreen: View {
                     .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 10)
-                    .background(Color.white)
+                    .background(Color.white.opacity(0.8))
                     .overlay(
                         RoundedRectangle(cornerRadius: 10)
                             .stroke(Color.blue.opacity(0.3), lineWidth: 1)
@@ -288,6 +341,7 @@ struct PhotosScreen: View {
         .shadow(color: .black.opacity(0.1), radius: 4, y: 2)
         .padding(.horizontal)
     }
+
 
     // MARK: - Helpers
     fileprivate struct MatchedSwatch { let color: RGB; let closest: NamedColor? }
