@@ -42,7 +42,7 @@ private struct SystemPhotoPicker: UIViewControllerRepresentable {
     }
 }
 
-// MARK: - View
+// MARK: - Main View
 struct PhotosScreen: View {
     @EnvironmentObject var store: StoreVM
     @EnvironmentObject var favs: FavoritesStore
@@ -52,13 +52,13 @@ struct PhotosScreen: View {
     @State private var image: UIImage?
     @State private var palette: [RGB] = []
     @State private var matches: [MatchedSwatch] = []
-
     @State private var selection: CatalogSelection = .all
     @State private var showVendorSheet = false
     @State private var showSystemPicker = false
-
     @State private var showToast = false
     @State private var toastMessage = ""
+    @State private var pulse = false
+    @State private var showPaletteSheet = false
 
     private var vendorIDs: [CatalogID] { CatalogID.allCases.filter { $0 != .generic } }
 
@@ -66,38 +66,8 @@ struct PhotosScreen: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 18) {
-
-                    // 🔹 Mantiene el mismo estilo azul del filtro activo
                     if selection.isFiltered {
-                        HStack(spacing: 8) {
-                            Image(systemName: "line.3.horizontal.decrease.circle")
-                            Text(selection.filterSubtitle).lineLimit(1)
-                            Spacer()
-                            Button {
-                                withAnimation(.easeInOut) {
-                                    selection = .all
-                                    VendorSelectionStorage.save(selection)
-                                    rebuildMatches()
-                                }
-                            } label: {
-                                Label("Clear", systemImage: "xmark.circle.fill")
-                                    .labelStyle(.titleAndIcon)
-                            }
-                            .buttonStyle(.bordered)
-                            .tint(.blue)
-                            .font(.caption.bold())
-                        }
-                        .font(.footnote)
-                        .padding(10)
-                        .background(Color.blue.opacity(0.12))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.blue.opacity(0.5), lineWidth: 1)
-                        )
-                        .foregroundColor(.blue)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
-                        .padding(.horizontal)
-                        .transition(.move(edge: .top).combined(with: .opacity))
+                        filterHeader
                     }
 
                     if !palette.isEmpty {
@@ -125,11 +95,7 @@ struct PhotosScreen: View {
                                 .font(.caption.bold())
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 6)
-                                .background(
-                                    LinearGradient(colors: [.purple, .pink],
-                                                   startPoint: .topLeading,
-                                                   endPoint: .bottomTrailing)
-                                )
+                                .background(Color.accentColor)
                                 .foregroundColor(.white)
                                 .cornerRadius(8)
                                 .shadow(radius: 2)
@@ -149,8 +115,15 @@ struct PhotosScreen: View {
                     rebuildMatches()
                 }
             }
-            .sheet(isPresented: $store.showPaywall) {
+            .sheet(isPresented: Binding(
+                get: { store.showPaywall },
+                set: { newValue in if !newValue { store.showPaywall = false } })
+            ) {
                 PaywallView().environmentObject(store)
+            }
+            .sheet(isPresented: $showPaletteSheet) {
+                DetectedPaletteSheet(matches: matches)
+                    .presentationDetents([.medium, .large])
             }
             .fullScreenCover(isPresented: $showSystemPicker) {
                 SystemPhotoPicker(isPresented: $showSystemPicker, image: $image) { uiimg in
@@ -187,7 +160,39 @@ struct PhotosScreen: View {
         }
     }
 
-    // MARK: - Image Section (refined Change Photo)
+    // MARK: - Filter Header
+    private var filterHeader: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "line.3.horizontal.decrease.circle")
+            Text(selection.filterSubtitle).lineLimit(1)
+            Spacer()
+            Button {
+                withAnimation(.easeInOut) {
+                    selection = .all
+                    VendorSelectionStorage.save(selection)
+                    rebuildMatches()
+                }
+            } label: {
+                Label("Clear", systemImage: "xmark.circle.fill")
+                    .labelStyle(.titleAndIcon)
+            }
+            .buttonStyle(.bordered)
+            .tint(.blue)
+            .font(.caption.bold())
+        }
+        .font(.footnote)
+        .padding(10)
+        .background(Color.blue.opacity(0.12))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(Color.blue.opacity(0.5), lineWidth: 1)
+        )
+        .foregroundColor(.blue)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .padding(.horizontal)
+    }
+
+    // MARK: - Image Section
     private var imageSection: some View {
         VStack(spacing: 14) {
             if let img = image {
@@ -199,7 +204,6 @@ struct PhotosScreen: View {
                         .shadow(radius: 6)
                         .padding(.horizontal, 12)
                         .padding(.top, 6)
-                        .onTapGesture { showSystemPicker = true }
 
                     Button {
                         showSystemPicker = true
@@ -207,37 +211,20 @@ struct PhotosScreen: View {
                         Label("Change Photo", systemImage: "photo.on.rectangle")
                             .font(.headline.weight(.semibold))
                             .foregroundColor(.white)
-                            .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                             .padding(.horizontal, 26)
                             .padding(.vertical, 12)
                             .background(
-                                LinearGradient(
-                                    colors: [
-                                        Color.blue.opacity(0.85),
-                                        Color.purple.opacity(0.9)
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                                .blur(radius: 0.5)
-                                .overlay(
-                                    VisualEffectBlur(style: .systemUltraThinMaterialDark)
-                                        .clipShape(Capsule())
-                                )
-                                .clipShape(Capsule())
+                                VisualEffectBlur(style: .systemUltraThinMaterialDark)
+                                    .clipShape(Capsule())
+                                    .overlay(
+                                        Capsule()
+                                            .stroke(Color.white.opacity(0.4), lineWidth: 1)
+                                    )
                             )
-                            .overlay(
-                                Capsule()
-                                    .stroke(LinearGradient(colors: [.white.opacity(0.6), .white.opacity(0.2)],
-                                                           startPoint: .topLeading,
-                                                           endPoint: .bottomTrailing),
-                                            lineWidth: 1)
-                            )
+                            .shadow(color: .black.opacity(0.3), radius: 5)
                     }
                     .buttonStyle(.plain)
                     .padding(.top, 18)
-                    .scaleEffect(showSystemPicker ? 0.97 : 1)
-                    .animation(.spring(response: 0.3, dampingFraction: 0.7), value: showSystemPicker)
                 }
             } else {
                 VStack(spacing: 14) {
@@ -290,15 +277,16 @@ struct PhotosScreen: View {
                     }
                     .frame(height: 60)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
+                    .shadow(color: .black.opacity(0.1), radius: 3, y: 2)
+                    .onTapGesture { showPaletteSheet = true }
 
                     Button {
                         if store.isPro {
                             let finals = matches.map { $0.closest != nil ? hexToRGB($0.closest!.hex) : $0.color }
                             let name: String
                             switch selection {
-                            case .all:          name = "All Colors Palette"
-                            case .genericOnly:  name = "Generic Colors"
+                            case .all: name = "All Colors Palette"
+                            case .genericOnly: name = "Generic Colors"
                             case .vendor(let id): name = id.displayName
                             }
                             let unique = Array(Set(finals.map { $0.hex })).compactMap { hexToRGB($0) }
@@ -313,75 +301,34 @@ struct PhotosScreen: View {
                             .padding(.horizontal, 20)
                             .padding(.vertical, 10)
                             .frame(maxWidth: .infinity)
-                            .background(Color.accentColor.opacity(0.15))
-                            .foregroundColor(.accentColor)
+                            .background(Color.accentColor)
+                            .foregroundColor(.white)
                             .cornerRadius(10)
-                            .blur(radius: store.isPro ? 0 : 2.5)
-                            .opacity(store.isPro ? 1 : 0.6)
+                            .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
                     }
-                    .disabled(!store.isPro)
-                    .padding(.top, 4)
+                    .padding(.top, 6)
                 }
             }
             .padding(14)
             .background(.ultraThinMaterial)
             .clipShape(RoundedRectangle(cornerRadius: 20))
-            .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+            .shadow(color: .black.opacity(0.1), radius: 4, y: 2)
             .padding(.horizontal)
-
-            // 🔹 Refined Unlock Full Palette
-            if !store.isPro {
-                VisualEffectBlur(style: .systemUltraThinMaterialLight)
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
-                    .padding(.horizontal)
-                    .allowsHitTesting(false)
-
-                Button {
-                    store.showPaywall = true
-                } label: {
-                    HStack(spacing: 8) {
-                        Image(systemName: "lock.fill")
-                        Text("Unlock Full Palette")
-                            .fontWeight(.semibold)
-                    }
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 38)
-                    .padding(.vertical, 14)
-                    .background(
-                        LinearGradient(
-                            colors: [
-                                Color.purple.opacity(0.9),
-                                Color.pink.opacity(0.9),
-                                Color.orange.opacity(0.85)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                        .clipShape(Capsule())
-                        .shadow(color: .pink.opacity(0.5), radius: 14, x: 0, y: 5)
-                    )
-                    .overlay(
-                        Capsule()
-                            .stroke(Color.white.opacity(0.6), lineWidth: 1)
-                    )
-                }
-                .buttonStyle(.plain)
-                .padding(.top, 10)
-            }
         }
     }
 
     // MARK: - Helpers
-    private struct MatchedSwatch { let color: RGB; let closest: NamedColor? }
+    fileprivate struct MatchedSwatch { let color: RGB; let closest: NamedColor? }
 
     private func preloadForSelection() {
         switch selection {
         case .all:
             catalogs.load(.generic)
             vendorIDs.forEach { catalogs.load($0) }
-        case .genericOnly: catalogs.load(.generic)
-        case .vendor(let id): catalogs.load(id)
+        case .genericOnly:
+            catalogs.load(.generic)
+        case .vendor(let id):
+            catalogs.load(id)
         }
     }
 
@@ -393,8 +340,10 @@ struct PhotosScreen: View {
             let generic = catalogs.loaded[.generic] ?? catalog.names
             let vendors = catalogs.colors(for: Set(vendorIDs))
             pool = generic + vendors
-        case .genericOnly: pool = catalogs.loaded[.generic] ?? catalog.names
-        case .vendor(let id): pool = catalogs.loaded[id] ?? []
+        case .genericOnly:
+            pool = catalogs.loaded[.generic] ?? catalog.names
+        case .vendor(let id):
+            pool = catalogs.loaded[id] ?? []
         }
         matches = palette.map { rgb in
             let closest = pool.min(by: {
@@ -413,11 +362,69 @@ struct PhotosScreen: View {
     }
 }
 
-// MARK: - Blur helper
+// MARK: - Palette Colors Detail Sheet
+private struct DetectedPaletteSheet: View {
+    let matches: [PhotosScreen.MatchedSwatch]
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 14) {
+                    ForEach(matches, id: \.color.hex) { m in
+                        let display = m.closest
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text(display?.name ?? "Unnamed Color")
+                                .font(.headline)
+
+                            if let brand = display?.vendor?.brand {
+                                Text(brand)
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            }
+
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(display != nil ? hexToRGB(display!.hex).uiColor : m.color.uiColor))
+                                .frame(height: 80)
+
+                            Text((display?.hex ?? m.color.hex).uppercased())
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(14)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                        .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
+                    }
+                }
+                .padding(16)
+            }
+            .navigationTitle("Palette Colors")
+        }
+    }
+}
+
+// MARK: - Blur helper + Hex extension
 private struct VisualEffectBlur: UIViewRepresentable {
     let style: UIBlurEffect.Style
     func makeUIView(context: Context) -> UIVisualEffectView {
         UIVisualEffectView(effect: UIBlurEffect(style: style))
     }
     func updateUIView(_ uiView: UIVisualEffectView, context: Context) {}
+}
+
+extension Color {
+    init(hex: String) {
+        let scanner = Scanner(string: hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted))
+        var int: UInt64 = 0
+        scanner.scanHexInt64(&int)
+        let a, r, g, b: UInt64
+        switch hex.count {
+        case 3: (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
+        case 6: (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
+        case 8: (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
+        default:(a, r, g, b) = (255, 0, 0, 0)
+        }
+        self.init(.sRGB, red: Double(r)/255, green: Double(g)/255, blue: Double(b)/255, opacity: Double(a)/255)
+    }
 }
