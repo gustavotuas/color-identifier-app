@@ -419,7 +419,7 @@ private struct DetectedPaletteSheet: View {
     }
 }
 
-// MARK: - Color Picker View (mejorada)
+// MARK: - Color Picker View (zoom + pan + target correcto con compensación)
 struct ColorPickerView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var favs: FavoritesStore
@@ -429,80 +429,154 @@ struct ColorPickerView: View {
     @State private var hexValue: String = "#FFFFFF"
     @State private var touchPoint: CGPoint? = nil
 
+    // Zoom y paneo
+    @State private var scale: CGFloat = 1.0
+    @State private var lastScale: CGFloat = 1.0
+    @State private var offset: CGSize = .zero
+    @State private var lastOffset: CGSize = .zero
+
     var body: some View {
         ZStack {
             GeometryReader { geo in
+                let containerSize = geo.size
+                let fitRect = aspectFitRect(imageSize: image.size, in: containerSize)
+
+                // Capa de imagen con pinch + pan
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFit()
-                    .frame(maxWidth: geo.size.width, maxHeight: geo.size.height)
-                    .contentShape(Rectangle())
-                    .onTapGesture { location in
-                        touchPoint = location
-                        if let color = image.getPixelColor(at: location, in: geo.frame(in: .local)) {
-                            pickedColor = color
-                            hexValue = color.toHexString()
-                        }
-                    }
+                    .frame(width: containerSize.width, height: containerSize.height, alignment: .center)
+                    .scaleEffect(scale, anchor: .center)
+                    .offset(offset)
+                    .gesture(
+                        SimultaneousGesture(
+                            DragGesture() // pan
+                                .onChanged { value in
+                                    offset = CGSize(
+                                        width: lastOffset.width + value.translation.width,
+                                        height: lastOffset.height + value.translation.height
+                                    )
+                                }
+                                .onEnded { _ in
+                                    lastOffset = offset
+                                },
+                            MagnificationGesture() // pinch
+                                .onChanged { value in
+                                    scale = min(max(lastScale * value, 1.0), 4.0)
+                                }
+                                .onEnded { _ in
+                                    lastScale = scale
+                                }
+                        )
+                    )
 
-                // 🎯 Target visual con preview del color
-                if let point = touchPoint {
+                // Capa transparente encima para capturar tap/drag del target y samplear color
+                Rectangle()
+                    .fill(Color.clear)
+                    .contentShape(Rectangle())
+                    .gesture(
+                        DragGesture(minimumDistance: 0)
+                            .onChanged { value in
+                                // Punto en coordenadas del contenedor (pantalla)
+                                let pScreen = value.location
+                                touchPoint = pScreen
+
+                                // 1) Deshacer offset y escala (escala desde el centro del contenedor)
+                                let centered = CGPoint(x: pScreen.x - containerSize.width/2,
+                                                       y: pScreen.y - containerSize.height/2)
+                                let unscaled = CGPoint(x: centered.x / scale, y: centered.y / scale)
+                                let afterScale = CGPoint(x: unscaled.x + containerSize.width/2,
+                                                         y: unscaled.y + containerSize.height/2)
+                                let pBase = CGPoint(x: afterScale.x - offset.width,
+                                                    y: afterScale.y - offset.height)
+
+                                // 2) Convertir al rectángulo aspect-fit (coordenadas relativas)
+                                if fitRect.contains(pBase) {
+                                    let rel = CGPoint(x: pBase.x - fitRect.minX,
+                                                      y: pBase.y - fitRect.minY)
+                                    // 3) Samplear usando el rect del contenido mostrado
+                                    if let color = image.getPixelColor(at: rel, in: fitRect) {
+                                        pickedColor = color
+                                        hexValue = color.toHexString()
+                                    }
+                                }
+                            }
+                    )
+
+                // 🎯 Target con preview del color
+                if let p = touchPoint {
                     VStack(spacing: 6) {
                         Circle()
                             .fill(Color(pickedColor))
-                            .frame(width: 26, height: 26)
+                            .frame(width: 32, height: 32)
                             .shadow(radius: 3)
                             .overlay(Circle().stroke(Color.white, lineWidth: 1))
                         Image(systemName: "plus.circle.fill")
-                            .font(.system(size: 24))
+                            .font(.system(size: 28))
                             .foregroundColor(.white)
                             .shadow(radius: 2)
                     }
-                    .position(point)
-                    .animation(.spring(response: 0.3, dampingFraction: 0.7), value: point)
+                    .position(p)
+                    .animation(.easeInOut(duration: 0.12), value: p)
                 }
             }
 
-            // 🟣 Panel inferior visible sobre la imagen
+            // 🧭 Panel inferior
             VStack(spacing: 10) {
                 RoundedRectangle(cornerRadius: 12)
                     .fill(Color(pickedColor))
                     .frame(width: 80, height: 80)
                     .shadow(radius: 4)
+
                 Text(hexValue)
-                    .font(.headline)
-                    .foregroundColor(.primary)
-                Button("Save to Favorites") {
+                    .font(.headline.weight(.medium))
+                    .foregroundColor(isColorLight(pickedColor) ? .black : .white)
+                    .padding(6)
+                    .padding(.horizontal, 8)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(.ultraThinMaterial)
+                            .shadow(radius: 2)
+                    )
+
+                Button {
                     let rgb = hexToRGB(hexValue)
                     favs.add(color: rgb)
                     dismiss()
+                } label: {
+                    Label("Save to Favorites", systemImage: "heart.fill")
+                        .font(.headline)
+                        .padding(.horizontal, 28)
+                        .padding(.vertical, 12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 14)
+                                .fill(.ultraThinMaterial)
+                                .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14)
+                                .stroke(Color.white.opacity(0.2), lineWidth: 0.8)
+                        )
+                        .foregroundColor(.white)
                 }
-                .font(.headline)
-                .padding(.horizontal, 24)
-                .padding(.vertical, 10)
-                .background(.ultraThinMaterial)
-                .cornerRadius(12)
-                .foregroundColor(.white)
+                .buttonStyle(.plain)
             }
-            .padding(.bottom, 50)
-            .background(
-                LinearGradient(colors: [.black.opacity(0.3), .clear], startPoint: .bottom, endPoint: .top)
-                    .ignoresSafeArea(edges: .bottom)
-            )
+            .padding(.bottom, 60)
             .frame(maxHeight: .infinity, alignment: .bottom)
 
-            // 🔘 Botón “Close” visible arriba
+            // 🔘 Botón “Close”
             VStack {
                 HStack {
                     Button {
                         dismiss()
                     } label: {
                         Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 26))
+                            .font(.system(size: 28))
                             .foregroundColor(.white)
                             .padding(8)
                             .background(Color.black.opacity(0.4))
                             .clipShape(Circle())
+                            .shadow(radius: 2)
                     }
                     Spacer()
                 }
@@ -513,7 +587,33 @@ struct ColorPickerView: View {
         .background(Color.black.opacity(0.9))
         .ignoresSafeArea()
     }
+
+    // MARK: - Helpers
+
+    /// Rectángulo aspect-fit de la imagen dentro del contenedor
+    private func aspectFitRect(imageSize: CGSize, in container: CGSize) -> CGRect {
+        guard imageSize.width > 0, imageSize.height > 0, container.width > 0, container.height > 0 else {
+            return .zero
+        }
+        let scale = min(container.width / imageSize.width, container.height / imageSize.height)
+        let size = CGSize(width: imageSize.width * scale, height: imageSize.height * scale)
+        let origin = CGPoint(x: (container.width - size.width) / 2,
+                             y: (container.height - size.height) / 2)
+        return CGRect(origin: origin, size: size)
+    }
+
+    /// Contraste automático para texto según luminosidad
+    private func isColorLight(_ color: UIColor) -> Bool {
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        color.getRed(&r, green: &g, blue: &b, alpha: &a)
+        let luminance = (0.299 * r + 0.587 * g + 0.114 * b)
+        return luminance > 0.6
+    }
 }
+
+
+
+
 
 
 // MARK: - UIImage pixel color extraction
