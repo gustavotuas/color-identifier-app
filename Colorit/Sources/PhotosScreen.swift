@@ -316,20 +316,36 @@ private var paletteCard: some View {
         .shadow(color: .black.opacity(0.1), radius: 4, y: 2)
         .padding(.horizontal)
 
-        // 🔒 Overlay difuminado mágico
+        // 🔒 Overlay con blur más fuerte en el centro y suave en los bordes
         if !store.isPro {
             ZStack {
+                // Capa base con blur y material
                 Rectangle()
                     .fill(.ultraThinMaterial)
                     .blur(radius: 10)
+                    .opacity(0.95)
+                    .mask(
+                        LinearGradient(
+                            gradient: Gradient(stops: [
+                                .init(color: .white.opacity(0.0), location: 0.0),  // top → menos blur
+                                .init(color: .white.opacity(1.0), location: 0.4),  // centro → más blur
+                                .init(color: .white.opacity(1.0), location: 0.6),  // centro → más blur
+                                .init(color: .white.opacity(1.0), location: 1.0)   // bottom → menos blur
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
                     .clipShape(RoundedRectangle(cornerRadius: 20))
                     .padding(.horizontal)
 
+                // Botón de desbloqueo mágico
                 MagicalUnlockButton()
                     .onTapGesture { store.showPaywall = true }
             }
             .transition(.opacity)
         }
+
     }
 }
 
