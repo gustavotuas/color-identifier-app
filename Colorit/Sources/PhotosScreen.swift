@@ -316,7 +316,7 @@ private var paletteCard: some View {
         .shadow(color: .black.opacity(0.1), radius: 4, y: 2)
         .padding(.horizontal)
 
-        // 🔒 Overlay difuminado que cubre toda la sección si no es PRO
+        // 🔒 Overlay difuminado mágico
         if !store.isPro {
             ZStack {
                 Rectangle()
@@ -325,39 +325,47 @@ private var paletteCard: some View {
                     .clipShape(RoundedRectangle(cornerRadius: 20))
                     .padding(.horizontal)
 
-                VStack(spacing: 10) {
-                    Image(systemName: "lock.open.fill")
-                        .font(.title)
-                        .foregroundColor(.white)
-                        .shadow(color: .white.opacity(0.4), radius: 4, y: 2)
-
-                    Text("Unlock Full Palette")
-                        .font(.headline.weight(.semibold))
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 24)
-                        .padding(.vertical, 10)
-                        .background(
-                            LinearGradient(
-                                colors: [
-                                    Color(hex: "#3C8CE7"), // azul brillante
-                                    Color(hex: "#A63DE8"), // violeta
-                                    Color(hex: "#FF61B6")  // fucsia
-                                ],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .clipShape(Capsule())
-                        .shadow(color: Color.white.opacity(0.3), radius: 6, y: 3)
-                }
-                .onTapGesture {
-                    store.showPaywall = true
-                }
+                MagicalUnlockButton()
+                    .onTapGesture { store.showPaywall = true }
             }
             .transition(.opacity)
         }
     }
 }
+
+// MARK: - Magical Unlock Button (slightly larger, perfect balance)
+private struct MagicalUnlockButton: View {
+    var body: some View {
+        VStack(spacing: 10) {
+            Image(systemName: "lock.fill")
+                .font(.system(size: 22, weight: .semibold))
+                .foregroundColor(.white.opacity(0.95))
+                .shadow(color: .white.opacity(0.4), radius: 3, y: 1)
+
+            Text("Unlock Full Palette")
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundColor(.white)
+                .padding(.horizontal, 26)
+                .padding(.vertical, 10)
+                .background(
+                    LinearGradient(
+                        colors: [
+                            Color(hex: "#3C8CE7"), // azul brillante
+                            Color(hex: "#6F3CE7"), // violeta intenso
+                            Color(hex: "#C63DE8"), // púrpura neón
+                            Color(hex: "#FF61B6")  // fucsia vibrante
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .clipShape(Capsule())
+                .shadow(color: Color.purple.opacity(0.35), radius: 6, y: 3)
+        }
+        .padding(.vertical, 12)
+    }
+}
+
 
 
 
