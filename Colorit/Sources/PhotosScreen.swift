@@ -515,7 +515,6 @@ private struct DetectedPaletteSheet: View {
     }
 }
 
-
 // MARK: - Color Picker View (blur detrás si PRO, encima si no)
 import SwiftUI
 import UIKit
@@ -635,75 +634,78 @@ struct ColorPickerView: View {
                             RoundedRectangle(cornerRadius: 20)
                                 .stroke(Color.white.opacity(0.15), lineWidth: 0.8)
                         )
-                        .frame(width: 250, height: 150)
+                        .frame(width: 250, height: 160)
                         .shadow(color: .black.opacity(0.15), radius: 6, y: 3)
                         .opacity(0.8)
 
                     // 🎨 Contenido (color + hex + Save)
-                    VStack(spacing: 8) {
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(Color(pickedColor))
-                            .frame(width: 70, height: 70)
-                            .shadow(color: .black.opacity(0.1), radius: 3, y: 2)
+VStack(spacing: 10) {
+    RoundedRectangle(cornerRadius: 10)
+        .fill(Color(pickedColor))
+        .frame(width: 70, height: 70)
+        .shadow(color: .black.opacity(0.1), radius: 3, y: 2)
 
-                        // HEX mejorado y legible
-                        Text(hexValue.uppercased())
-                            .font(.caption.bold())
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 4)
-                            .background(
-                                RoundedRectangle(cornerRadius: 6)
-                                    .fill(
-                                        isColorLight(pickedColor)
-                                        ? Color.black.opacity(0.35)
-                                        : Color.white.opacity(0.25)
-                                    )
-                            )
-                            .foregroundColor(isColorLight(pickedColor) ? .white : .black)
-                            .shadow(color: .black.opacity(0.25), radius: 1, y: 1)
+    // HEX legible
+    Text(hexValue.uppercased())
+        .font(.caption.bold())
+        .padding(.horizontal, 10)
+        .padding(.vertical, 4)
+        .background(
+            RoundedRectangle(cornerRadius: 6)
+                .fill(
+                    isColorLight(pickedColor)
+                    ? Color.black.opacity(0.35)
+                    : Color.white.opacity(0.25)
+                )
+        )
+        .foregroundColor(isColorLight(pickedColor) ? .white : .black)
+        .shadow(color: .black.opacity(0.25), radius: 1, y: 1)
 
-                        Button {
-                            if store.isPro {
-                                let rgb = hexToRGB(hexValue)
-                                favs.add(color: rgb)
-                                dismiss()
-                            } else {
-                                store.showPaywall = true
-                            }
-                        } label: {
-                            Label("Save to Favorites", systemImage: "heart.fill")
-                                .font(.subheadline.weight(.semibold))
-                                .padding(.horizontal, 20)
-                                .padding(.vertical, 8)
-                                .background(Color.white.opacity(0.15))
-                                .clipShape(Capsule())
-                                .foregroundColor(.white)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                    .opacity(1)
-                    .zIndex(1)
+    // 🎯 Nuevo botón estilo "Pick Color"
+    Button {
+        if store.isPro {
+            let rgb = hexToRGB(hexValue)
+            favs.add(color: rgb)
+            dismiss()
+        } else {
+            store.showPaywall = true
+        }
+    } label: {
+        Label("Save Color", systemImage: "heart.fill")
+            .font(.subheadline.weight(.semibold))
+            .foregroundColor(.white)
+            .padding(.horizontal, 24)
+            .padding(.vertical, 10)
+            .background(.ultraThinMaterial)
+            .clipShape(Capsule())
+            .shadow(color: .black.opacity(0.25), radius: 4, y: 2)
+    }
+    .buttonStyle(.plain)
+}
+.opacity(1)
+.zIndex(1)
+
 
                     // Blur encima SOLO si no es PRO
                     if !store.isPro {
                         RoundedRectangle(cornerRadius: 20)
                             .fill(.ultraThinMaterial)
-                            .blur(radius: 35)
+                            .blur(radius: 10)
                             .mask(
                                 LinearGradient(
                                     gradient: Gradient(stops: [
                                         .init(color: .white.opacity(0.0), location: 0.0),
                                         .init(color: .white.opacity(1.0), location: 0.3),
                                         .init(color: .white.opacity(1.0), location: 0.7),
-                                        .init(color: .white.opacity(0.0), location: 1.0)
+                                        .init(color: .white.opacity(1.0), location: 1.0)
                                     ]),
                                     startPoint: .top,
                                     endPoint: .bottom
                                 )
                             )
                             .clipShape(RoundedRectangle(cornerRadius: 20))
-                            .frame(width: 250, height: 150)
-                            .opacity(0.95)
+                            .frame(width: 250, height: 160)
+                            .opacity(0.99)
                             .zIndex(2)
 
                         // 🔒 Botón Unlock encima
@@ -794,6 +796,7 @@ private struct MagicalUnlockButtonSmall: View {
         .shadow(color: .purple.opacity(0.35), radius: 5, y: 3)
     }
 }
+
 
 
 
