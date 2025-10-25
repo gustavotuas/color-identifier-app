@@ -660,25 +660,35 @@ struct ColorPickerView: View {
             .padding(.bottom, 60)
             .frame(maxHeight: .infinity, alignment: .bottom)
 
-            // 🔘 Botón “Close”
-            VStack {
-                HStack {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 28))
-                            .foregroundColor(.white)
-                            .padding(8)
-                            .background(Color.black.opacity(0.4))
-                            .clipShape(Circle())
-                            .shadow(radius: 2)
-                    }
-                    Spacer()
-                }
-                .padding()
-                Spacer()
+// 🔘 Botón “Close”
+VStack {
+    HStack {
+        Button {
+            dismiss()
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 22, weight: .semibold))
+                Text("Close")
+                    .font(.headline.weight(.semibold))
             }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(Color.black.opacity(0.5))
+            .foregroundColor(.white)
+            .clipShape(Capsule())
+            .shadow(color: .black.opacity(0.4), radius: 4, y: 2)
+        }
+        Spacer()
+    }
+    // 👇 más espacio para que no quede debajo del notch o zona no tocable
+    .padding(.top, 60)
+    .padding(.leading, 16)
+    Spacer()
+}
+.ignoresSafeArea(.all, edges: .top)
+
+
         }
         .background(Color.black.opacity(0.9))
         .ignoresSafeArea()
