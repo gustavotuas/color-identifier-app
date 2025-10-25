@@ -593,21 +593,38 @@ struct ColorPickerView: View {
                             }
                     )
 
-                // 🎯 Indicador visual del color seleccionado
+                // 🎯 Indicador visual del color seleccionado mejorado
                 if let p = touchPoint {
-                    VStack(spacing: 6) {
+                    ZStack {
+                        // Sombra difusa para destacar sobre fondos claros u oscuros
+                        Circle()
+                            .fill(Color.black.opacity(0.25))
+                            .frame(width: 46, height: 46)
+                            .blur(radius: 2)
+
+                        // Anillo principal con color seleccionado
+                        Circle()
+                            .strokeBorder(Color(pickedColor), lineWidth: 4)
+                            .background(Circle().fill(Color.white.opacity(0.8)))
+                            .frame(width: 38, height: 38)
+                            .shadow(color: .black.opacity(0.3), radius: 3, y: 1)
+
+                        // Punto central (el píxel exacto de muestreo)
                         Circle()
                             .fill(Color(pickedColor))
-                            .frame(width: 32, height: 32)
-                            .shadow(radius: 3)
-                            .overlay(Circle().stroke(Color.white, lineWidth: 1))
-                        Image(systemName: "plus.circle.fill")
-                            .font(.system(size: 28))
-                            .foregroundColor(.white)
+                            .frame(width: 12, height: 12)
+                            .overlay(Circle().stroke(Color.white, lineWidth: 1.2))
+
+                        // Icono guía de precisión
+                        Image(systemName: "plus")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(isColorLight(pickedColor) ? .black : .white)
+                            .shadow(color: .black.opacity(0.2), radius: 1, y: 1)
                     }
                     .position(p)
-                    .animation(.easeInOut(duration: 0.1), value: p)
+                    .animation(.easeInOut(duration: 0.12), value: p)
                 }
+
             }
 
             // MARK: - Contenedor inferior
