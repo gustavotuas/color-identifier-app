@@ -72,7 +72,7 @@ struct PhotosScreen: View {
                 }
                 .padding(.top, 10)
             }
-            .navigationTitle("Photo Colours")
+            .navigationTitle("Photo")
             .toolbar {
                 // ⚙️ Botón izquierdo (Filtros)
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -243,7 +243,7 @@ struct PhotosScreen: View {
                     Image(systemName: "photo.on.rectangle.angled")
                         .font(.system(size: 60))
                         .foregroundColor(.secondary)
-                    Text("Select a photo to discover its colors")
+                    Text("Select an image to extract its colors")
                         .multilineTextAlignment(.center)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
