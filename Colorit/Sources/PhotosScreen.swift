@@ -515,10 +515,12 @@ private struct DetectedPaletteSheet: View {
     }
 }
 
-// MARK: - Color Picker View (zoom + pan + target correcto con compensación)
+
+
 struct ColorPickerView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var favs: FavoritesStore
+    @EnvironmentObject var store: StoreVM
     let image: UIImage
 
     @State private var pickedColor: UIColor = .white
@@ -537,47 +539,42 @@ struct ColorPickerView: View {
                 let containerSize = geo.size
                 let fitRect = aspectFitRect(imageSize: image.size, in: containerSize)
 
-                // Capa de imagen con pinch + pan
+                // Imagen principal
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: containerSize.width, height: containerSize.height, alignment: .center)
-                    .scaleEffect(scale, anchor: .center)
+                    .frame(width: containerSize.width, height: containerSize.height)
+                    .scaleEffect(scale)
                     .offset(offset)
                     .gesture(
                         SimultaneousGesture(
-                            DragGesture() // pan
+                            DragGesture()
                                 .onChanged { value in
                                     offset = CGSize(
                                         width: lastOffset.width + value.translation.width,
                                         height: lastOffset.height + value.translation.height
                                     )
                                 }
-                                .onEnded { _ in
-                                    lastOffset = offset
-                                },
-                            MagnificationGesture() // pinch
+                                .onEnded { _ in lastOffset = offset },
+                            MagnificationGesture()
                                 .onChanged { value in
                                     scale = min(max(lastScale * value, 1.0), 4.0)
                                 }
-                                .onEnded { _ in
-                                    lastScale = scale
-                                }
+                                .onEnded { _ in lastScale = scale }
                         )
                     )
 
-                // Capa transparente encima para capturar tap/drag del target y samplear color
+                // Sampleo de color
                 Rectangle()
                     .fill(Color.clear)
                     .contentShape(Rectangle())
                     .gesture(
                         DragGesture(minimumDistance: 0)
                             .onChanged { value in
-                                // Punto en coordenadas del contenedor (pantalla)
                                 let pScreen = value.location
                                 touchPoint = pScreen
 
-                                // 1) Deshacer offset y escala (escala desde el centro del contenedor)
+                                // Calcular posición real dentro del fitRect
                                 let centered = CGPoint(x: pScreen.x - containerSize.width/2,
                                                        y: pScreen.y - containerSize.height/2)
                                 let unscaled = CGPoint(x: centered.x / scale, y: centered.y / scale)
@@ -586,11 +583,9 @@ struct ColorPickerView: View {
                                 let pBase = CGPoint(x: afterScale.x - offset.width,
                                                     y: afterScale.y - offset.height)
 
-                                // 2) Convertir al rectángulo aspect-fit (coordenadas relativas)
                                 if fitRect.contains(pBase) {
                                     let rel = CGPoint(x: pBase.x - fitRect.minX,
                                                       y: pBase.y - fitRect.minY)
-                                    // 3) Samplear usando el rect del contenido mostrado
                                     if let color = image.getPixelColor(at: rel, in: fitRect) {
                                         pickedColor = color
                                         hexValue = color.toHexString()
@@ -599,7 +594,7 @@ struct ColorPickerView: View {
                             }
                     )
 
-                // 🎯 Target con preview del color
+                // 🎯 Indicador visual del color seleccionado
                 if let p = touchPoint {
                     VStack(spacing: 6) {
                         Circle()
@@ -610,114 +605,153 @@ struct ColorPickerView: View {
                         Image(systemName: "plus.circle.fill")
                             .font(.system(size: 28))
                             .foregroundColor(.white)
-                            .shadow(radius: 2)
                     }
                     .position(p)
-                    .animation(.easeInOut(duration: 0.12), value: p)
+                    .animation(.easeInOut(duration: 0.1), value: p)
                 }
             }
 
-            // 🧭 Panel inferior
-            VStack(spacing: 10) {
-                RoundedRectangle(cornerRadius: 12)
+            // MARK: - Contenedor compacto estilo DetectedPalette
+// MARK: - Contenedor compacto estilo DetectedPalette con fondo borroso
+VStack {
+    Spacer()
+    ZStack {
+        // 🧊 Fondo blur translúcido tipo tarjeta
+        RoundedRectangle(cornerRadius: 20)
+            .fill(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .shadow(color: .black.opacity(0.08), radius: 6, y: 3)
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(Color.white.opacity(0.15), lineWidth: 0.8)
+            )
+            .frame(width: 250, height: 150)
+            .padding(.horizontal)
+
+        // 🎨 Contenido detrás del blur (color + hex + save)
+        ZStack {
+            VStack(spacing: 8) {
+                RoundedRectangle(cornerRadius: 10)
                     .fill(Color(pickedColor))
-                    .frame(width: 80, height: 80)
-                    .shadow(radius: 4)
+                    .frame(width: 70, height: 70)
+                    .shadow(color: .black.opacity(0.15), radius: 3, y: 2)
 
                 Text(hexValue)
-                    .font(.headline.weight(.medium))
+                    .font(.caption.bold())
                     .foregroundColor(isColorLight(pickedColor) ? .black : .white)
-                    .padding(6)
-                    .padding(.horizontal, 8)
-                    .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(.ultraThinMaterial)
-                            .shadow(radius: 2)
-                    )
 
                 Button {
-                    let rgb = hexToRGB(hexValue)
-                    favs.add(color: rgb)
-                    dismiss()
+                    if store.isPro {
+                        let rgb = hexToRGB(hexValue)
+                        favs.add(color: rgb)
+                        dismiss()
+                    } else {
+                        store.showPaywall = true
+                    }
                 } label: {
                     Label("Save to Favorites", systemImage: "heart.fill")
-                        .font(.headline)
-                        .padding(.horizontal, 28)
-                        .padding(.vertical, 12)
-                        .background(
-                            RoundedRectangle(cornerRadius: 14)
-                                .fill(.ultraThinMaterial)
-                                .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 14)
-                                .stroke(Color.white.opacity(0.2), lineWidth: 0.8)
-                        )
+                        .font(.subheadline.weight(.semibold))
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 8)
+                        .background(Color.white.opacity(0.15))
+                        .clipShape(Capsule())
                         .foregroundColor(.white)
                 }
                 .buttonStyle(.plain)
             }
-            .padding(.bottom, 60)
-            .frame(maxHeight: .infinity, alignment: .bottom)
-
-// 🔘 Botón “Close”
-VStack {
-    HStack {
-        Button {
-            dismiss()
-        } label: {
-            HStack(spacing: 6) {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 22, weight: .semibold))
-                Text("Close")
-                    .font(.headline.weight(.semibold))
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
-            .background(Color.black.opacity(0.5))
-            .foregroundColor(.white)
-            .clipShape(Capsule())
-            .shadow(color: .black.opacity(0.4), radius: 4, y: 2)
+            .opacity(0.8)
+            .blur(radius: 15) // 👈 borroso y debajo del blur principal
         }
-        Spacer()
+
+        // 🔒 Botón Unlock Picker encima del blur (solo si no es PRO)
+        if !store.isPro {
+            MagicalUnlockButtonSmall(title: "Unlock Picker")
+                .onTapGesture { store.showPaywall = true }
+        }
     }
-    // 👇 más espacio para que no quede debajo del notch o zona no tocable
-    .padding(.top, 60)
-    .padding(.leading, 16)
-    Spacer()
+    .padding(.bottom, 36)
 }
-.ignoresSafeArea(.all, edges: .top)
 
 
+            // MARK: - Botón Close
+            VStack {
+                HStack {
+                    Button {
+                        dismiss()
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(size: 22, weight: .semibold))
+                            Text("Close")
+                                .font(.headline.weight(.semibold))
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 10)
+                        .background(Color.black.opacity(0.5))
+                        .foregroundColor(.white)
+                        .clipShape(Capsule())
+                        .shadow(color: .black.opacity(0.4), radius: 4, y: 2)
+                    }
+                    Spacer()
+                }
+                .padding(.top, 60)
+                .padding(.leading, 16)
+                Spacer()
+            }
+            .ignoresSafeArea(edges: .top)
         }
         .background(Color.black.opacity(0.9))
         .ignoresSafeArea()
     }
 
     // MARK: - Helpers
-
-    /// Rectángulo aspect-fit de la imagen dentro del contenedor
     private func aspectFitRect(imageSize: CGSize, in container: CGSize) -> CGRect {
-        guard imageSize.width > 0, imageSize.height > 0, container.width > 0, container.height > 0 else {
-            return .zero
-        }
+        guard imageSize.width > 0, imageSize.height > 0, container.width > 0, container.height > 0 else { return .zero }
         let scale = min(container.width / imageSize.width, container.height / imageSize.height)
         let size = CGSize(width: imageSize.width * scale, height: imageSize.height * scale)
-        let origin = CGPoint(x: (container.width - size.width) / 2,
-                             y: (container.height - size.height) / 2)
+        let origin = CGPoint(x: (container.width - size.width) / 2, y: (container.height - size.height) / 2)
         return CGRect(origin: origin, size: size)
     }
 
-    /// Contraste automático para texto según luminosidad
     private func isColorLight(_ color: UIColor) -> Bool {
         var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
         color.getRed(&r, green: &g, blue: &b, alpha: &a)
-        let luminance = (0.299 * r + 0.587 * g + 0.114 * b)
-        return luminance > 0.6
+        return (0.299 * r + 0.587 * g + 0.114 * b) > 0.6
     }
 }
 
+// MARK: - Mini botón mágico PRO
+private struct MagicalUnlockButtonSmall: View {
+    var title: String
 
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "lock.fill")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundColor(.white.opacity(0.95))
+                .shadow(color: .white.opacity(0.3), radius: 2, y: 1)
+            Text(title)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(.white)
+        }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 10)
+        .background(
+            LinearGradient(
+                colors: [
+                    Color(hex: "#3C8CE7"),
+                    Color(hex: "#6F3CE7"),
+                    Color(hex: "#C63DE8"),
+                    Color(hex: "#FF61B6")
+                ],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+        )
+        .clipShape(Capsule())
+        .shadow(color: .purple.opacity(0.35), radius: 5, y: 3)
+    }
+}
 
 
 
