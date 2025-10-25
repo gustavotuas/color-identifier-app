@@ -573,8 +573,6 @@ struct ColorPickerView: View {
                             .onChanged { value in
                                 let pScreen = value.location
                                 touchPoint = pScreen
-
-                                // Calcular posición real dentro del fitRect
                                 let centered = CGPoint(x: pScreen.x - containerSize.width/2,
                                                        y: pScreen.y - containerSize.height/2)
                                 let unscaled = CGPoint(x: centered.x / scale, y: centered.y / scale)
@@ -582,7 +580,6 @@ struct ColorPickerView: View {
                                                          y: unscaled.y + containerSize.height/2)
                                 let pBase = CGPoint(x: afterScale.x - offset.width,
                                                     y: afterScale.y - offset.height)
-
                                 if fitRect.contains(pBase) {
                                     let rel = CGPoint(x: pBase.x - fitRect.minX,
                                                       y: pBase.y - fitRect.minY)
@@ -611,67 +608,88 @@ struct ColorPickerView: View {
                 }
             }
 
-            // MARK: - Contenedor compacto estilo DetectedPalette
-// MARK: - Contenedor compacto estilo DetectedPalette con fondo borroso
-VStack {
-    Spacer()
-    ZStack {
-        // 🧊 Fondo blur translúcido tipo tarjeta
-        RoundedRectangle(cornerRadius: 20)
-            .fill(.ultraThinMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 20))
-            .shadow(color: .black.opacity(0.08), radius: 6, y: 3)
-            .overlay(
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(Color.white.opacity(0.15), lineWidth: 0.8)
-            )
-            .frame(width: 250, height: 150)
-            .padding(.horizontal)
-
-        // 🎨 Contenido detrás del blur (color + hex + save)
-        ZStack {
-            VStack(spacing: 8) {
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(Color(pickedColor))
-                    .frame(width: 70, height: 70)
-                    .shadow(color: .black.opacity(0.15), radius: 3, y: 2)
-
-                Text(hexValue)
-                    .font(.caption.bold())
-                    .foregroundColor(isColorLight(pickedColor) ? .black : .white)
-
-                Button {
-                    if store.isPro {
-                        let rgb = hexToRGB(hexValue)
-                        favs.add(color: rgb)
-                        dismiss()
-                    } else {
-                        store.showPaywall = true
+            // MARK: - Contenedor inferior
+            VStack {
+                Spacer()
+                ZStack {
+                    // 🧊 Fondo blur centrado (solo si NO es PRO)
+                    if !store.isPro {
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill(.ultraThinMaterial)
+                            .blur(radius: 35)
+                            .mask(
+                                LinearGradient(
+                                    gradient: Gradient(stops: [
+                                        .init(color: .white.opacity(0.0), location: 0.0),
+                                        .init(color: .white.opacity(1.0), location: 0.3),
+                                        .init(color: .white.opacity(1.0), location: 0.7),
+                                        .init(color: .white.opacity(0.0), location: 1.0)
+                                    ]),
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 20)
+                                    .stroke(Color.white.opacity(0.15), lineWidth: 0.8)
+                            )
+                            .frame(width: 250, height: 150)
+                            .shadow(color: .black.opacity(0.15), radius: 6, y: 3)
                     }
-                } label: {
-                    Label("Save to Favorites", systemImage: "heart.fill")
-                        .font(.subheadline.weight(.semibold))
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 8)
-                        .background(Color.white.opacity(0.15))
-                        .clipShape(Capsule())
-                        .foregroundColor(.white)
+
+                    // 🎨 Fondo (color + hex + Save)
+                    VStack(spacing: 8) {
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color(pickedColor))
+                            .frame(width: 70, height: 70)
+                            .shadow(color: .black.opacity(0.1), radius: 3, y: 2)
+
+                        Text(hexValue.uppercased())
+                        .font(.caption.bold())
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(
+                            RoundedRectangle(cornerRadius: 6)
+                                .fill(
+                                    isColorLight(pickedColor)
+                                    ? Color.black.opacity(0.35)
+                                    : Color.white.opacity(0.25)
+                                )
+                        )
+                        .foregroundColor(isColorLight(pickedColor) ? .white : .black)
+                        .shadow(color: .black.opacity(0.25), radius: 1, y: 1)
+
+
+                        Button {
+                            if store.isPro {
+                                let rgb = hexToRGB(hexValue)
+                                favs.add(color: rgb)
+                                dismiss()
+                            } else {
+                                store.showPaywall = true
+                            }
+                        } label: {
+                            Label("Save to Favorites", systemImage: "heart.fill")
+                                .font(.subheadline.weight(.semibold))
+                                .padding(.horizontal, 20)
+                                .padding(.vertical, 8)
+                                .background(Color.white.opacity(0.15))
+                                .clipShape(Capsule())
+                                .foregroundColor(.white)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .opacity(store.isPro ? 1 : 0.9)
+                    .blur(radius: store.isPro ? 0 : 18) // 👈 el blur desaparece si es PRO
+
+                    // 🔒 Botón Unlock encima (solo si no es PRO)
+                    if !store.isPro {
+                        MagicalUnlockButtonSmall(title: "Unlock Picker")
+                            .onTapGesture { store.showPaywall = true }
+                    }
                 }
-                .buttonStyle(.plain)
+                .padding(.bottom, 36)
             }
-            .opacity(0.8)
-            .blur(radius: 15) // 👈 borroso y debajo del blur principal
-        }
-
-        // 🔒 Botón Unlock Picker encima del blur (solo si no es PRO)
-        if !store.isPro {
-            MagicalUnlockButtonSmall(title: "Unlock Picker")
-                .onTapGesture { store.showPaywall = true }
-        }
-    }
-    .padding(.bottom, 36)
-}
-
 
             // MARK: - Botón Close
             VStack {
@@ -720,7 +738,7 @@ VStack {
     }
 }
 
-// MARK: - Mini botón mágico PRO
+// MARK: - Mini botón PRO
 private struct MagicalUnlockButtonSmall: View {
     var title: String
 
@@ -752,8 +770,6 @@ private struct MagicalUnlockButtonSmall: View {
         .shadow(color: .purple.opacity(0.35), radius: 5, y: 3)
     }
 }
-
-
 
 
 // MARK: - UIImage pixel color extraction
