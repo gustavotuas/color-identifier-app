@@ -139,7 +139,7 @@ private struct BucketGrid: View {
         GeometryReader { geo in
             let (buckets, yMin, yMax) = buildBuckets()
             let spacing: CGFloat = 6
-            let width = geo.size.width - 16 // 8 padding each side
+            let width = geo.size.width - 24 // 12 padding each side
             let cellW = (width - spacing * CGFloat(hueBins - 1)) / CGFloat(hueBins)
             let rowsCount = max(1, (yMax - yMin + 1))
             let totalHeight = CGFloat(rowsCount) * cellW + spacing * CGFloat(rowsCount - 1)
@@ -235,7 +235,7 @@ private struct BucketCell: View {
     }
 }
 
-// MARK: - Bucket Detail Sheet
+// MARK: - Bucket Detail Sheet (tap color → opens ColorDetailView)
 
 private struct BucketDetailSheet: View {
     let key: BucketKey
@@ -249,6 +249,9 @@ private struct BucketDetailSheet: View {
 
     @State private var pageSize = 80
     private let pageStep = 80
+
+    // 👇 nuevo estado para abrir ColorDetailView
+    @State private var selectedColor: NamedColor? = nil
 
     private var itemsAll: [NamedColor] {
         let filtered = colors.filter { c in
@@ -273,7 +276,7 @@ private struct BucketDetailSheet: View {
             List {
                 Section {
                     ForEach(itemsPage) { nc in
-                        BucketRowItem(nc: nc)
+                        BucketRowItem(nc: nc, onTap: { selectedColor = nc })
                             .environmentObject(favs)
                     }
 
@@ -301,22 +304,25 @@ private struct BucketDetailSheet: View {
                     } label: {
                         HStack(spacing: 4) {
                             Image(systemName: "xmark.circle.fill")
-                            Text("Close")
-                                .font(.subheadline.bold())
+                            Text("Close").font(.subheadline.bold())
                         }
                     }
                     .tint(.secondary)
                 }
             }
         }
+        // 👇 sheet para abrir ColorDetailView al tocar el color
+        .sheet(item: $selectedColor) { color in
+            ColorDetailView(color: color)
+                .environmentObject(favs)
+        }
     }
 }
-
-// MARK: - Row Item + Spotify Favorite
 
 private struct BucketRowItem: View {
     @EnvironmentObject var favs: FavoritesStore
     let nc: NamedColor
+    let onTap: () -> Void
     @State private var animateFav = false
 
     private var isFav: Bool {
@@ -326,10 +332,10 @@ private struct BucketRowItem: View {
 
     var body: some View {
         HStack(spacing: 12) {
+            // Swatch SIN gestos (para no competir con los del row)
             RoundedRectangle(cornerRadius: 8)
                 .fill(Color(hexToRGB(nc.hex).uiColor))
                 .frame(width: 42, height: 42)
-                .onTapGesture(count: 2) { toggleFav() }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(nc.name).font(.subheadline).lineLimit(1)
@@ -343,12 +349,21 @@ private struct BucketRowItem: View {
             }
             Spacer()
 
-            SpotifyFavoriteSmallButton(hex: nc.hex)
+            LikeFavoriteSmallButton(hex: nc.hex)
                 .scaleEffect(animateFav ? 1.12 : 1.0)
                 .animation(.spring(response: 0.3, dampingFraction: 0.6), value: animateFav)
         }
         .padding(.vertical, 2)
-        .onTapGesture(count: 2) { toggleFav() }
+        // El row entero define la zona táctil
+        .contentShape(Rectangle())
+        // 1) Doble tap con prioridad alta -> like/unlike
+        .highPriorityGesture(
+            TapGesture(count: 2).onEnded { toggleFav() }
+        )
+        // 2) Tap simple -> abrir ColorDetailView
+        .onTapGesture {
+            onTap()
+        }
     }
 
     private func toggleFav() {
@@ -366,7 +381,10 @@ private struct BucketRowItem: View {
     }
 }
 
-private struct SpotifyFavoriteSmallButton: View {
+
+// MARK: - Spotify Favorite Button (reutilizado)
+
+private struct LikeFavoriteSmallButton: View {
     @EnvironmentObject var favs: FavoritesStore
     let hex: String
 
