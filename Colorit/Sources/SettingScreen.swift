@@ -1,15 +1,64 @@
 import SwiftUI
 import UIKit
 
+
+// MARK: - SettingScreen
 struct SettingScreen: View {
     @EnvironmentObject var store: StoreVM
-    @EnvironmentObject var theme: ThemeManager   // 👈 Nuevo
+    @EnvironmentObject var theme: ThemeManager
+    @EnvironmentObject var languageManager: LanguageManager
 
     // 🔹 Lee la versión automáticamente desde Info.plist
     private var appVersion: String {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"
         return "\(version) (\(build))"
+    }
+
+    // 🔹 Lista de idiomas disponibles (coincide con tus .lproj)
+    private let languages: [(code: String, name: String, flag: String)] = [
+        ("system", "System", "🖥️"),
+        ("ar", "العربية", "🇸🇦"),
+        ("bn", "বাংলা", "🇧🇩"),
+        ("cs", "Čeština", "🇨🇿"),
+        ("da", "Dansk", "🇩🇰"),
+        ("de", "Deutsch", "🇩🇪"),
+        ("el", "Ελληνικά", "🇬🇷"),
+        ("en", "English", "🇬🇧"),
+        ("es", "Español", "🇪🇸"),
+        ("fa", "فارسی", "🇮🇷"),
+        ("fi", "Suomi", "🇫🇮"),
+        ("fil", "Filipino", "🇵🇭"),
+        ("fr", "Français", "🇫🇷"),
+        ("he", "עברית", "🇮🇱"),
+        ("hi", "हिन्दी", "🇮🇳"),
+        ("hu", "Magyar", "🇭🇺"),
+        ("id", "Bahasa Indonesia", "🇮🇩"),
+        ("it", "Italiano", "🇮🇹"),
+        ("ja", "日本語", "🇯🇵"),
+        ("ko", "한국어", "🇰🇷"),
+        ("ms", "Bahasa Melayu", "🇲🇾"),
+        ("nl", "Nederlands", "🇳🇱"),
+        ("no", "Norsk", "🇳🇴"),
+        ("pl", "Polski", "🇵🇱"),
+        ("pt-BR", "Português (Brasil)", "🇧🇷"),
+        ("pt-PT", "Português (Portugal)", "🇵🇹"),
+        ("ro", "Română", "🇷🇴"),
+        ("ru", "Русский", "🇷🇺"),
+        ("sk", "Slovenčina", "🇸🇰"),
+        ("sv", "Svenska", "🇸🇪"),
+        ("sw", "Kiswahili", "🇰🇪"),
+        ("ta", "தமிழ்", "🇮🇳"),
+        ("th", "ไทย", "🇹🇭"),
+        ("tr", "Türkçe", "🇹🇷"),
+        ("uk", "Українська", "🇺🇦"),
+        ("vi", "Tiếng Việt", "🇻🇳"),
+        ("zh-Hans", "中文 (简体)", "🇨🇳"),
+        ("zh-Hant", "中文 (繁體)", "🇹🇼")
+    ]
+
+    private var currentLanguage: (code: String, name: String, flag: String) {
+        languages.first(where: { $0.code == languageManager.selectedLanguageCode }) ?? languages.first(where: { $0.code == "system" })!
     }
 
     var body: some View {
@@ -53,6 +102,52 @@ struct SettingScreen: View {
                 }
                 .pickerStyle(.segmented)
             }
+
+            // MARK: - Language (custom dropdown)
+            Section {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Language")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+
+                    Menu {
+                        ForEach(languages, id: \.code) { lang in
+                            Button {
+                                Haptic.tap()
+                                languageManager.selectedLanguageCode = lang.code
+                            } label: {
+                                if lang.code == languageManager.selectedLanguageCode {
+                                    Label("\(lang.flag) \(lang.name)", systemImage: "checkmark")
+                                } else {
+                                    Text("\(lang.flag) \(lang.name)")
+                                }
+                            }
+                        }
+                    } label: {
+                        HStack {
+                            Text("\(currentLanguage.flag) \(currentLanguage.name)")
+                                .foregroundColor(.primary)
+                            Spacer()
+                            Image(systemName: "chevron.up.chevron.down")
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(.horizontal)
+                        .padding(.vertical, 10)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(.ultraThinMaterial)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.gray.opacity(0.15), lineWidth: 1)
+                                )
+                        )
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+
+
 
             // MARK: - About
             Section(header: Text("About")) {

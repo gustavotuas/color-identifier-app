@@ -74,7 +74,7 @@ struct PhotosScreen: View {
                 }
                 .padding(.top, 10)
             }
-            .navigationTitle("Photo")
+            .navigationTitle("photos".localized)
             .toolbar {
                 // ⚙️ Botón izquierdo (Filtros)
                 ToolbarItem(placement: .navigationBarLeading) {
