@@ -376,12 +376,11 @@ struct SearchScreen: View {
 
 }
 
-// MARK: - ColorRow
-
 struct ColorRow: View {
     @EnvironmentObject var favs: FavoritesStore
     let color: NamedColor
     @State private var showDetail = false
+    @State private var tapCount = 0
 
     var body: some View {
         HStack(spacing: 12) {
@@ -390,44 +389,79 @@ struct ColorRow: View {
                 .frame(width: 45, height: 45)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(color.name).font(.headline).lineLimit(1)
+                Text(color.name)
+                    .font(.headline)
+                    .lineLimit(1)
                 HStack(spacing: 6) {
-                    Text(color.hex).font(.caption).foregroundColor(.secondary)
+                    Text(color.hex)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                     if let brand = color.vendor?.brand, let code = color.vendor?.code {
-                        Text("• \(brand) \(code)").font(.caption).foregroundColor(.secondary)
+                        Text("• \(brand) \(code)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
                 }
             }
 
             Spacer()
 
+            // ✅ Botón tipo Spotify
             Button {
-                let rgb = hexToRGB(color.hex)
-                withAnimation(.easeInOut(duration: 0.2)) {
-                    if isFavoriteNormalized {
-                        favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
-                    } else {
-                        let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
-                        if !exists { favs.add(color: rgb) }
-                    }
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                    toggleFavorite()
+                    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
                 }
-                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
             } label: {
-                Image(systemName: isFavoriteNormalized ? "heart.fill" : "heart")
-                    .font(.system(size: 20))
-                    .foregroundColor(isFavoriteNormalized ? .pink : .gray)
+                ZStack {
+                    Circle()
+                        .strokeBorder(isFavoriteNormalized ? Color.clear : Color(red: 179/255, green: 179/255, blue: 179/255), lineWidth: 1.4)
+                        .background(
+                            Circle()
+                                .fill(isFavoriteNormalized ? Color(red: 30/255, green: 215/255, blue: 96/255) : Color.clear)
+                        )
+                        .frame(width: 22, height: 22)
+
+                    Image(systemName: isFavoriteNormalized ? "checkmark" : "plus")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundColor(isFavoriteNormalized ? .black : Color(red: 179/255, green: 179/255, blue: 179/255))
+                }
+                .scaleEffect(isFavoriteNormalized ? 1.1 : 1.0)
+                .animation(.spring(response: 0.3, dampingFraction: 0.5), value: isFavoriteNormalized)
             }
             .buttonStyle(.plain)
         }
         .padding(.vertical, 6)
         .contentShape(Rectangle())
-        .onTapGesture {
+
+        // ✅ Doble tap para like / unlike
+        .onTapGesture(count: 2) {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                toggleFavorite()
+            }
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        }
+
+        // 👆 Tap simple para abrir detalle (separado)
+        .onTapGesture(count: 1) {
             showDetail = true
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
         }
+
         .sheet(isPresented: $showDetail) {
             ColorDetailView(color: color)
                 .environmentObject(favs)
+        }
+    }
+
+    // MARK: - Helpers
+    private func toggleFavorite() {
+        let rgb = hexToRGB(color.hex)
+        if isFavoriteNormalized {
+            favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
+        } else {
+            let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
+            if !exists { favs.add(color: rgb) }
         }
     }
 
@@ -437,7 +471,6 @@ struct ColorRow: View {
     }
 }
 
-// MARK: - ColorTile
 
 struct ColorTile: View {
     @EnvironmentObject var favs: FavoritesStore
@@ -447,66 +480,78 @@ struct ColorTile: View {
     @State private var showDetail = false
 
     var body: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 4) {
             ZStack(alignment: .topTrailing) {
+
+                // Fondo del color principal (solo gestiona los taps grandes)
                 RoundedRectangle(cornerRadius: 10)
                     .fill(Color(uiColor(for: color.hex)))
                     .frame(height: layout == .grid3 ? 90 : 120)
-                    .onTapGesture {
+                    .contentShape(Rectangle()) // asegura área de toque completa
+                    .simultaneousGesture( // ✅ combinamos gestos sin bloquear el botón
+                        TapGesture(count: 2).onEnded {
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                                toggleFavorite()
+                            }
+                            UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+                        }
+                    )
+                    .onTapGesture(count: 1) {
                         showDetail = true
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     }
-                    .contextMenu {
-                        Button {
-                            let rgb = hexToRGB(color.hex)
-                            if isFavoriteNormalized {
-                                favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
-                            } else {
-                                let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
-                                if !exists { favs.add(color: rgb) }
-                            }
-                            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                        } label: {
-                            Label(isFavoriteNormalized ? "Remove from Favorites" : "Add to Favorites",
-                                  systemImage: isFavoriteNormalized ? "heart.slash" : "heart")
-                        }
-                    }
 
+                // ✅ Botón tipo Spotify — ahora responde sin retraso
                 Button {
-                    let rgb = hexToRGB(color.hex)
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) {
-                        if isFavoriteNormalized {
-                            favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
-                        } else {
-                            let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
-                            if !exists { favs.add(color: rgb) }
-                        }
+                    withAnimation(.spring(response: 0.25, dampingFraction: 0.7)) {
+                        toggleFavorite()
+                        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
                     }
-                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                 } label: {
-                    Image(systemName: isFavoriteNormalized ? "heart.fill" : "heart")
-                        .font(.system(size: 14))
-                        .foregroundColor(iconColor(for: color))
-                        .padding(6)
-                        .background(.ultraThinMaterial, in: Circle())
-                        .padding(6)
-                        .scaleEffect(isFavoriteNormalized ? 1.3 : 1.0)
-                        .animation(.spring(response: 0.3, dampingFraction: 0.5), value: isFavoriteNormalized)
+                    ZStack {
+                        Circle()
+                            .strokeBorder(isFavoriteNormalized ? Color.clear : Color(red: 179/255, green: 179/255, blue: 179/255), lineWidth: 1.4)
+                            .background(
+                                Circle()
+                                    .fill(isFavoriteNormalized ? Color(red: 30/255, green: 215/255, blue: 96/255) : Color.clear)
+                            )
+                            .frame(width: 22, height: 22)
+                            .contentShape(Circle())
+
+                        Image(systemName: isFavoriteNormalized ? "checkmark" : "plus")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundColor(isFavoriteNormalized ? .black : Color(red: 179/255, green: 179/255, blue: 179/255))
+                    }
+                    .scaleEffect(isFavoriteNormalized ? 1.15 : 1.0)
+                    .animation(.spring(response: 0.3, dampingFraction: 0.5), value: isFavoriteNormalized)
+                    .padding(6)
                 }
                 .buttonStyle(.plain)
+                .contentShape(Rectangle()) // 👈 hace que capture el tap antes del fondo
+                .highPriorityGesture( // 👈 prioriza el toque del botón
+                    TapGesture().onEnded {
+                        withAnimation(.spring(response: 0.25, dampingFraction: 0.7)) {
+                            toggleFavorite()
+                            UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+                        }
+                    }
+                )
             }
 
-            VStack(spacing: 2) {
+            // Info del color
+            VStack(spacing: 1) {
                 Text(color.name).font(.caption.bold()).lineLimit(1)
                 HStack(spacing: 4) {
                     Text(color.hex).font(.caption2).foregroundColor(.secondary)
                     if let brand = color.vendor?.brand, let code = color.vendor?.code {
-                        Text("• \(brand) \(code)").font(.caption2).foregroundColor(.secondary).lineLimit(1)
+                        Text("• \(brand) \(code)")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                            .lineLimit(1)
                     }
                 }
             }
-            // 👇 Aquí está el único cambio solicitado
-            .padding(6)
+            .padding(.vertical, 4)
             .frame(maxWidth: .infinity)
             .background(
                 colorScheme == .dark
@@ -523,17 +568,20 @@ struct ColorTile: View {
         }
     }
 
-    private func iconColor(for named: NamedColor) -> Color {
-        let rgb = hexToRGB(named.hex)
-        let brightness = (0.299 * Double(rgb.r) + 0.587 * Double(rgb.g) + 0.114 * Double(rgb.b)) / 255.0
+    // MARK: - Helpers
+    private func toggleFavorite() {
+        let rgb = hexToRGB(color.hex)
         if isFavoriteNormalized {
-            return brightness < 0.5 ? .red : .red.opacity(0.9)
+            favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
         } else {
-            return brightness < 0.5 ? .white.opacity(0.9) : .black.opacity(0.7)
+            let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
+            if !exists { favs.add(color: rgb) }
         }
     }
+
     private var isFavoriteNormalized: Bool {
         let key = normalizeHex(color.hex)
         return favs.colors.contains { normalizeHex($0.color.hex) == key }
     }
 }
+
