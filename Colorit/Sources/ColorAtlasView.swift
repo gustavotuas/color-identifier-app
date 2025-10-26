@@ -1,8 +1,7 @@
 import SwiftUI
 
-// MARK: - Helpers (locales a este archivo)
+// MARK: - Helpers
 
-/// Normaliza HEX: quita espacios, "#", y lo pone en UPPERCASE.
 @inline(__always)
 private func normalizeHex(_ hex: String) -> String {
     var s = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
@@ -10,7 +9,6 @@ private func normalizeHex(_ hex: String) -> String {
     return s
 }
 
-/// Convierte RGB -> HSL. Usa tu `hexToRGB` existente fuera de este archivo.
 private func rgbToHSL(_ rgb: RGB) -> (h: Double, s: Double, l: Double) {
     let r = Double(rgb.r) / 255.0
     let g = Double(rgb.g) / 255.0
@@ -32,63 +30,59 @@ private func rgbToHSL(_ rgb: RGB) -> (h: Double, s: Double, l: Double) {
     return (h, s, l)
 }
 
-// MARK: - Tipos del Atlas
+// MARK: - Types
 
-/// Eje Y: usar Lightness o Saturation
 enum AtlasMode: String, CaseIterable {
     case hueLightness = "Lightness"
     case hueSaturation = "Saturation"
 }
 
-/// Clave de bucket (cuadrícula)
 struct BucketKey: Hashable, Identifiable {
     let hIdx: Int
     let yIdx: Int
     var id: String { "\(hIdx)-\(yIdx)" }
 }
 
-/// Datos por bucket
 struct BucketData {
     var count: Int = 0
     var representative: NamedColor?
 }
 
-// MARK: - Vista principal
+// MARK: - Main View
 
 struct ColorAtlasView: View {
+    @EnvironmentObject var favs: FavoritesStore
     let colors: [NamedColor]
 
-    // ✅ Arranca con el mínimo de agrupaciones para mejor visibilidad
+    @State private var hueBins: Int = 6
     @State private var mode: AtlasMode = .hueLightness
-    @State private var hueBins: Int = 6   // mínimo
-    @State private var yBins: Int = 5     // mínimo
-
+    @State private var baseYBins: Int = 14
     @State private var showing: BucketKey?
-    @State private var bucketsCache: [BucketKey: BucketData] = [:]
 
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 10) {
 
-            // Controles compactos (solo modo, sin steppers)
+            // Picker (Lightness / Saturation)
             HStack {
                 Picker("", selection: $mode) {
                     ForEach(AtlasMode.allCases, id: \.self) { Text($0.rawValue).tag($0) }
                 }
                 .pickerStyle(.segmented)
+                .frame(maxWidth: .infinity)
             }
             .padding(.horizontal)
+            .padding(.top, 4)
+            .padding(.bottom, 6)
 
-            // Cuadrícula compacta (siempre cuadrado)
+            // Atlas grid
             BucketGrid(
                 colors: colors,
                 mode: mode,
                 hueBins: hueBins,
-                yBins: yBins
+                baseYBins: baseYBins
             ) { key in
                 showing = key
             }
-            .onChange(of: colors) { _ in bucketsCache.removeAll() }
-            .onChange(of: mode) { _ in bucketsCache.removeAll() }
         }
         .sheet(item: $showing) { key in
             BucketDetailSheet(
@@ -96,118 +90,165 @@ struct ColorAtlasView: View {
                 colors: colors,
                 mode: mode,
                 hueBins: hueBins,
-                yBins: yBins
+                baseYBins: baseYBins
             )
+            .environmentObject(favs)
         }
     }
 }
 
-// MARK: - Grid compacto
+// MARK: - Grid with dynamic rows
 
 private struct BucketGrid: View {
+    @EnvironmentObject var favs: FavoritesStore
     let colors: [NamedColor]
     let mode: AtlasMode
     let hueBins: Int
-    let yBins: Int
+    let baseYBins: Int
     let onTapBucket: (BucketKey) -> Void
 
-    private var buckets: [BucketKey: BucketData] {
+    private func buildBuckets() -> (buckets: [BucketKey: BucketData], yMin: Int, yMax: Int) {
         var dict: [BucketKey: BucketData] = [:]
+        var yMin = Int.max
+        var yMax = Int.min
+
         for c in colors {
             let rgb = hexToRGB(c.hex)
             let (h, s, l) = rgbToHSL(rgb)
-
             let hIdx = max(0, min(hueBins - 1, Int((h / 360.0) * Double(hueBins))))
             let yRaw = (mode == .hueLightness) ? l : s
-            let yIdx = max(0, min(yBins - 1, Int(yRaw * Double(yBins))))
+            let yIdx = max(0, min(baseYBins - 1, Int(yRaw * Double(baseYBins))))
 
             let key = BucketKey(hIdx: hIdx, yIdx: yIdx)
             var data = dict[key] ?? BucketData()
             data.count += 1
             if data.representative == nil { data.representative = c }
             dict[key] = data
+
+            yMin = min(yMin, yIdx)
+            yMax = max(yMax, yIdx)
         }
-        return dict
+
+        if dict.isEmpty {
+            yMin = 0; yMax = 0
+        }
+        return (dict, yMin, yMax)
     }
 
     var body: some View {
         GeometryReader { geo in
-            let side = min(geo.size.width, geo.size.height)
+            let (buckets, yMin, yMax) = buildBuckets()
             let spacing: CGFloat = 6
-            let cell = (side - spacing * CGFloat(hueBins - 1)) / CGFloat(hueBins)
+            let width = geo.size.width - 16 // 8 padding each side
+            let cellW = (width - spacing * CGFloat(hueBins - 1)) / CGFloat(hueBins)
+            let rowsCount = max(1, (yMax - yMin + 1))
+            let totalHeight = CGFloat(rowsCount) * cellW + spacing * CGFloat(rowsCount - 1)
 
-            VStack(spacing: spacing) {
-                ForEach((0..<yBins).reversed(), id: \.self) { y in
-                    HStack(spacing: spacing) {
-                        ForEach(0..<hueBins, id: \.self) { h in
-                            let key = BucketKey(hIdx: h, yIdx: y)
-                            let data = buckets[key]
-                            BucketCell(data: data) { onTapBucket(key) }
-                                .frame(width: cell, height: cell)
+            ScrollView {
+                VStack(spacing: spacing) {
+                    ForEach((yMin...yMax).reversed(), id: \.self) { y in
+                        HStack(spacing: spacing) {
+                            ForEach(0..<hueBins, id: \.self) { h in
+                                let key = BucketKey(hIdx: h, yIdx: y)
+                                let data = buckets[key]
+                                BucketCell(
+                                    data: data,
+                                    key: key,
+                                    favs: favs,
+                                    onTapBucket: onTapBucket
+                                )
+                                .frame(width: cellW, height: cellW)
+                            }
                         }
                     }
                 }
+                .padding(.horizontal, 12)
+                .frame(width: geo.size.width)
+                .frame(height: totalHeight)
             }
-            .frame(width: side, height: side)
-            .position(x: geo.size.width/2, y: geo.size.height/2)
         }
-        .aspectRatio(1, contentMode: .fit)
-        .padding(.horizontal)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
     }
 }
 
-// MARK: - Bucket cell
+// MARK: - Bucket Cell (clean look, double tap like)
 
 private struct BucketCell: View {
     let data: BucketData?
-    let tap: () -> Void
+    let key: BucketKey
+    @ObservedObject var favs: FavoritesStore
+    let onTapBucket: (BucketKey) -> Void
+
+    private var isFav: Bool {
+        guard let hex = data?.representative?.hex else { return false }
+        let key = normalizeHex(hex)
+        return favs.colors.contains { normalizeHex($0.color.hex) == key }
+    }
 
     var body: some View {
-        Button(action: tap) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color(.secondarySystemBackground))
-
-                if let rep = data?.representative {
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(Color(hexToRGB(rep.hex).uiColor))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .strokeBorder(Color.white.opacity(0.25), lineWidth: 1)
-                        )
+        RoundedRectangle(cornerRadius: 8)
+            .fill(Color(.secondarySystemBackground))
+            .overlay(
+                Group {
+                    if let rep = data?.representative {
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(Color(hexToRGB(rep.hex).uiColor))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .strokeBorder(Color.white.opacity(0.25), lineWidth: 1)
+                            )
+                    }
                 }
-
-                if let count = data?.count, count > 0 {
-                    Text("\(count)")
-                        .font(.caption2.bold())
-                        .foregroundColor(.white)
-                        .padding(.vertical, 2)
-                        .padding(.horizontal, 5)
-                        .background(Color.black.opacity(0.35), in: Capsule())
-                        .padding(6)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+            )
+            .overlay(
+                Group {
+                    if let count = data?.count, count > 0 {
+                        Text("\(count)")
+                            .font(.caption2.bold())
+                            .foregroundColor(.white)
+                            .padding(.vertical, 2)
+                            .padding(.horizontal, 5)
+                            .background(Color.black.opacity(0.35), in: Capsule())
+                            .padding(6)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+                    }
                 }
+            )
+            .opacity((data?.count ?? 0) == 0 ? 0.35 : 1.0)
+            .contentShape(Rectangle())
+            .onTapGesture(count: 2) { toggleFav() }
+            .onTapGesture(count: 1) { onTapBucket(key) }
+    }
+
+    private func toggleFav() {
+        guard let rep = data?.representative else { return }
+        let rgb = hexToRGB(rep.hex)
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+            if isFav {
+                favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
+            } else {
+                let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
+                if !exists { favs.add(color: rgb) }
             }
         }
-        .buttonStyle(.plain)
-        .contentShape(RoundedRectangle(cornerRadius: 8))
-        .opacity((data?.count ?? 0) == 0 ? 0.35 : 1.0)
+        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
     }
 }
 
-// MARK: - Detalle con paginación
+// MARK: - Bucket Detail Sheet
 
 private struct BucketDetailSheet: View {
     let key: BucketKey
     let colors: [NamedColor]
     let mode: AtlasMode
     let hueBins: Int
-    let yBins: Int
+    let baseYBins: Int
 
+    @EnvironmentObject var favs: FavoritesStore
     @Environment(\.dismiss) private var dismiss
 
-    @State private var pageSize = 60
-    private let pageStep = 60
+    @State private var pageSize = 80
+    private let pageStep = 80
 
     private var itemsAll: [NamedColor] {
         let filtered = colors.filter { c in
@@ -215,7 +256,7 @@ private struct BucketDetailSheet: View {
             let (h, s, l) = rgbToHSL(rgb)
             let hIdx = max(0, min(hueBins - 1, Int((h / 360.0) * Double(hueBins))))
             let yRaw = (mode == .hueLightness) ? l : s
-            let yIdx = max(0, min(yBins - 1, Int(yRaw * Double(yBins))))
+            let yIdx = max(0, min(baseYBins - 1, Int(yRaw * Double(baseYBins))))
             return hIdx == key.hIdx && yIdx == key.yIdx
         }
         return filtered.sorted {
@@ -232,24 +273,8 @@ private struct BucketDetailSheet: View {
             List {
                 Section {
                     ForEach(itemsPage) { nc in
-                        HStack(spacing: 12) {
-                            RoundedRectangle(cornerRadius: 8)
-                                .fill(Color(hexToRGB(nc.hex).uiColor))
-                                .frame(width: 42, height: 42)
-
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(nc.name).font(.subheadline).lineLimit(1)
-                                HStack(spacing: 6) {
-                                    Text(nc.hex).font(.caption).foregroundColor(.secondary)
-                                    if let brand = nc.vendor?.brand, let code = nc.vendor?.code {
-                                        Text("• \(brand) \(code)")
-                                            .font(.caption).foregroundColor(.secondary)
-                                    }
-                                }
-                            }
-                            Spacer()
-                            FavoriteToggleButton(hex: nc.hex)
-                        }
+                        BucketRowItem(nc: nc)
+                            .environmentObject(favs)
                     }
 
                     if itemsAll.count > pageSize {
@@ -270,15 +295,78 @@ private struct BucketDetailSheet: View {
             }
             .navigationTitle("Bucket \(key.hIdx + 1) · \(key.yIdx + 1)")
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) { Button("Close") { dismiss() } }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "xmark.circle.fill")
+                            Text("Close")
+                                .font(.subheadline.bold())
+                        }
+                    }
+                    .tint(.secondary)
+                }
             }
         }
     }
 }
 
-// MARK: - Favorite toggle reutilizable
+// MARK: - Row Item + Spotify Favorite
 
-private struct FavoriteToggleButton: View {
+private struct BucketRowItem: View {
+    @EnvironmentObject var favs: FavoritesStore
+    let nc: NamedColor
+    @State private var animateFav = false
+
+    private var isFav: Bool {
+        let key = normalizeHex(nc.hex)
+        return favs.colors.contains { normalizeHex($0.color.hex) == key }
+    }
+
+    var body: some View {
+        HStack(spacing: 12) {
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color(hexToRGB(nc.hex).uiColor))
+                .frame(width: 42, height: 42)
+                .onTapGesture(count: 2) { toggleFav() }
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(nc.name).font(.subheadline).lineLimit(1)
+                HStack(spacing: 6) {
+                    Text(nc.hex).font(.caption).foregroundColor(.secondary)
+                    if let brand = nc.vendor?.brand, let code = nc.vendor?.code {
+                        Text("• \(brand) \(code)")
+                            .font(.caption).foregroundColor(.secondary)
+                    }
+                }
+            }
+            Spacer()
+
+            SpotifyFavoriteSmallButton(hex: nc.hex)
+                .scaleEffect(animateFav ? 1.12 : 1.0)
+                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: animateFav)
+        }
+        .padding(.vertical, 2)
+        .onTapGesture(count: 2) { toggleFav() }
+    }
+
+    private func toggleFav() {
+        let rgb = hexToRGB(nc.hex)
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+            if isFav {
+                favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
+            } else {
+                let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
+                if !exists { favs.add(color: rgb) }
+            }
+            animateFav.toggle()
+        }
+        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+    }
+}
+
+private struct SpotifyFavoriteSmallButton: View {
     @EnvironmentObject var favs: FavoritesStore
     let hex: String
 
@@ -288,21 +376,30 @@ private struct FavoriteToggleButton: View {
     }
 
     var body: some View {
-        Button {
-            let rgb = hexToRGB(hex)
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-                if isFav {
-                    favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
-                } else {
-                    let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
-                    if !exists { favs.add(color: rgb) }
-                }
+        Button { toggle() } label: {
+            ZStack {
+                Circle()
+                    .strokeBorder(isFav ? Color.clear : Color(red: 179/255, green: 179/255, blue: 179/255), lineWidth: 1.4)
+                    .background(Circle().fill(isFav ? Color(red: 30/255, green: 215/255, blue: 96/255) : Color.clear))
+                    .frame(width: 15, height: 15)
+                Image(systemName: isFav ? "checkmark" : "plus")
+                    .font(.system(size: 6, weight: .bold))
+                    .foregroundColor(isFav ? .black : Color(red: 179/255, green: 179/255, blue: 179/255))
             }
-            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-        } label: {
-            Image(systemName: isFav ? "heart.fill" : "heart")
-                .foregroundColor(isFav ? .pink : .gray)
         }
         .buttonStyle(.plain)
+    }
+
+    private func toggle() {
+        let rgb = hexToRGB(hex)
+        withAnimation(.spring(response: 0.25, dampingFraction: 0.7)) {
+            if isFav {
+                favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
+            } else {
+                let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
+                if !exists { favs.add(color: rgb) }
+            }
+        }
+        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
     }
 }
