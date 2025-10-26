@@ -76,26 +76,24 @@ final class ColorSearchEngine {
     }
 }
 
-// MARK: - BrowseScreen
+
 
 struct SearchScreen: View {
-    @EnvironmentObject var catalog: Catalog            // catálogo genérico (tus NamedColors locales)
+    @EnvironmentObject var catalog: Catalog
     @EnvironmentObject var store: StoreVM
     @EnvironmentObject var favs: FavoritesStore
-    @EnvironmentObject var catalogs: CatalogStore      // vendors JSON
+    @EnvironmentObject var catalogs: CatalogStore
+
+    @Environment(\.colorScheme) var colorScheme
 
     @State private var query = ""
     @State private var layout: LayoutMode = .grid3
     @State private var ascending = true
-
     @State private var selection: CatalogSelection = .all
     @State private var showVendorSheet = false
-
-    // Lazy loading
     @State private var visibleCount = 100
     private let batchSize = 100
 
-    // Search
     @State private var filteredColors: [NamedColor] = []
     @State private var searchEngine: ColorSearchEngine?
     @State private var pendingSearchWorkItem: DispatchWorkItem?
@@ -114,157 +112,186 @@ struct SearchScreen: View {
 
     private var vendorIDs: [CatalogID] { CatalogID.allCases.filter { $0 != .generic } }
 
+    // MARK: - Body
     var body: some View {
         NavigationStack {
-            ZStack {
-                VStack(spacing: 10) {
-
-                    if selection.isFiltered {
-                        HStack(spacing: 8) {
-                            Image(systemName: "line.3.horizontal.decrease.circle")
-                            Text(selection.filterSubtitle).lineLimit(1)
-                            Spacer()
-                            Button{
-                                withAnimation(.easeInOut) {
-                                    selection = .all
-                                    VendorSelectionStorage.save(selection)
-                                }
-                            }label: {
-                                    Label("Clear", systemImage: "xmark.circle.fill")
-                                        .labelStyle(.titleAndIcon)
-                                }
-                            .buttonStyle(.bordered)
-                            .tint(.blue)
-                            .font(.caption.bold())
-                        }
-                        .font(.footnote)
-                        .padding(10)
-                        .background(Color.blue.opacity(0.12))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.blue.opacity(0.5), lineWidth: 1)
-                        )
-                        .foregroundColor(.blue)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
-                        .padding(.horizontal)
-                        .transition(.move(edge: .top).combined(with: .opacity))
-                    }
-
-                    Group {
-                        switch layout {
-                        case .list:
-                            List(filteredColors.prefix(visibleCount)) { color in
-                                ColorRow(color: color)
-                                    .listRowSeparator(.hidden)
-                                    .listRowBackground(Color.clear)
-                                    .onAppear { handlePagination(color) }
-                            }
-                            .listStyle(.plain)
-
-                        case .grid2, .grid3:
-                            ScrollView {
-                                LazyVGrid(columns: gridColumns, spacing: 16) {
-                                    ForEach(filteredColors.prefix(visibleCount)) { color in
-                                        ColorTile(color: color, layout: layout)
-                                            .onAppear { handlePagination(color) }
-                                    }
-                                }
-                                .padding()
-                            }
-
-                        case .wheel:
-                            ColorAtlasView(colors: filteredColors)
-                                .environmentObject(favs)
-                                .padding(.vertical, 8)
-                        }
-                    }
-                    .animation(.easeInOut, value: layout)
-                }
-            }
-            .navigationTitle("Colors")
-            .toolbar {
-                ToolbarItemGroup(placement: .navigationBarLeading) {
-                    Button { showVendorSheet = true } label: {
-                        Image(systemName: "slider.horizontal.3")
-                    }
-                    .accessibilityLabel("Select vendor")
-                }
-
-                ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    Button {
-                        ascending.toggle()
-                        sortFilteredInPlace()
-                    } label: {
-                        Image(systemName: ascending ? "arrow.up" : "arrow.down")
-                    }
-
-                    Button {
-                        withAnimation(.spring()) { toggleLayout() }
-                    } label: {
-                        Image(systemName: layout.icon)
-                    }
-
-                    if !store.isPro {
-                        Button {
-                            store.showPaywall = true
-                        } label: {
-                            Text("PRO")
-                                .font(.caption.bold())
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 6)
-                                .background(
-                                    LinearGradient(colors: [.purple, .pink],
-                                                   startPoint: .topLeading,
-                                                   endPoint: .bottomTrailing)
-                                )
-                                .foregroundColor(.white)
-                                .cornerRadius(8)
-                                .shadow(radius: 2)
-                        }
-                    }
-                }
-            }
-            .sheet(isPresented: $showVendorSheet) {
-                VendorListSheet(
-                    selection: $selection,
-                    candidates: vendorIDs,
-                    catalogs: catalogs
+            mainContent
+                .navigationTitle("Colors")
+                .toolbar { toolbarContent }
+                .sheet(isPresented: $showVendorSheet) { vendorSheet }
+                .searchable(
+                    text: $query,
+                    placement: .navigationBarDrawer(displayMode: .always),
+                    prompt: "Search by name, hex, brand or code"
                 )
-                .presentationDetents([.medium, .large])
-                .onDisappear {
-                    preloadForSelection()
-                    rebuildEngineAndRefilter()
+                .onAppear {
+                    setupSearchBar(for: colorScheme)
+                    initialize()
                 }
-            }
-            .searchable(text: $query,
-                        placement: .navigationBarDrawer(displayMode: .always),
-                        prompt: "Search by name, hex, brand or code")
-            .onAppear {
-                setupSearchBar()
-                if let saved = VendorSelectionStorage.load() {
-                    selection = saved
-                }
-                preloadForSelection()
-                let all = makeColors(for: selection)
-                filteredColors = all.sorted { ascending ? $0.name < $1.name : $0.name > $1.name }
-                if searchEngine == nil { searchEngine = ColorSearchEngine(allColors: all) }
-                else { searchEngine?.replaceAll(all) }
-            }
-            .onReceive(catalogs.$loaded) { _ in
-                rebuildEngineAndRefilter()
-            }
-            .onChange(of: selection) { _ in
-                VendorSelectionStorage.save(selection)
-                preloadForSelection()
-                rebuildEngineAndRefilter()
-            }
-            .onChange(of: query) { newValue in
-                performAsyncFilter(newValue)
+                .onChange(of: colorScheme) { setupSearchBar(for: $0) }
+                .onChange(of: query) { performAsyncFilter($0) }
+                .onChange(of: selection) { _ in selectionChanged() }
+                .onReceive(catalogs.$loaded) { _ in rebuildEngineAndRefilter() }
+        }
+    }
+
+    // MARK: - Main Content
+    @ViewBuilder
+    private var mainContent: some View {
+        ZStack {
+            VStack(spacing: 10) {
+                if selection.isFiltered { filterBanner }
+                layoutView
             }
         }
     }
 
+    // MARK: - Filter Banner
+    @ViewBuilder
+    private var filterBanner: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "line.3.horizontal.decrease.circle")
+            Text(selection.filterSubtitle).lineLimit(1)
+            Spacer()
+            Button {
+                withAnimation(.easeInOut) {
+                    selection = .all
+                    VendorSelectionStorage.save(selection)
+                }
+            } label: {
+                Label("Clear", systemImage: "xmark.circle.fill")
+                    .labelStyle(.titleAndIcon)
+            }
+            .buttonStyle(.bordered)
+            .tint(.blue)
+            .font(.caption.bold())
+        }
+        .font(.footnote)
+        .padding(10)
+        .background(Color.blue.opacity(0.12))
+        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.blue.opacity(0.5)))
+        .foregroundColor(.blue)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .padding(.horizontal)
+        .transition(.move(edge: .top).combined(with: .opacity))
+    }
+
+    // MARK: - Layout View
+    @ViewBuilder
+    private var layoutView: some View {
+        switch layout {
+        case .list:
+            listLayout
+        case .grid2, .grid3:
+            gridLayout
+        case .wheel:
+            ColorAtlasView(colors: filteredColors)
+                .environmentObject(favs)
+                .padding(.vertical, 8)
+        }
+    }
+
+    private var listLayout: some View {
+        List(filteredColors.prefix(visibleCount)) { color in
+            ColorRow(color: color)
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
+                .onAppear { handlePagination(color) }
+        }
+        .listStyle(.plain)
+    }
+
+    private var gridLayout: some View {
+        ScrollView {
+            LazyVGrid(columns: gridColumns, spacing: 16) {
+                ForEach(filteredColors.prefix(visibleCount)) { color in
+                    ColorTile(color: color, layout: layout)
+                        .onAppear { handlePagination(color) }
+                }
+            }
+            .padding()
+        }
+    }
+
+    // MARK: - Toolbar
+    @ToolbarContentBuilder
+    private var toolbarContent: some ToolbarContent {
+        ToolbarItemGroup(placement: .navigationBarLeading) {
+            Button { showVendorSheet = true } label: {
+                Image(systemName: "slider.horizontal.3")
+            }
+            .accessibilityLabel("Select vendor")
+        }
+
+        ToolbarItemGroup(placement: .navigationBarTrailing) {
+            Button {
+                ascending.toggle()
+                sortFilteredInPlace()
+            } label: {
+                Image(systemName: ascending ? "arrow.up" : "arrow.down")
+            }
+
+            Button {
+                withAnimation(.spring()) { toggleLayout() }
+            } label: {
+                Image(systemName: layout.icon)
+            }
+
+            if !store.isPro {
+                Button {
+                    store.showPaywall = true
+                } label: {
+                    Text("PRO")
+                        .font(.caption.bold())
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(
+                            LinearGradient(colors: [.purple, .pink],
+                                           startPoint: .topLeading,
+                                           endPoint: .bottomTrailing)
+                        )
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                        .shadow(radius: 2)
+                }
+            }
+        }
+    }
+
+    // MARK: - Vendor Sheet
+    private var vendorSheet: some View {
+        VendorListSheet(
+            selection: $selection,
+            candidates: vendorIDs,
+            catalogs: catalogs
+        )
+        .presentationDetents([.medium, .large])
+        .onDisappear {
+            preloadForSelection()
+            rebuildEngineAndRefilter()
+        }
+    }
+
     // MARK: - Helpers
+    private func initialize() {
+        if let saved = VendorSelectionStorage.load() {
+            selection = saved
+        }
+        preloadForSelection()
+        let all = makeColors(for: selection)
+        filteredColors = all.sorted { ascending ? $0.name < $1.name : $0.name > $1.name }
+        if searchEngine == nil {
+            searchEngine = ColorSearchEngine(allColors: all)
+        } else {
+            searchEngine?.replaceAll(all)
+        }
+    }
+
+    private func selectionChanged() {
+        VendorSelectionStorage.save(selection)
+        preloadForSelection()
+        rebuildEngineAndRefilter()
+    }
 
     private func preloadForSelection() {
         switch selection {
@@ -319,7 +346,7 @@ struct SearchScreen: View {
         case .list: layout = .grid2
         case .grid2: layout = .grid3
         case .grid3: layout = .wheel
-        case .wheel: return layout = .list
+        case .wheel: layout = .list
         }
     }
 
@@ -334,17 +361,33 @@ struct SearchScreen: View {
     private func handlePagination(_ color: NamedColor) {
         if color.id == filteredColors.prefix(visibleCount).last?.id { loadMore() }
     }
+
     private func loadMore() {
         guard visibleCount < filteredColors.count else { return }
         visibleCount += batchSize
     }
 
-    private func setupSearchBar() {
-        UISearchBar.appearance().searchTextField.backgroundColor = UIColor.systemGray5
-        UISearchBar.appearance().searchTextField.textColor = .white
-        UISearchBar.appearance().searchTextField.attributedPlaceholder =
-            NSAttributedString(string: "Search by name, hex, brand or code",
-                               attributes: [.foregroundColor: UIColor.lightGray])
+    // MARK: - SearchBar dynamic theme
+    private func setupSearchBar(for scheme: ColorScheme) {
+        let field = UISearchBar.appearance().searchTextField
+        switch scheme {
+        case .dark:
+            field.backgroundColor = UIColor.systemGray5
+            field.textColor = .white
+            field.attributedPlaceholder = NSAttributedString(
+                string: "Search by name, hex, brand or code",
+                attributes: [.foregroundColor: UIColor.lightGray]
+            )
+        case .light:
+            field.backgroundColor = UIColor.systemGray6
+            field.textColor = .black
+            field.attributedPlaceholder = NSAttributedString(
+                string: "Search by name, hex, brand or code",
+                attributes: [.foregroundColor: UIColor.gray]
+            )
+        @unknown default:
+            break
+        }
     }
 
     private func performAsyncFilter(_ query: String) {
@@ -373,8 +416,8 @@ struct SearchScreen: View {
             filteredColors.sort { key($0) > key($1) }
         }
     }
-
 }
+
 
 struct ColorRow: View {
     @EnvironmentObject var favs: FavoritesStore
