@@ -420,10 +420,10 @@ struct ColorRow: View {
                             Circle()
                                 .fill(isFavoriteNormalized ? Color(red: 30/255, green: 215/255, blue: 96/255) : Color.clear)
                         )
-                        .frame(width: 22, height: 22)
+                        .frame(width: 15, height: 15)
 
                     Image(systemName: isFavoriteNormalized ? "checkmark" : "plus")
-                        .font(.system(size: 10, weight: .bold))
+                        .font(.system(size: 6, weight: .bold))
                         .foregroundColor(isFavoriteNormalized ? .black : Color(red: 179/255, green: 179/255, blue: 179/255))
                 }
                 .scaleEffect(isFavoriteNormalized ? 1.1 : 1.0)
@@ -515,11 +515,11 @@ struct ColorTile: View {
                                 Circle()
                                     .fill(isFavoriteNormalized ? Color(red: 30/255, green: 215/255, blue: 96/255) : Color.clear)
                             )
-                            .frame(width: 22, height: 22)
+                            .frame(width: 15, height: 15)
                             .contentShape(Circle())
 
                         Image(systemName: isFavoriteNormalized ? "checkmark" : "plus")
-                            .font(.system(size: 10, weight: .bold))
+                            .font(.system(size: 6, weight: .bold))
                             .foregroundColor(isFavoriteNormalized ? .black : Color(red: 179/255, green: 179/255, blue: 179/255))
                     }
                     .scaleEffect(isFavoriteNormalized ? 1.15 : 1.0)
