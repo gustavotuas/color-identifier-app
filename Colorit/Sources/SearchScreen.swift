@@ -325,7 +325,10 @@ private var gridLayoutWithBanner: some View {
         .presentationDetents([.medium, .large])
         .onDisappear {
             preloadForSelection()
-            rebuildEngineAndRefilter()
+            // Espera un pequeño delay para asegurar que el vendor se haya cargado
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                rebuildEngineAndRefilter()
+            }
         }
     }
 
