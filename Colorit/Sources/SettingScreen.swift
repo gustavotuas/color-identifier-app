@@ -104,12 +104,8 @@ struct SettingScreen: View {
             }
 
             // MARK: - Language (custom dropdown)
-            Section {
+            Section(header: Text("Language")) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Language")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-
                     Menu {
                         ForEach(languages, id: \.code) { lang in
                             Button {
