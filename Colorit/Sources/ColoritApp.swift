@@ -12,6 +12,7 @@ struct ColoritApp: App {
     @StateObject var store = StoreVM()
     @StateObject var catalog = Catalog()
     @StateObject var favs = FavoritesStore()
+    @StateObject private var theme = ThemeManager()
     @Environment(\.scenePhase) private var scenePhase
 
     @StateObject private var catalogs = CatalogStore(preload: [.generic, .sherwinWilliams])
@@ -23,6 +24,8 @@ struct ColoritApp: App {
                 .environmentObject(catalog)
                 .environmentObject(favs)
                 .environmentObject(catalogs)
+                .environmentObject(theme)  // 👈 Se pasa a todas las vistas
+                .preferredColorScheme(theme.selectedTheme.colorScheme)
 
                 // ✅ Ya no necesitas llamar a store.load(), se hace en el init
                 .task {

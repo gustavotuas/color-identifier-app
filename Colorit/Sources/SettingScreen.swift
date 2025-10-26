@@ -3,6 +3,7 @@ import UIKit
 
 struct SettingScreen: View {
     @EnvironmentObject var store: StoreVM
+    @EnvironmentObject var theme: ThemeManager   // 👈 Nuevo
 
     // 🔹 Lee la versión automáticamente desde Info.plist
     private var appVersion: String {
@@ -41,6 +42,16 @@ struct SettingScreen: View {
                     }
                     .buttonStyle(.plain)
                 }
+            }
+
+            // MARK: - Appearance
+            Section(header: Text("Appearance")) {
+                Picker("Theme", selection: $theme.selectedTheme) {
+                    ForEach(AppTheme.allCases) { option in
+                        Text(option.displayName).tag(option)
+                    }
+                }
+                .pickerStyle(.segmented)
             }
 
             // MARK: - About
@@ -90,9 +101,7 @@ struct SettingScreen: View {
     }
 }
 
-//
 // MARK: - SettingRow
-//
 struct SettingRow: View {
     let icon: String
     let iconColor: Color
