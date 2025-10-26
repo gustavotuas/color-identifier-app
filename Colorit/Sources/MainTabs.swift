@@ -47,39 +47,60 @@ struct HomeScreen: View {
 
 // MARK: - Pestañas principales
 struct MainTabs: View {
+    @EnvironmentObject var favs: FavoritesStore  // 👈 ahora sí tienes acceso al store
+    @EnvironmentObject var store: StoreVM
     @State private var selectedTab = 0
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            NavigationStack { SearchScreen() }
-                .tabItem {
-                    Label(NSLocalizedString("search", comment: ""), systemImage: "magnifyingglass")
-                }
-                .tag(0)
 
-            NavigationStack { FavoritesScreen() }
-                .tabItem {
-                    Label(NSLocalizedString("favorites", comment: ""), systemImage: "heart")
-                }
-                .tag(1)
+            // 🔍 Search
+            NavigationStack {
+                SearchScreen()
+            }
+            .tabItem {
+                Label(NSLocalizedString("search", comment: ""), systemImage: "magnifyingglass")
+            }
+            .tag(0)
 
-            NavigationStack { CameraScreen() }
-                .tabItem {
-                    Label(NSLocalizedString("camera", comment: ""), systemImage: "camera")
-                }
-                .tag(2)
+            // ❤️ Favorites
+            NavigationStack {
+                FavoritesScreen()
+                    .environmentObject(favs)
+                    .onAppear { favs.hasNewFavorites = false } // 👈 limpia el badge al entrar
+            }
+            .tabItem {
+                Label(NSLocalizedString("Collections", comment: ""), systemImage: "rectangle.stack.fill")
+            }
+            .badge(favs.hasNewFavorites ? "●" : nil) // 👈 muestra el puntito de novedades
+            .tag(1)
 
-            NavigationStack { PhotosScreen() }
-                .tabItem {
-                    Label(NSLocalizedString("photo", comment: ""), systemImage: "photo")
-                }
-                .tag(3)
+            // 📷 Camera
+            NavigationStack {
+                CameraScreen()
+            }
+            .tabItem {
+                Label(NSLocalizedString("camera", comment: ""), systemImage: "camera")
+            }
+            .tag(2)
 
-            NavigationStack { SettingScreen() }
-                .tabItem {
-                    Label(NSLocalizedString("settings", comment: ""), systemImage: "gearshape")
-                }
-                .tag(4)
+            // 🖼 Photos
+            NavigationStack {
+                PhotosScreen()
+            }
+            .tabItem {
+                Label(NSLocalizedString("photo", comment: ""), systemImage: "photo")
+            }
+            .tag(3)
+
+            // ⚙️ Settings
+            NavigationStack {
+                SettingScreen()
+            }
+            .tabItem {
+                Label(NSLocalizedString("settings", comment: ""), systemImage: "gearshape")
+            }
+            .tag(4)
         }
         .onChange(of: selectedTab) { _ in
             Haptic.tap() // 💥 vibra cada vez que cambias de pestaña

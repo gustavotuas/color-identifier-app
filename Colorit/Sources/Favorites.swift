@@ -56,6 +56,10 @@ struct FavoritePalette: Identifiable, Codable, Equatable {
 final class FavoritesStore: ObservableObject {
     @Published var colors: [FavoriteColor] = []
     @Published var palettes: [FavoritePalette] = []
+    @Published var totalFavorites: Int = 0        // sigue mostrando el total (para badge)
+    @Published var hasNewFavorites: Bool = false  // 👈 nuevo: controla si hay nuevos no vistos
+
+
 
     private let colorsKey = "favorites_colors_v1"
     private let palettesKey = "favorites_palettes_v1"
@@ -66,6 +70,8 @@ final class FavoritesStore: ObservableObject {
         if !colors.contains(where: { $0.color.hex == color.hex }) {
             colors.insert(FavoriteColor(color: color, date: Date()), at: 0)
             persist()
+            totalFavorites = colors.count
+            hasNewFavorites = true // 👈 marca como “nuevo sin revisar”
         }
     }
 
@@ -73,7 +79,9 @@ final class FavoritesStore: ObservableObject {
         let pal = FavoritePalette(colors: colors, name: name)
         palettes.insert(pal, at: 0)
         persist()
+        hasNewFavorites = true // 👈 igual aquí
     }
+
 
     func updatePalette(_ pal: FavoritePalette) {
         if let idx = palettes.firstIndex(where: { $0.id == pal.id }) {
@@ -97,7 +105,10 @@ final class FavoritesStore: ObservableObject {
         colors.removeAll()
         palettes.removeAll()
         persist()
+        totalFavorites = 0
+        hasNewFavorites = false
     }
+
 
     private func persist() {
         let encoder = JSONEncoder()
