@@ -135,16 +135,73 @@ struct SearchScreen: View {
         }
     }
 
-    // MARK: - Main Content
     @ViewBuilder
     private var mainContent: some View {
-        ZStack {
-            VStack(spacing: 10) {
-                if selection.isFiltered { filterBanner }
-                layoutView
+        Group {
+            switch layout {
+            case .list:
+                listLayoutWithBanner
+            case .grid2, .grid3:
+                gridLayoutWithBanner
+            case .wheel:
+                ColorAtlasView(colors: filteredColors)
+                    .environmentObject(favs)
+                    .padding(.vertical, 8)
             }
         }
     }
+
+    // MARK: - List layout + banner scrollable
+    private var listLayoutWithBanner: some View {
+        List {
+            if selection.isFiltered {
+                Section {
+                    filterBanner
+                }
+                .listRowInsets(EdgeInsets()) // quita padding lateral
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
+            }
+
+            ForEach(filteredColors.prefix(visibleCount)) { color in
+                ColorRow(color: color)
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+                    .onAppear { handlePagination(color) }
+            }
+        }
+        .listStyle(.plain)
+    }
+
+private var gridLayoutWithBanner: some View {
+    GeometryReader { geo in
+        ScrollView {
+            VStack(spacing: 10) {
+                if selection.isFiltered {
+                    filterBanner
+                        .frame(width: geo.size.width) // ocupa TODO el ancho visible
+                        .padding(.top, 6)
+                }
+
+                LazyVGrid(columns: gridColumns, spacing: 16) {
+                    ForEach(filteredColors.prefix(visibleCount)) { color in
+                        ColorTile(color: color, layout: layout)
+                            .onAppear { handlePagination(color) }
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 12)
+            }
+            .frame(width: geo.size.width) // asegura que el VStack también tenga el ancho completo
+        }
+        .ignoresSafeArea(.keyboard) // evita cortes por el teclado
+    }
+}
+
+
+
+
+
 
     // MARK: - Filter Banner
     @ViewBuilder
