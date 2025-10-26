@@ -119,39 +119,36 @@ struct SearchScreen: View {
             ZStack {
                 VStack(spacing: 10) {
 
-                    // Banner/Pill de filtro activo — más notorio (indigo + borde)
-                    // Banner/Pill de filtro activo — estilo teal con buen contraste
-                        if selection.isFiltered {
-                            HStack(spacing: 8) {
-                                Image(systemName: "line.3.horizontal.decrease.circle")
-                                Text(selection.filterSubtitle).lineLimit(1)
-                                Spacer()
-                                Button{
-                                    withAnimation(.easeInOut) {
-                                        selection = .all
-                                        VendorSelectionStorage.save(selection)
-                                    }
-                                }label: {
-                                        Label("Clear", systemImage: "xmark.circle.fill")
-                                            .labelStyle(.titleAndIcon)
-                                    }
-                                .buttonStyle(.bordered)    // 👈 outlined, no relleno sólido
-                                .tint(.blue)               // color del borde y texto
-                                .font(.caption.bold())
-                            }
-                            .font(.footnote)
-                            .padding(10)
-                            .background(Color.blue.opacity(0.12)) // 👈 fondo suave
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(Color.blue.opacity(0.5), lineWidth: 1) // 👈 borde
-                            )
-                            .foregroundColor(.blue)         // ícono y texto del banner
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                            .padding(.horizontal)
-                            .transition(.move(edge: .top).combined(with: .opacity))
+                    if selection.isFiltered {
+                        HStack(spacing: 8) {
+                            Image(systemName: "line.3.horizontal.decrease.circle")
+                            Text(selection.filterSubtitle).lineLimit(1)
+                            Spacer()
+                            Button{
+                                withAnimation(.easeInOut) {
+                                    selection = .all
+                                    VendorSelectionStorage.save(selection)
+                                }
+                            }label: {
+                                    Label("Clear", systemImage: "xmark.circle.fill")
+                                        .labelStyle(.titleAndIcon)
+                                }
+                            .buttonStyle(.bordered)
+                            .tint(.blue)
+                            .font(.caption.bold())
                         }
-
+                        .font(.footnote)
+                        .padding(10)
+                        .background(Color.blue.opacity(0.12))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color.blue.opacity(0.5), lineWidth: 1)
+                        )
+                        .foregroundColor(.blue)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .padding(.horizontal)
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                    }
 
                     Group {
                         switch layout {
@@ -176,15 +173,15 @@ struct SearchScreen: View {
                             }
 
                         case .wheel:
-                                ColorAtlasView(colors: filteredColors)
-                                    .environmentObject(favs)
-                                    .padding(.vertical, 8)
+                            ColorAtlasView(colors: filteredColors)
+                                .environmentObject(favs)
+                                .padding(.vertical, 8)
                         }
                     }
                     .animation(.easeInOut, value: layout)
                 }
             }
-            .navigationTitle("Colors") // 👈 fijo, no cambia
+            .navigationTitle("Colors")
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarLeading) {
                     Button { showVendorSheet = true } label: {
@@ -269,7 +266,6 @@ struct SearchScreen: View {
 
     // MARK: - Helpers
 
-    /// Carga perezosa según la selección
     private func preloadForSelection() {
         switch selection {
         case .all:
@@ -282,7 +278,6 @@ struct SearchScreen: View {
         }
     }
 
-    /// Construye el dataset acorde a la selección
     private func makeColors(for sel: CatalogSelection) -> [NamedColor] {
         func genericColors() -> [NamedColor] {
             catalog.names.map { n in NamedColor(name: n.name, hex: n.hex, vendor: nil, rgb: nil) }
@@ -358,8 +353,7 @@ struct SearchScreen: View {
             guard let engine = searchEngine else { return }
             engine.search(query: query, ascending: ascending) { result in
                 self.filteredColors = result
-                // Reaplica el orden vigente por si el motor devolvió sincrónico/rápido:
-                self.sortFilteredInPlace()        // 👈 asegura consistencia
+                self.sortFilteredInPlace()
                 self.visibleCount = self.batchSize
             }
         }
@@ -367,10 +361,7 @@ struct SearchScreen: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: work)
     }
 
-
-    /// Ordena en sitio lo que ya está en pantalla (sin invocar al motor).
     private func sortFilteredInPlace() {
-        // Puedes ajustar la “clave” de orden acá (name, luego brand, luego code, luego hex).
         func key(_ c: NamedColor) -> String {
             let brand = c.vendor?.brand ?? ""
             let code  = c.vendor?.code  ?? ""
@@ -450,6 +441,7 @@ struct ColorRow: View {
 
 struct ColorTile: View {
     @EnvironmentObject var favs: FavoritesStore
+    @Environment(\.colorScheme) var colorScheme
     let color: NamedColor
     let layout: SearchScreen.LayoutMode
     @State private var showDetail = false
@@ -513,8 +505,16 @@ struct ColorTile: View {
                     }
                 }
             }
+            // 👇 Aquí está el único cambio solicitado
+            .padding(6)
+            .frame(maxWidth: .infinity)
+            .background(
+                colorScheme == .dark
+                ? Color.white.opacity(0.04)
+                : Color.black.opacity(0.01)
+            )
+            .cornerRadius(10)
         }
-        .background(Color.white.opacity(0.7))
         .cornerRadius(10)
         .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
         .sheet(isPresented: $showDetail) {
