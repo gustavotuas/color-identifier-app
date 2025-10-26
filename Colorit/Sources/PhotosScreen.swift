@@ -732,9 +732,10 @@ struct ColorPickerView: View {
                 .padding(.bottom, 36)
             }
 
-            // MARK: - Botón Close
+            // MARK: - Botón Close (lado derecho)
             VStack {
                 HStack {
+                    Spacer()
                     Button {
                         dismiss()
                     } label: {
@@ -751,13 +752,13 @@ struct ColorPickerView: View {
                         .clipShape(Capsule())
                         .shadow(color: .black.opacity(0.4), radius: 4, y: 2)
                     }
-                    Spacer()
+                    .padding(.trailing, 16)
                 }
                 .padding(.top, 60)
-                .padding(.leading, 16)
                 Spacer()
             }
             .ignoresSafeArea(edges: .top)
+
         }
         .background(Color.black.opacity(0.9))
         .ignoresSafeArea()
