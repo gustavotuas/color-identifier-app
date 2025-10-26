@@ -30,9 +30,11 @@ private struct SystemPhotoPicker: UIViewControllerRepresentable {
             if provider.canLoadObject(ofClass: UIImage.self) {
                 provider.loadObject(ofClass: UIImage.self) { object, _ in
                     if let uiimg = object as? UIImage {
+                        // ✅ Normaliza orientación y asegura sRGB para que el mapeo de píxeles sea correcto
+                        let fixed = uiimg.normalizedUpSRGB() ?? uiimg
                         DispatchQueue.main.async {
-                            self.parent.image = uiimg
-                            self.parent.onPicked(uiimg)
+                            self.parent.image = fixed
+                            self.parent.onPicked(fixed)
                         }
                     }
                 }
@@ -261,129 +263,126 @@ struct PhotosScreen: View {
         }
     }
 
-// MARK: - Palette Card
-private var paletteCard: some View {
-    ZStack {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text("Detected Palette").font(.headline)
-                Spacer()
-                Text("(\(matches.count) colors)")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
+    // MARK: - Palette Card
+    private var paletteCard: some View {
+        ZStack {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text("Detected Palette").font(.headline)
+                    Spacer()
+                    Text("(\(matches.count) colors)")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
 
-            // 🎨 Paleta de colores detectados
-            HStack(spacing: 0) {
-                ForEach(matches, id: \.color.hex) { m in
+                // 🎨 Paleta de colores detectados
+                HStack(spacing: 0) {
+                    ForEach(matches, id: \.color.hex) { m in
+                        Rectangle()
+                            .fill(m.closest != nil ? Color(hexToRGB(m.closest!.hex).uiColor)
+                                                   : Color(m.color.uiColor))
+                    }
+                }
+                .frame(height: 60)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .shadow(color: .black.opacity(0.1), radius: 3, y: 2)
+                .onTapGesture { showPaletteSheet = true }
+
+                // 💾 Botón Save Palette
+                Button {
+                    if store.isPro {
+                        let finals = matches.map { $0.closest != nil ? hexToRGB($0.closest!.hex) : $0.color }
+                        let unique = Array(Set(finals.map { $0.hex })).compactMap { hexToRGB($0) }
+                        favs.addPalette(name: "Detected Palette", colors: unique)
+                        showToast("Palette saved")
+                    } else {
+                        store.showPaywall = true
+                    }
+                } label: {
+                    Label("Save Palette", systemImage: "heart.fill")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(Color.white.opacity(0.85))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color.blue.opacity(0.3), lineWidth: 1)
+                        )
+                        .foregroundColor(.blue)
+                        .cornerRadius(10)
+                }
+            }
+            .padding(14)
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .shadow(color: .black.opacity(0.1), radius: 4, y: 2)
+            .padding(.horizontal)
+
+            // 🔒 Overlay con blur más fuerte en el centro y suave en los bordes
+            if !store.isPro {
+                ZStack {
+                    // Capa base con blur y material
                     Rectangle()
-                        .fill(m.closest != nil ? Color(hexToRGB(m.closest!.hex).uiColor)
-                                               : Color(m.color.uiColor))
-                }
-            }
-            .frame(height: 60)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-            .shadow(color: .black.opacity(0.1), radius: 3, y: 2)
-            .onTapGesture { showPaletteSheet = true }
+                        .fill(.ultraThinMaterial)
+                        .blur(radius: 10)
+                        .opacity(0.95)
+                        .mask(
+                            LinearGradient(
+                                gradient: Gradient(stops: [
+                                    .init(color: .white.opacity(0.0), location: 0.0),  // top → menos blur
+                                    .init(color: .white.opacity(1.0), location: 0.4),  // centro → más blur
+                                    .init(color: .white.opacity(1.0), location: 0.6),  // centro → más blur
+                                    .init(color: .white.opacity(1.0), location: 1.0)   // bottom → menos blur
+                                ]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                        .padding(.horizontal)
 
-            // 💾 Botón Save Palette
-            Button {
-                if store.isPro {
-                    let finals = matches.map { $0.closest != nil ? hexToRGB($0.closest!.hex) : $0.color }
-                    let unique = Array(Set(finals.map { $0.hex })).compactMap { hexToRGB($0) }
-                    favs.addPalette(name: "Detected Palette", colors: unique)
-                    showToast("Palette saved")
-                } else {
-                    store.showPaywall = true
+                    // Botón de desbloqueo mágico
+                    MagicalUnlockButton()
+                        .onTapGesture { store.showPaywall = true }
                 }
-            } label: {
-                Label("Save Palette", systemImage: "heart.fill")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 10)
-                    .background(Color.white.opacity(0.85))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color.blue.opacity(0.3), lineWidth: 1)
-                    )
-                    .foregroundColor(.blue)
-                    .cornerRadius(10)
+                .transition(.opacity)
             }
+
         }
-        .padding(14)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 20))
-        .shadow(color: .black.opacity(0.1), radius: 4, y: 2)
-        .padding(.horizontal)
+    }
 
-        // 🔒 Overlay con blur más fuerte en el centro y suave en los bordes
-        if !store.isPro {
-            ZStack {
-                // Capa base con blur y material
-                Rectangle()
-                    .fill(.ultraThinMaterial)
-                    .blur(radius: 10)
-                    .opacity(0.95)
-                    .mask(
+    // MARK: - Magical Unlock Button (slightly larger, perfect balance)
+    private struct MagicalUnlockButton: View {
+        var body: some View {
+            VStack(spacing: 10) {
+                Image(systemName: "lock.fill")
+                    .font(.system(size: 22, weight: .semibold))
+                    .foregroundColor(.white.opacity(0.95))
+                    .shadow(color: .white.opacity(0.4), radius: 3, y: 1)
+
+                Text("Unlock Full Palette")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 26)
+                    .padding(.vertical, 10)
+                    .background(
                         LinearGradient(
-                            gradient: Gradient(stops: [
-                                .init(color: .white.opacity(0.0), location: 0.0),  // top → menos blur
-                                .init(color: .white.opacity(1.0), location: 0.4),  // centro → más blur
-                                .init(color: .white.opacity(1.0), location: 0.6),  // centro → más blur
-                                .init(color: .white.opacity(1.0), location: 1.0)   // bottom → menos blur
-                            ]),
-                            startPoint: .top,
-                            endPoint: .bottom
+                            colors: [
+                                Color(hex: "#3C8CE7"), // azul brillante
+                                Color(hex: "#6F3CE7"), // violeta intenso
+                                Color(hex: "#C63DE8"), // púrpura neón
+                                Color(hex: "#FF61B6")  // fucsia vibrante
+                            ],
+                            startPoint: .leading,
+                            endPoint: .trailing
                         )
                     )
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
-                    .padding(.horizontal)
-
-                // Botón de desbloqueo mágico
-                MagicalUnlockButton()
-                    .onTapGesture { store.showPaywall = true }
+                    .clipShape(Capsule())
+                    .shadow(color: Color.purple.opacity(0.35), radius: 6, y: 3)
             }
-            .transition(.opacity)
+            .padding(.vertical, 12)
         }
-
     }
-}
-
-// MARK: - Magical Unlock Button (slightly larger, perfect balance)
-private struct MagicalUnlockButton: View {
-    var body: some View {
-        VStack(spacing: 10) {
-            Image(systemName: "lock.fill")
-                .font(.system(size: 22, weight: .semibold))
-                .foregroundColor(.white.opacity(0.95))
-                .shadow(color: .white.opacity(0.4), radius: 3, y: 1)
-
-            Text("Unlock Full Palette")
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundColor(.white)
-                .padding(.horizontal, 26)
-                .padding(.vertical, 10)
-                .background(
-                    LinearGradient(
-                        colors: [
-                            Color(hex: "#3C8CE7"), // azul brillante
-                            Color(hex: "#6F3CE7"), // violeta intenso
-                            Color(hex: "#C63DE8"), // púrpura neón
-                            Color(hex: "#FF61B6")  // fucsia vibrante
-                        ],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                )
-                .clipShape(Capsule())
-                .shadow(color: Color.purple.opacity(0.35), radius: 6, y: 3)
-        }
-        .padding(.vertical, 12)
-    }
-}
-
-
-
 
     // MARK: - Helpers
     fileprivate struct MatchedSwatch { let color: RGB; let closest: NamedColor? }
@@ -583,8 +582,8 @@ struct ColorPickerView: View {
                                 let pBase = CGPoint(x: afterScale.x - offset.width,
                                                     y: afterScale.y - offset.height)
                                 if fitRect.contains(pBase) {
-                                    let rel = CGPoint(x: pBase.x - fitRect.minX,
-                                                      y: pBase.y - fitRect.minY)
+                                    let rel = CGPoint(x: round(pBase.x - fitRect.minX),
+                                                      y: round(pBase.y - fitRect.minY))
                                     if let color = image.getPixelColor(at: rel, in: fitRect) {
                                         pickedColor = color
                                         hexValue = color.toHexString()
@@ -656,52 +655,51 @@ struct ColorPickerView: View {
                         .opacity(0.8)
 
                     // 🎨 Contenido (color + hex + Save)
-VStack(spacing: 10) {
-    RoundedRectangle(cornerRadius: 10)
-        .fill(Color(pickedColor))
-        .frame(width: 70, height: 70)
-        .shadow(color: .black.opacity(0.1), radius: 3, y: 2)
+                    VStack(spacing: 10) {
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color(pickedColor))
+                            .frame(width: 70, height: 70)
+                            .shadow(color: .black.opacity(0.1), radius: 3, y: 2)
 
-    // HEX legible
-    Text(hexValue.uppercased())
-        .font(.caption.bold())
-        .padding(.horizontal, 10)
-        .padding(.vertical, 4)
-        .background(
-            RoundedRectangle(cornerRadius: 6)
-                .fill(
-                    isColorLight(pickedColor)
-                    ? Color.black.opacity(0.35)
-                    : Color.white.opacity(0.25)
-                )
-        )
-        .foregroundColor(isColorLight(pickedColor) ? .white : .black)
-        .shadow(color: .black.opacity(0.25), radius: 1, y: 1)
+                        // HEX legible
+                        Text(hexValue.uppercased())
+                            .font(.caption.bold())
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 4)
+                            .background(
+                                RoundedRectangle(cornerRadius: 6)
+                                    .fill(
+                                        isColorLight(pickedColor)
+                                        ? Color.black.opacity(0.35)
+                                        : Color.white.opacity(0.25)
+                                    )
+                            )
+                            .foregroundColor(isColorLight(pickedColor) ? .white : .black)
+                            .shadow(color: .black.opacity(0.25), radius: 1, y: 1)
 
-    // 🎯 Nuevo botón estilo "Pick Color"
-    Button {
-        if store.isPro {
-            let rgb = hexToRGB(hexValue)
-            favs.add(color: rgb)
-            dismiss()
-        } else {
-            store.showPaywall = true
-        }
-    } label: {
-        Label("Save Color", systemImage: "heart.fill")
-            .font(.subheadline.weight(.semibold))
-            .foregroundColor(.white)
-            .padding(.horizontal, 24)
-            .padding(.vertical, 10)
-            .background(.ultraThinMaterial)
-            .clipShape(Capsule())
-            .shadow(color: .black.opacity(0.25), radius: 4, y: 2)
-    }
-    .buttonStyle(.plain)
-}
-.opacity(1)
-.zIndex(1)
-
+                        // 🎯 Nuevo botón estilo "Pick Color"
+                        Button {
+                            if store.isPro {
+                                let rgb = hexToRGB(hexValue)
+                                favs.add(color: rgb)
+                                dismiss()
+                            } else {
+                                store.showPaywall = true
+                            }
+                        } label: {
+                            Label("Save Color", systemImage: "heart.fill")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 24)
+                                .padding(.vertical, 10)
+                                .background(.ultraThinMaterial)
+                                .clipShape(Capsule())
+                                .shadow(color: .black.opacity(0.25), radius: 4, y: 2)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .opacity(1)
+                    .zIndex(1)
 
                     // Blur encima SOLO si no es PRO
                     if !store.isPro {
@@ -814,31 +812,105 @@ private struct MagicalUnlockButtonSmall: View {
     }
 }
 
-
-
-
-// MARK: - UIImage pixel color extraction
+// MARK: - UIImage pixel color extraction (CORREGIDO)
 extension UIImage {
     func getPixelColor(at point: CGPoint, in viewBounds: CGRect) -> UIColor? {
-        guard let cgImage = self.cgImage else { return nil }
+        // point: coordenadas relativas dentro de fitRect (no pantalla completa)
+        guard let cgImage = self.cgImage, viewBounds.width > 0, viewBounds.height > 0 else { return nil }
 
-        let scaleX = CGFloat(cgImage.width) / viewBounds.width
-        let scaleY = CGFloat(cgImage.height) / viewBounds.height
+        // Mapea punto relativo -> coordenadas de pixel reales del CGImage
+        let px = Int((point.x / viewBounds.width)  * CGFloat(cgImage.width))
+        let py = Int((point.y / viewBounds.height) * CGFloat(cgImage.height))
 
-        let x = Int(point.x * scaleX)
-        let y = Int(point.y * scaleY)
-        guard x >= 0, y >= 0, x < cgImage.width, y < cgImage.height else { return nil }
+        // Clamps seguros
+        let x = max(0, min(cgImage.width  - 1, px))
+        let y = max(0, min(cgImage.height - 1, py))
 
-        guard let data = cgImage.dataProvider?.data,
-              let ptr = CFDataGetBytePtr(data) else { return nil }
+        // Flip vertical (CoreGraphics suele tener origen en la esquina inferior izquierda)
+        let yFlipped = cgImage.height - 1 - y
 
-        let bytesPerPixel = cgImage.bitsPerPixel / 8
-        let offset = (y * cgImage.bytesPerRow) + (x * bytesPerPixel)
-        let r = CGFloat(ptr[offset]) / 255.0
-        let g = CGFloat(ptr[offset + 1]) / 255.0
-        let b = CGFloat(ptr[offset + 2]) / 255.0
-        let a = CGFloat(ptr[offset + 3]) / 255.0
+        // Contexto 1x1 RGBA8 sRGB para leer el pixel exacto
+        let colorSpace = CGColorSpace(name: CGColorSpace.sRGB)!
+        var pixel: [UInt8] = [0, 0, 0, 0]
+        guard let ctx = CGContext(
+            data: &pixel,
+            width: 1, height: 1,
+            bitsPerComponent: 8, bytesPerRow: 4,
+            space: colorSpace,
+            bitmapInfo: CGBitmapInfo.byteOrder32Big.rawValue | CGImageAlphaInfo.premultipliedLast.rawValue
+        ) else { return nil }
+
+        ctx.interpolationQuality = .none
+        // Dibujamos de modo que (x, yFlipped) caiga en (0,0) del contexto 1x1
+        ctx.translateBy(x: -CGFloat(x), y: -CGFloat(yFlipped))
+        ctx.draw(cgImage, in: CGRect(x: 0, y: 0, width: cgImage.width, height: cgImage.height))
+
+        let r = CGFloat(pixel[0]) / 255.0
+        let g = CGFloat(pixel[1]) / 255.0
+        let b = CGFloat(pixel[2]) / 255.0
+        let a = CGFloat(pixel[3]) / 255.0
         return UIColor(red: r, green: g, blue: b, alpha: a)
+    }
+
+    /// Normaliza orientación a .up y asegura espacio de color sRGB RGBA8
+    func normalizedUpSRGB() -> UIImage? {
+        guard let cg = self.cgImage else { return nil }
+        if imageOrientation == .up { return self }
+
+        let colorSpace = CGColorSpace(name: CGColorSpace.sRGB)!
+        guard let ctx = CGContext(
+            data: nil,
+            width: cg.width,
+            height: cg.height,
+            bitsPerComponent: 8,
+            bytesPerRow: 0,
+            space: colorSpace,
+            bitmapInfo: CGBitmapInfo.byteOrder32Big.rawValue | CGImageAlphaInfo.premultipliedLast.rawValue
+        ) else { return nil }
+
+        var transform = CGAffineTransform.identity
+
+        switch imageOrientation {
+        case .down, .downMirrored:
+            transform = transform
+                .translatedBy(x: CGFloat(cg.width), y: CGFloat(cg.height))
+                .rotated(by: .pi)
+        case .left, .leftMirrored:
+            transform = transform
+                .translatedBy(x: CGFloat(cg.width), y: 0)
+                .rotated(by: .pi / 2)
+        case .right, .rightMirrored:
+            transform = transform
+                .translatedBy(x: 0, y: CGFloat(cg.height))
+                .rotated(by: -.pi / 2)
+        default: break
+        }
+
+        switch imageOrientation {
+        case .upMirrored, .downMirrored:
+            transform = transform
+                .translatedBy(x: CGFloat(cg.width), y: 0)
+                .scaledBy(x: -1, y: 1)
+        case .leftMirrored, .rightMirrored:
+            transform = transform
+                .translatedBy(x: CGFloat(cg.height), y: 0)
+                .scaledBy(x: -1, y: 1)
+        default: break
+        }
+
+        ctx.concatenate(transform)
+
+        let drawRect: CGRect
+        if imageOrientation == .left || imageOrientation == .leftMirrored ||
+           imageOrientation == .right || imageOrientation == .rightMirrored {
+            drawRect = CGRect(x: 0, y: 0, width: cg.height, height: cg.width)
+        } else {
+            drawRect = CGRect(x: 0, y: 0, width: cg.width, height: cg.height)
+        }
+
+        ctx.draw(cg, in: drawRect)
+        guard let fixedCG = ctx.makeImage() else { return nil }
+        return UIImage(cgImage: fixedCG, scale: 1, orientation: .up)
     }
 }
 
@@ -862,7 +934,6 @@ extension RGB {
     }
 }
 
-
 // MARK: - Hex Color Initializer
 extension Color {
     init(hex: String) {
@@ -884,4 +955,3 @@ extension Color {
         )
     }
 }
-
