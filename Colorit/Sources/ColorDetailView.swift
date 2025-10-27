@@ -35,7 +35,7 @@ struct ColorDetailView: View {
                         .overlay(
                             VStack(spacing: 4) {
                                 Text(color.name)
-                                    .font(.system(size: 30, weight: .bold))
+                                    .font(.system(size: 22, weight: .semibold)) // antes 30 → más pequeño
                                     .foregroundColor(.white)
                                     .shadow(color: .black.opacity(0.4), radius: 3, y: 1)
                                 Text(color.hex)
@@ -43,12 +43,13 @@ struct ColorDetailView: View {
                                     .foregroundColor(.white.opacity(0.9))
                                     .shadow(color: .black.opacity(0.3), radius: 2, y: 1)
                             }
-                            .padding(.vertical, 6)
-                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 14)
                             .background(
                                 Color.black.opacity(0.45),
-                                in: RoundedRectangle(cornerRadius: 12)
+                                in: RoundedRectangle(cornerRadius: 14)
                             )
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
                         )
                         .shadow(color: .black.opacity(0.1), radius: 6, x: 0, y: 3)
                         .padding(.horizontal)
