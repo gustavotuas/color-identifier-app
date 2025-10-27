@@ -4,7 +4,6 @@ import UIKit
 import CoreImage
 import CoreGraphics
 import Combine
-import PhotosUI
 
 // MARK: - Engine + helpers
 
@@ -33,6 +32,8 @@ extension UIColor {
         return String(format: "#%02X%02X%02X", Int(r*255), Int(g*255), Int(b*255))
     }
 }
+
+// MARK: - Camera Engine
 
 @MainActor
 final class CameraEngine: NSObject, ObservableObject {
@@ -144,7 +145,6 @@ extension CameraEngine: AVCaptureVideoDataOutputSampleBufferDelegate {
         CVPixelBufferLockBaseAddress(pb, .readOnly)
         let w = CVPixelBufferGetWidth(pb), h = CVPixelBufferGetHeight(pb), bpr = CVPixelBufferGetBytesPerRow(pb)
         if let base = CVPixelBufferGetBaseAddress(pb) {
-            // sample center
             let x = w/2, y = h/2
             let px = base.advanced(by: y*bpr + x*4)
             let b = Int(px.load(fromByteOffset: 0, as: UInt8.self))
@@ -154,7 +154,6 @@ extension CameraEngine: AVCaptureVideoDataOutputSampleBufferDelegate {
         }
         CVPixelBufferUnlockBaseAddress(pb, .readOnly)
 
-        // lastFrame (throttle)
         let now = CACurrentMediaTime()
         guard now - lastFrameTime >= frameInterval else { return }
         lastFrameTime = now
@@ -166,7 +165,7 @@ extension CameraEngine: AVCaptureVideoDataOutputSampleBufferDelegate {
     }
 }
 
-// MARK: - Preview layer + gestures
+// MARK: - Preview View
 
 struct CameraPreviewView: UIViewRepresentable {
     @ObservedObject var engine: CameraEngine
@@ -178,7 +177,6 @@ struct CameraPreviewView: UIViewRepresentable {
 
         let pinch = UIPinchGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.onPinch(_:)))
         v.addGestureRecognizer(pinch)
-
         return v
     }
 
@@ -207,7 +205,7 @@ struct CameraPreviewView: UIViewRepresentable {
     }
 }
 
-// MARK: - Toast (top banner)
+// MARK: - Toast
 
 enum ToastKind { case success, info, error }
 
@@ -223,6 +221,7 @@ struct ToastBanner: View {
         case .error:   return .red
         }
     }
+
     private var symbol: String {
         switch kind {
         case .success: return "checkmark.circle.fill"
@@ -233,7 +232,8 @@ struct ToastBanner: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
-            Image(systemName: symbol).foregroundColor(tint)
+            Image(systemName: symbol)
+                .foregroundColor(tint)
                 .font(.title3)
                 .padding(.top, 2)
             VStack(alignment: .leading, spacing: 2) {
@@ -242,44 +242,29 @@ struct ToastBanner: View {
             }
             Spacer(minLength: 6)
         }
-        .padding(.horizontal, 14).padding(.vertical, 10)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 14))
     }
 }
 
-// MARK: - Matches Navigation Model
-
-struct MatchesPayload: Identifiable, Equatable {
-    let id = UUID()
-    let colors: [RGB]
-    let sourceImage: UIImage?
-}
-
-// MARK: - Main UI
+// MARK: - Camera Screen
 
 struct CameraScreen: View {
     @EnvironmentObject var favs: FavoritesStore
     @EnvironmentObject var catalog: Catalog
-
     @StateObject private var engine = CameraEngine()
 
-    // pulses & flash
     @State private var likedPulse = false
     @State private var copiedPulse = false
     @State private var flash = false
 
-    // toast
     @State private var toastVisible = false
     @State private var toastTitle = ""
     @State private var toastMessage = ""
     @State private var toastKind: ToastKind = .success
 
-    // gallery picker
-    @State private var showPicker = false
-    @State private var pickedImage: UIImage? = nil
-
-    // navigation
     @State private var matches: MatchesPayload? = nil
 
     var body: some View {
@@ -287,18 +272,23 @@ struct CameraScreen: View {
             Color.black.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // Top bar: Good/Low + Torch (near edges)
-                HStack {
-                    let ok = engine.brightness > 0.45
-                    Label(ok ? "Good Light" : "Low Light",
-                          systemImage: ok ? "lightbulb.fill" : "cloud.fill")
-                        .font(.caption2)
-                        .padding(.horizontal, 10).padding(.vertical, 6)
-                        .background(.ultraThinMaterial).clipShape(Capsule())
-                        .foregroundStyle(ok ? .green : .orange)
+                // Top bar
+                // Top bar
+            HStack {
+                let ok = engine.brightness > 0.45
+                Label(ok ? "Good Light" : "Low Light",
+                    systemImage: ok ? "lightbulb.fill" : "cloud.fill")
+                    .font(.caption2)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(.ultraThinMaterial)
+                    .clipShape(Capsule())
+                    .foregroundStyle(ok ? .green : .orange)
 
-                    Spacer()
+                Spacer()
 
+                HStack(spacing: 10) {
+                    // Torch button
                     let showTorch = (engine.activeDevice()?.hasTorch ?? false) && !engine.isUsingFront
                     if showTorch {
                         Button { engine.setTorch(!engine.torchOn) } label: {
@@ -310,20 +300,30 @@ struct CameraScreen: View {
                                 .clipShape(Circle())
                         }
                     }
-                }
-                .padding(.horizontal, 12)
-                .padding(.top, topSafeInset() + 2)
 
-                // Framed camera with CENTER TARGET + ISLAND INSIDE
+                    // Flip camera button
+                    Button { engine.switchCamera() } label: {
+                        Image(systemName: "arrow.triangle.2.circlepath.camera")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                            .padding(10)
+                            .background(.ultraThinMaterial)
+                            .clipShape(Circle())
+                    }
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.top, topSafeInset() + 2)
+
+
+                // Camera preview
                 ZStack {
                     CameraPreviewView(engine: engine)
 
-                    // Center target
                     CrosshairCenter(color: Color(uiColor: engine.currentRGB.uiColor))
                         .frame(width: 22, height: 22)
                         .allowsHitTesting(false)
 
-                    // Island inside camera (bottom aligned). Top/bottom = 0 feeling.
                     VStack(spacing: 0) {
                         Spacer(minLength: 0)
                         ColorIsland(
@@ -352,72 +352,43 @@ struct CameraScreen: View {
                         .environment(\.copyPulse, copiedPulse)
                         .environment(\.likePulse, likedPulse)
                         .padding(.horizontal, 2)
-                        .padding(.bottom, 0) // feel like it's inside, touching the bottom
+                        .padding(.bottom, 0)
                     }
                 }
-                .clipShape(RoundedRectangle(cornerRadius: 26)) // clip the WHOLE stack
+                .clipShape(RoundedRectangle(cornerRadius: 26))
                 .overlay(RoundedRectangle(cornerRadius: 26).stroke(.black, lineWidth: 12))
                 .padding(.horizontal, 8)
                 .padding(.top, 8)
 
                 Spacer(minLength: 8)
 
-                // Bottom black bar
+                // Bottom bar (only shutter + flip)
+                // Bottom bar (only shutter centered)
                 ZStack {
                     Rectangle().fill(Color.black).ignoresSafeArea(edges: .bottom)
-                    HStack {
-                        // Gallery
-                        Button { showPicker = true } label: {
-                            ZStack {
-                                if let img = pickedImage {
-                                    Image(uiImage: img).resizable().scaledToFill()
-                                } else {
-                                    Image(systemName: "photo").font(.title3).foregroundStyle(.white)
-                                }
-                            }
-                            .frame(width: 52, height: 52)
-                            .background(Color.white.opacity(0.08))
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
+
+                    // Shutter button perfectly centered
+                    Button {
+                        generatePaletteFromLive()
+                        withAnimation(.easeOut(duration: 0.06)) { flash = true }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
+                            withAnimation(.easeIn(duration: 0.12)) { flash = false }
                         }
-
-                        Spacer()
-
-                        // Shutter
-                        Button {
-                            generatePaletteFromLive()
-                            withAnimation(.easeOut(duration: 0.06)) { flash = true }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
-                                withAnimation(.easeIn(duration: 0.12)) { flash = false }
-                            }
-                        } label: {
-                            ZStack {
-                                Circle().stroke(.white, lineWidth: 4).frame(width: 62, height: 62)
-                                Circle().fill(.white).frame(width: 50, height: 50)
-                            }
-                            .accessibilityLabel("Generate Palette")
+                    } label: {
+                        ZStack {
+                            Circle().stroke(.white, lineWidth: 4).frame(width: 62, height: 62)
+                            Circle().fill(.white).frame(width: 50, height: 50)
                         }
-                        .buttonStyle(SquishButtonStyle())
-
-                        Spacer()
-
-                        // Flip camera
-                        Button { engine.switchCamera() } label: {
-                            Image(systemName: "arrow.triangle.2.circlepath.camera")
-                                .font(.title3).foregroundStyle(.white)
-                                .frame(width: 52, height: 52)
-                                .background(Color.white.opacity(0.08))
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                        }
+                        .accessibilityLabel("Generate Palette")
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.top, 14)       // space from camera frame
-                    .padding(.bottom, bottomSafeInset() + 8)
+                    .buttonStyle(SquishButtonStyle())
                 }
+                .padding(.top, 14)
+                .padding(.bottom, bottomSafeInset() + 8)
                 .frame(height: 110)
-
-            } // VStack
-        } // ZStack
-        // Global toasts
+            }
+        }
+        // Toasts
         .overlay(alignment: .top) {
             if toastVisible {
                 ToastBanner(title: toastTitle, message: toastMessage, kind: toastKind)
@@ -428,14 +399,6 @@ struct CameraScreen: View {
         }
         .onAppear { engine.start() }
         .onDisappear { engine.stop() }
-        .sheet(isPresented: $showPicker) {
-            PhotoPicker(image: $pickedImage)
-        }
-        .onChange(of: pickedImage) { _, img in
-            guard let img else { return }
-            let colors = KMeans.palette(from: img, k: 10)
-            matches = MatchesPayload(colors: colors, sourceImage: img)
-        }
         .sheet(item: $matches) { payload in
             MatchesView(payload: payload)
                 .environmentObject(favs)
@@ -495,14 +458,25 @@ struct SquishButtonStyle: ButtonStyle {
     }
 }
 
-// MARK: - Island
+
+// MARK: - Matches Payload
+struct MatchesPayload: Identifiable, Equatable {
+    let id = UUID()
+    let colors: [RGB]
+    let sourceImage: UIImage?
+}
+
+// MARK: - Environment Pulses
 
 private struct CopyPulseKey: EnvironmentKey { static let defaultValue: Bool = false }
 private struct LikePulseKey: EnvironmentKey { static let defaultValue: Bool = false }
+
 extension EnvironmentValues {
     var copyPulse: Bool { get { self[CopyPulseKey.self] } set { self[CopyPulseKey.self] = newValue } }
     var likePulse: Bool { get { self[LikePulseKey.self] } set { self[LikePulseKey.self] = newValue } }
 }
+
+// MARK: - Color Island (bottom info panel)
 
 struct ColorIsland: View {
     let raw: RGB
@@ -530,8 +504,11 @@ struct ColorIsland: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(catalog.nearestName(to: color)?.name ?? color.hex)
-                        .font(.headline).lineLimit(1)
-                    Text(precisionText).font(.caption).foregroundStyle(.secondary)
+                        .font(.headline)
+                        .lineLimit(1)
+                    Text(precisionText)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
 
                 Spacer()
@@ -576,7 +553,7 @@ struct ColorIsland: View {
     }
 }
 
-// MARK: - Matches Screen
+// MARK: - Matches View
 
 struct MatchesView: View {
     @Environment(\.dismiss) private var dismiss
@@ -588,14 +565,14 @@ struct MatchesView: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 16) {
-                    // Swatch strip (no gradient)
+                    // Swatch strip
                     SwatchStrip(colors: payload.colors)
                         .frame(height: 100)
                         .clipShape(RoundedRectangle(cornerRadius: 24))
-                        .overlay(RoundedRectangle(cornerRadius: 24).stroke(Color.black.opacity(0.08), lineWidth: 1))
+                        .overlay(RoundedRectangle(cornerRadius: 24)
+                            .stroke(Color.black.opacity(0.08), lineWidth: 1))
                         .padding(.horizontal)
 
-                    // Per-color breakdown
                     VStack(spacing: 10) {
                         ForEach(Array(payload.colors.enumerated()), id: \.offset) { (idx, c) in
                             ColorBreakdownRow(index: idx+1, color: c)
@@ -603,24 +580,14 @@ struct MatchesView: View {
                         }
                     }
 
-                    // Actions
                     HStack {
                         Button {
                             favs.addPalette(name: nil, colors: payload.colors)
                         } label: {
-                            Label("Save Palette", systemImage: "square.and.arrow.down").frame(maxWidth: .infinity)
+                            Label("Save Palette", systemImage: "square.and.arrow.down")
+                                .frame(maxWidth: .infinity)
                         }
                         .buttonStyle(.borderedProminent)
-
-                        Button {
-                            if let url = LocalPDFExporter.makePalettePDF(colors: payload.colors, sourceImage: payload.sourceImage) {
-                                let act = UIActivityViewController(activityItems: [url], applicationActivities: nil)
-                                UIApplication.shared.topMostViewController()?.present(act, animated: true)
-                            }
-                        } label: {
-                            Label("Export PDF", systemImage: "doc.richtext").frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(.bordered)
                     }
                     .padding(.horizontal)
                     .padding(.bottom, 20)
@@ -630,7 +597,9 @@ struct MatchesView: View {
             .navigationTitle("Colour Matches")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button { dismiss() } label: { Image(systemName: "xmark") }
+                    Button { dismiss() } label: {
+                        Image(systemName: "xmark")
+                    }
                 }
             }
         }
@@ -643,10 +612,13 @@ struct ColorBreakdownRow: View {
     var body: some View {
         HStack(alignment: .center, spacing: 12) {
             ZStack {
-                RoundedRectangle(cornerRadius: 10).fill(Color(uiColor: color.uiColor))
-                RoundedRectangle(cornerRadius: 10).stroke(Color.black.opacity(0.08), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color(uiColor: color.uiColor))
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(Color.black.opacity(0.08), lineWidth: 1)
             }
             .frame(width: 54, height: 54)
+
             VStack(alignment: .leading, spacing: 4) {
                 Text("#\(index)").font(.caption).foregroundStyle(.secondary)
                 Text("HEX: \(color.hex)").font(.subheadline)
@@ -674,141 +646,6 @@ struct SwatchStrip: View {
                         .accessibilityHidden(true)
                 }
             }
-            .frame(width: geo.size.width, height: geo.size.height, alignment: .leading)
         }
-    }
-}
-
-// MARK: - Photo Picker
-
-struct PhotoPicker: UIViewControllerRepresentable {
-    @Binding var image: UIImage?
-
-    func makeUIViewController(context: Context) -> PHPickerViewController {
-        var config = PHPickerConfiguration(photoLibrary: .shared())
-        config.selectionLimit = 1
-        config.filter = .images
-        let picker = PHPickerViewController(configuration: config)
-        picker.delegate = context.coordinator
-        return picker
-    }
-
-    func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) { }
-
-    func makeCoordinator() -> Coordinator { Coordinator(self) }
-
-    final class Coordinator: NSObject, PHPickerViewControllerDelegate {
-        let parent: PhotoPicker
-        init(_ parent: PhotoPicker) { self.parent = parent }
-
-        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-            picker.dismiss(animated: true)
-            guard let provider = results.first?.itemProvider else { return }
-            if provider.canLoadObject(ofClass: UIImage.self) {
-                provider.loadObject(ofClass: UIImage.self) { obj, _ in
-                    DispatchQueue.main.async {
-                        self.parent.image = obj as? UIImage
-                    }
-                }
-            }
-        }
-    }
-}
-
-// MARK: - PDF Exporter (vertical per color)
-
-enum LocalPDFExporter {
-    static func makePalettePDF(colors: [RGB], sourceImage: UIImage? = nil) -> URL? {
-        let fmt = DateFormatter(); fmt.dateFormat = "yyyyMMdd-HHmmss"
-        let file = "Palette-\(fmt.string(from: Date())).pdf"
-        let url = FileManager.default.temporaryDirectory.appendingPathComponent(file)
-
-        let pageW: CGFloat = 595 // A4 @72dpi
-        let pageH: CGFloat = 842
-        let renderer = UIGraphicsPDFRenderer(bounds: CGRect(x: 0, y: 0, width: pageW, height: pageH))
-
-        do {
-            try renderer.writePDF(to: url) { ctx in
-                ctx.beginPage()
-                guard let cgctx = UIGraphicsGetCurrentContext() else { return }
-
-                let title = "Colorit – Colour Palette"
-                (title as NSString).draw(at: CGPoint(x: 36, y: 50),
-                                         withAttributes: [.font: UIFont.boldSystemFont(ofSize: 18)])
-
-                var y: CGFloat = 100
-
-                // Palette bar (strips)
-                let barRect = CGRect(x: 36, y: y, width: pageW - 72, height: 50).integral
-                let wCol = barRect.width / CGFloat(max(1, colors.count))
-                for (i, c) in colors.enumerated() {
-                    cgctx.setFillColor(c.uiColor.cgColor)
-                    let rect = CGRect(x: barRect.minX + CGFloat(i)*wCol, y: barRect.minY, width: wCol, height: barRect.height)
-                    cgctx.fill(rect)
-                }
-                cgctx.setStrokeColor(UIColor.black.withAlphaComponent(0.12).cgColor)
-                cgctx.stroke(barRect, width: 1)
-                y = barRect.maxY + 16
-
-                let font = UIFont.systemFont(ofSize: 12)
-                let bold = UIFont.boldSystemFont(ofSize: 12)
-                let leftX: CGFloat = 36
-                let swatch: CGFloat = 56
-                let spacing: CGFloat = 22
-
-                for c in colors {
-                    if y + swatch + 60 > pageH - 48 { ctx.beginPage(); y = 48 }
-
-                    let swRect = CGRect(x: leftX, y: y, width: swatch, height: swatch)
-                    cgctx.setFillColor(c.uiColor.cgColor); cgctx.fill(swRect)
-                    cgctx.setStrokeColor(UIColor.black.withAlphaComponent(0.1).cgColor)
-                    cgctx.stroke(swRect, width: 1)
-
-                    var ty = swRect.maxY + 6
-                    ("HEX" as NSString).draw(at: CGPoint(x: leftX, y: ty), withAttributes: [.font: bold])
-                    (c.hex as NSString).draw(at: CGPoint(x: leftX + 42, y: ty), withAttributes: [.font: font])
-                    ty += 16
-                    ("RGB" as NSString).draw(at: CGPoint(x: leftX, y: ty), withAttributes: [.font: bold])
-                    (c.rgbText as NSString).draw(at: CGPoint(x: leftX + 42, y: ty), withAttributes: [.font: font])
-                    ty += 16
-                    ("CMYK" as NSString).draw(at: CGPoint(x: leftX, y: ty), withAttributes: [.font: bold])
-                    (c.cmykText as NSString).draw(at: CGPoint(x: leftX + 42, y: ty), withAttributes: [.font: font])
-                    ty += 6
-
-                    y = max(ty, swRect.maxY) + spacing
-                }
-
-                let df = DateFormatter(); df.dateStyle = .medium; df.timeStyle = .short
-                let footer = "Generated \(df.string(from: Date()))"
-                (footer as NSString).draw(at: CGPoint(x: 36, y: pageH - 36),
-                                          withAttributes: [.font: UIFont.systemFont(ofSize: 10),
-                                                           .foregroundColor: UIColor.gray])
-            }
-            return url
-        } catch {
-            print("PDF error:", error.localizedDescription)
-            return nil
-        }
-    }
-}
-
-// MARK: - helpers
-
-extension UIApplication {
-    func topMostViewController(base: UIViewController? = nil) -> UIViewController? {
-        let base = base ?? connectedScenes
-            .compactMap { $0 as? UIWindowScene }
-            .flatMap { $0.windows }
-            .first { $0.isKeyWindow }?.rootViewController
-        if let nav = base as? UINavigationController {
-            return topMostViewController(base: nav.visibleViewController)
-        }
-        if let tab = base as? UITabBarController {
-            return topMostViewController(base: tab.selectedViewController)
-        }
-        if let presented = base?.presentedViewController {
-            return topMostViewController(base: presented)
-        }
-        return base
     }
 }
