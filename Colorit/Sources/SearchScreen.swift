@@ -98,6 +98,9 @@ struct SearchScreen: View {
     @State private var searchEngine: ColorSearchEngine?
     @State private var pendingSearchWorkItem: DispatchWorkItem?
 
+    // ✅ Nuevo estado para toasts (global en SearchScreen)
+    @State private var toastMessage: String? = nil
+
     enum LayoutMode: CaseIterable {
         case list, grid2, grid3, wheel
         var icon: String {
@@ -133,6 +136,8 @@ struct SearchScreen: View {
                 .onChange(of: selection) { _ in selectionChanged() }
                 .onReceive(catalogs.$loaded) { _ in rebuildEngineAndRefilter() }
         }
+        // ✅ Muestra toast globalmente
+        .toast(message: $toastMessage)
     }
 
     @ViewBuilder
@@ -164,7 +169,9 @@ struct SearchScreen: View {
             }
 
             ForEach(filteredColors.prefix(visibleCount)) { color in
-                ColorRow(color: color)
+                // ✅ Pasamos binding del toast a la fila
+                ColorRow(color: color, toast: $toastMessage)
+                    .environmentObject(favs)
                     .listRowSeparator(.hidden)
                     .listRowBackground(Color.clear)
                     .onAppear { handlePagination(color) }
@@ -173,35 +180,32 @@ struct SearchScreen: View {
         .listStyle(.plain)
     }
 
-private var gridLayoutWithBanner: some View {
-    GeometryReader { geo in
-        ScrollView {
-            VStack(spacing: 10) {
-                if selection.isFiltered {
-                    filterBanner
-                        .frame(width: geo.size.width) // ocupa TODO el ancho visible
-                        .padding(.top, 6)
-                }
-
-                LazyVGrid(columns: gridColumns, spacing: 16) {
-                    ForEach(filteredColors.prefix(visibleCount)) { color in
-                        ColorTile(color: color, layout: layout)
-                            .onAppear { handlePagination(color) }
+    private var gridLayoutWithBanner: some View {
+        GeometryReader { geo in
+            ScrollView {
+                VStack(spacing: 10) {
+                    if selection.isFiltered {
+                        filterBanner
+                            .frame(width: geo.size.width) // ocupa TODO el ancho visible
+                            .padding(.top, 6)
                     }
+
+                    LazyVGrid(columns: gridColumns, spacing: 16) {
+                        ForEach(filteredColors.prefix(visibleCount)) { color in
+                            // ✅ Pasamos binding del toast al tile
+                            ColorTile(color: color, layout: layout, toast: $toastMessage)
+                                .environmentObject(favs)
+                                .onAppear { handlePagination(color) }
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 12)
                 }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 12)
+                .frame(width: geo.size.width) // asegura que el VStack también tenga el ancho completo
             }
-            .frame(width: geo.size.width) // asegura que el VStack también tenga el ancho completo
+            .ignoresSafeArea(.keyboard) // evita cortes por el teclado
         }
-        .ignoresSafeArea(.keyboard) // evita cortes por el teclado
     }
-}
-
-
-
-
-
 
     // MARK: - Filter Banner
     @ViewBuilder
@@ -214,6 +218,8 @@ private var gridLayoutWithBanner: some View {
                 withAnimation(.easeInOut) {
                     selection = .all
                     VendorSelectionStorage.save(selection)
+                    // ✅ Toast al limpiar filtro
+                    toastMessage = "Vendor filter cleared"
                 }
             } label: {
                 Label("Clear", systemImage: "xmark.circle.fill")
@@ -233,7 +239,7 @@ private var gridLayoutWithBanner: some View {
         .transition(.move(edge: .top).combined(with: .opacity))
     }
 
-    // MARK: - Layout View
+    // MARK: - Layout View (no se usa ahora, pero lo respetamos)
     @ViewBuilder
     private var layoutView: some View {
         switch layout {
@@ -250,7 +256,8 @@ private var gridLayoutWithBanner: some View {
 
     private var listLayout: some View {
         List(filteredColors.prefix(visibleCount)) { color in
-            ColorRow(color: color)
+            ColorRow(color: color, toast: $toastMessage)
+                .environmentObject(favs)
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
                 .onAppear { handlePagination(color) }
@@ -262,7 +269,8 @@ private var gridLayoutWithBanner: some View {
         ScrollView {
             LazyVGrid(columns: gridColumns, spacing: 16) {
                 ForEach(filteredColors.prefix(visibleCount)) { color in
-                    ColorTile(color: color, layout: layout)
+                    ColorTile(color: color, layout: layout, toast: $toastMessage)
+                        .environmentObject(favs)
                         .onAppear { handlePagination(color) }
                 }
             }
@@ -351,6 +359,14 @@ private var gridLayoutWithBanner: some View {
         VendorSelectionStorage.save(selection)
         preloadForSelection()
         rebuildEngineAndRefilter()
+        // ✅ Toast al setear filtro
+        withAnimation {
+            if selection == .all {
+                toastMessage = "Vendor filter cleared"
+            } else {
+                toastMessage = "Vendor filter set: \(selection.filterSubtitle)"
+            }
+        }
     }
 
     private func preloadForSelection() {
@@ -479,11 +495,17 @@ private var gridLayoutWithBanner: some View {
 }
 
 
+/// =======================
+/// MARK: - ColorRow
+/// =======================
 struct ColorRow: View {
     @EnvironmentObject var favs: FavoritesStore
     let color: NamedColor
     @State private var showDetail = false
     @State private var tapCount = 0
+
+    // ✅ Binding recibido desde SearchScreen para disparar toasts
+    @Binding var toast: String?
 
     var body: some View {
         HStack(spacing: 12) {
@@ -562,9 +584,15 @@ struct ColorRow: View {
         let rgb = hexToRGB(color.hex)
         if isFavoriteNormalized {
             favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
+            // ✅ Toast remove
+            toast = "Removed from collections"
         } else {
             let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
-            if !exists { favs.add(color: rgb) }
+            if !exists {
+                favs.add(color: rgb)
+                // ✅ Toast add
+                toast = "Added to collections"
+            }
         }
     }
 
@@ -575,12 +603,18 @@ struct ColorRow: View {
 }
 
 
+/// =======================
+/// MARK: - ColorTile (grid)
+/// =======================
 struct ColorTile: View {
     @EnvironmentObject var favs: FavoritesStore
     @Environment(\.colorScheme) var colorScheme
     let color: NamedColor
     let layout: SearchScreen.LayoutMode
     @State private var showDetail = false
+
+    // ✅ Binding para toasts desde SearchScreen
+    @Binding var toast: String?
 
     var body: some View {
         VStack(spacing: 4) {
@@ -676,9 +710,15 @@ struct ColorTile: View {
         let rgb = hexToRGB(color.hex)
         if isFavoriteNormalized {
             favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
+            // ✅ Toast remove
+            toast = "Removed from collections"
         } else {
             let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
-            if !exists { favs.add(color: rgb) }
+            if !exists {
+                favs.add(color: rgb)
+                // ✅ Toast add
+                toast = "Added to collections"
+            }
         }
     }
 
@@ -687,4 +727,3 @@ struct ColorTile: View {
         return favs.colors.contains { normalizeHex($0.color.hex) == key }
     }
 }
-

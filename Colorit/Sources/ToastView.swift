@@ -6,9 +6,9 @@ struct ToastView: View {
 
     var body: some View {
         let bgColor: Color = {
-            if message.contains("Added") { return Color.green.opacity(0.75) }
-            if message.contains("Removed") { return Color.red.opacity(0.75) }
-            if message.contains("Share") { return Color.blue.opacity(0.75) }
+           // if message.contains("Added") { return Color.green.opacity(0.75) }
+           // if message.contains("Removed") { return Color.red.opacity(0.75) }
+           // if message.contains("Share") { return Color.blue.opacity(0.75) }
             return Color.gray.opacity(0.7)
         }()
 
