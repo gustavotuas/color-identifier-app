@@ -325,6 +325,7 @@ enum FavoritesFilter: String, CaseIterable {
 struct NewPaletteSheet: View {
     @EnvironmentObject var favs: FavoritesStore
     @EnvironmentObject var catalog: Catalog
+    @EnvironmentObject var catalogs: CatalogStore
     @Binding var showSheet: Bool
 
     @State private var selectedColors: Set<String> = []
@@ -344,21 +345,44 @@ struct NewPaletteSheet: View {
                     .onSubmit { hideKeyboard() }
 
                 ScrollView {
-                    LazyVGrid(columns: gridColumns, spacing: 10) {
+                    LazyVGrid(columns: gridColumns, spacing: 16) {
                         ForEach(favs.colors) { fav in
                             let isSelected = selectedColors.contains(fav.color.hex)
+                            let named = makeNamedColor(from: fav.color)
+
                             ZStack(alignment: .topTrailing) {
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(Color(uiColor(for: fav.color.hex)))
-                                    .frame(height: 90)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 10)
-                                            .stroke(isSelected ? Color.accentColor : .clear, lineWidth: 3)
-                                    )
-                                    .onTapGesture {
-                                        hideKeyboard()
-                                        toggleSelection(fav.color.hex)
+                                VStack(spacing: 6) {
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .fill(Color(fav.color.uiColor))
+                                        .frame(height: 100)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 10)
+                                                .stroke(isSelected ? Color.accentColor : .clear, lineWidth: 3)
+                                        )
+                                        .onTapGesture {
+                                            hideKeyboard()
+                                            toggleSelection(fav.color.hex)
+                                        }
+
+                                    // 👇 Nueva sección con nombre y HEX
+                                    VStack(spacing: 2) {
+                                        Text(named.name)
+                                            .font(.caption.bold())
+                                            .foregroundColor(.primary)
+                                            .lineLimit(1)
+
+                                        Text(fav.color.hex.uppercased())
+                                            .font(.caption2)
+                                            .foregroundColor(.secondary)
+
+                                        if let brand = named.vendor?.brand {
+                                            Text(brand)
+                                                .font(.caption2)
+                                                .foregroundColor(.secondary)
+                                        }
                                     }
+                                    .padding(.bottom, 4)
+                                }
 
                                 if isSelected {
                                     Image(systemName: "checkmark.circle.fill")
@@ -371,6 +395,7 @@ struct NewPaletteSheet: View {
                     }
                     .padding(.horizontal)
                 }
+
 
                 Button(action: createPalette) {
                     Text("Create Palette")
@@ -422,6 +447,36 @@ struct NewPaletteSheet: View {
     private func hideKeyboard() {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
+
+    // MARK: - Helpers
+    private func makeNamedColor(from rgb: RGB) -> NamedColor {
+        let fixedHex = "#" + rgb.hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        let normalized = fixedHex.replacingOccurrences(of: "#", with: "")
+        let rgbValues = hexToRGB(fixedHex)
+
+        if let exact = catalog.names.first(where: {
+            $0.hex.replacingOccurrences(of: "#", with: "").uppercased() == normalized
+        }) {
+            return exact
+        }
+
+        for id in CatalogID.allCases where id != .generic {
+            let vendorColors = catalogs.colors(for: [id])
+            if let exact = vendorColors.first(where: {
+                $0.hex.replacingOccurrences(of: "#", with: "").uppercased() == normalized
+            }) {
+                return exact
+            }
+        }
+
+        return NamedColor(
+            name: rgb.hex.uppercased(),
+            hex: fixedHex,
+            vendor: nil,
+            rgb: [rgbValues.r, rgbValues.g, rgbValues.b]
+        )
+    }
+
 }
 
 // MARK: - FavoriteColorTile
