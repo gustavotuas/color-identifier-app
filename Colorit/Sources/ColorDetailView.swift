@@ -35,13 +35,13 @@ struct ColorDetailView: View {
                         .overlay(
                             VStack(spacing: 4) {
                                 Text(color.name)
-                                    .font(.headline)
+                                    .font(.system(size: 30, weight: .bold))
                                     .foregroundColor(.white)
-                                    .shadow(color: .black.opacity(0.3), radius: 2, y: 1)
+                                    .shadow(color: .black.opacity(0.4), radius: 3, y: 1)
                                 Text(color.hex)
                                     .font(.subheadline)
                                     .foregroundColor(.white.opacity(0.9))
-                                    .shadow(color: .black.opacity(0.3), radius: 1, y: 1)
+                                    .shadow(color: .black.opacity(0.3), radius: 2, y: 1)
                             }
                             .padding(.vertical, 6)
                             .padding(.horizontal, 12)
@@ -254,9 +254,11 @@ struct ColorDetailView: View {
         animateLike.toggle()
     }
 
-    // MARK: - Share Card
+    // MARK: - Share Card (watermark auto contrast)
     private func generateColorCard() -> UIImage {
         let renderer = UIGraphicsImageRenderer(size: CGSize(width: 600, height: 600))
+        let isProUser = false // ⬅️ Cambia según tu lógica real
+
         return renderer.image { ctx in
             let uiColor = rgb.uiColor
             uiColor.setFill()
@@ -278,9 +280,28 @@ struct ColorDetailView: View {
                 .paragraphStyle: paragraphStyle
             ]
 
+            // 🎨 Info principal
             (color.name as NSString).draw(in: CGRect(x: 0, y: 200, width: 600, height: 50), withAttributes: titleAttrs)
             ("HEX: \(color.hex)" as NSString).draw(in: CGRect(x: 0, y: 260, width: 600, height: 40), withAttributes: infoAttrs)
             ("RGB: \(rgb.r), \(rgb.g), \(rgb.b)" as NSString).draw(in: CGRect(x: 0, y: 310, width: 600, height: 40), withAttributes: infoAttrs)
+
+            // 🪄 Marca de agua con contraste automático
+            if !isProUser {
+                let watermarkColor: UIColor = uiColor.isLight ? .black.withAlphaComponent(0.35) : .white.withAlphaComponent(0.4)
+
+                if let logo = UIImage(named: "AppIcon") {
+                    let logoSize: CGFloat = 70
+                    let logoRect = CGRect(x: (600 - logoSize)/2, y: 470, width: logoSize, height: logoSize)
+                    logo.withTintColor(watermarkColor, renderingMode: .alwaysOriginal).draw(in: logoRect, blendMode: .normal, alpha: 0.9)
+                }
+
+                let watermarkAttrs: [NSAttributedString.Key: Any] = [
+                    .font: UIFont.boldSystemFont(ofSize: 28),
+                    .foregroundColor: watermarkColor,
+                    .paragraphStyle: paragraphStyle
+                ]
+                ("Colorit" as NSString).draw(in: CGRect(x: 0, y: 545, width: 600, height: 40), withAttributes: watermarkAttrs)
+            }
         }
     }
 
@@ -305,12 +326,9 @@ struct ColorDetailView: View {
 // MARK: - UIKit Integration for Share Sheet
 struct ActivityViewController: UIViewControllerRepresentable {
     let items: [Any]
-
     func makeUIViewController(context: Context) -> UIActivityViewController {
-        let controller = UIActivityViewController(activityItems: items, applicationActivities: nil)
-        return controller
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
     }
-
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
@@ -340,7 +358,7 @@ private extension UIColor {
     }
 }
 
-// MARK: - Reusable Subviews
+// MARK: - Subviews
 private struct ValueRow: View {
     let label: String
     let value: String
