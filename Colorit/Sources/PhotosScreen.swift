@@ -204,7 +204,7 @@ struct PhotosScreen: View {
                 ZStack(alignment: .top) {
                     Image(uiImage: img)
                         .resizable()
-                        .scaledToFit()
+                        .aspectRatio(img.size, contentMode: .fit)
                         .clipShape(RoundedRectangle(cornerRadius: 20))
                         .shadow(radius: 6)
                         .padding(.horizontal, 12)
