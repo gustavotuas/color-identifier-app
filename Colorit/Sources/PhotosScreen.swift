@@ -59,6 +59,10 @@ struct PhotosScreen: View {
     @State private var showPaletteSheet = false
     @State private var showColorPicker = false
     @State private var toastMessage: String? = nil
+    @State private var addedToCollection = false
+    @State private var addedPalette = false
+
+
 
     private var vendorIDs: [CatalogID] { CatalogID.allCases.filter { $0 != .generic } }
 
@@ -251,92 +255,117 @@ struct PhotosScreen: View {
     }
 
     // MARK: - Palette Card
-    private var paletteCard: some View {
-        ZStack {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Text("Detected Palette").font(.headline)
-                    Spacer()
-                    Text("(\(matches.count) colors)")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
+private var paletteCard: some View {
+    ZStack {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Detected Palette").font(.headline)
+                Spacer()
+                Text("(\(matches.count) colors)")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
 
-                // 🎨 Paleta de colores detectados
-                HStack(spacing: 0) {
-                    ForEach(matches, id: \.color.hex) { m in
-                        Rectangle()
-                            .fill(m.closest != nil ? Color(hexToRGB(m.closest!.hex).uiColor)
-                                                   : Color(m.color.uiColor))
-                    }
+            // 🎨 Paleta de colores detectados
+            HStack(spacing: 0) {
+                ForEach(matches, id: \.color.hex) { m in
+                    Rectangle()
+                        .fill(m.closest != nil
+                              ? Color(hexToRGB(m.closest!.hex).uiColor)
+                              : Color(m.color.uiColor))
                 }
-                .frame(height: 60)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .shadow(color: .black.opacity(0.1), radius: 3, y: 2)
-                .onTapGesture { showPaletteSheet = true }
+            }
+            .frame(height: 60)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .shadow(color: .black.opacity(0.1), radius: 3, y: 2)
+            .onTapGesture { showPaletteSheet = true }
 
-                // 💾 Botón Save Palette
-                Button {
-                    if store.isPro {
-                        let finals = matches.map { $0.closest != nil ? hexToRGB($0.closest!.hex) : $0.color }
+            // 💾 Botón Add to Collections con animación visual y toast
+            Button {
+                if store.isPro {
+                    if !addedPalette {
+                        let finals = matches.map {
+                            $0.closest != nil ? hexToRGB($0.closest!.hex) : $0.color
+                        }
                         let unique = Array(Set(finals.map { $0.hex })).compactMap { hexToRGB($0) }
                         favs.addPalette(name: "Detected Palette", colors: unique)
-                        showToast("Palette Added to Collections")
-                    } else {
-                        store.showPaywall = true
+                        showToast("Added to Collections")
+                        withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
+                            addedPalette = true
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            withAnimation { addedPalette = false }
+                        }
                     }
-                } label: {
-                    Label("Add to Collections", systemImage: "plus")
+                } else {
+                    store.showPaywall = true
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: addedPalette ? "checkmark.circle.fill" : "plus.circle")
+                        .font(.system(size: 18, weight: .semibold))
+                        .symbolEffect(.bounce, value: addedPalette)
+                    Text(addedPalette ? "Added!" : "Add to Collections")
                         .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
-                        .background(Color.white.opacity(0.85))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.blue.opacity(0.3), lineWidth: 1)
-                        )
-                        .foregroundColor(.blue)
-                        .cornerRadius(10)
+                        .animation(.easeInOut(duration: 0.2), value: addedPalette)
                 }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(addedPalette ? Color.green.opacity(0.15)
+                                           : Color.white.opacity(0.85))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(addedPalette ? Color.green.opacity(0.5)
+                                             : Color.blue.opacity(0.3),
+                                lineWidth: 1)
+                )
+                .foregroundColor(addedPalette ? .green : .blue)
+                .cornerRadius(10)
+                .animation(.easeInOut(duration: 0.25), value: addedPalette)
             }
-            .padding(14)
-            .background(.ultraThinMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 20))
-            .shadow(color: .black.opacity(0.1), radius: 4, y: 2)
-            .padding(.horizontal)
+            .buttonStyle(.plain)
+        }
+        .padding(14)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .shadow(color: .black.opacity(0.1), radius: 4, y: 2)
+        .padding(.horizontal)
 
-            // 🔒 Overlay con blur más fuerte en el centro y suave en los bordes
-            if !store.isPro {
-                ZStack {
-                    // Capa base con blur y material
-                    Rectangle()
-                        .fill(.ultraThinMaterial)
-                        .blur(radius: 10)
-                        .opacity(0.95)
-                        .mask(
-                            LinearGradient(
-                                gradient: Gradient(stops: [
-                                    .init(color: .white.opacity(0.0), location: 0.0),  // top → menos blur
-                                    .init(color: .white.opacity(1.0), location: 0.4),  // centro → más blur
-                                    .init(color: .white.opacity(1.0), location: 0.6),  // centro → más blur
-                                    .init(color: .white.opacity(1.0), location: 1.0)   // bottom → menos blur
-                                ]),
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
+        // 🔒 Overlay con blur más fuerte en el centro y suave en los bordes
+        if !store.isPro {
+            ZStack {
+                // Capa base con blur y material
+                Rectangle()
+                    .fill(.ultraThinMaterial)
+                    .blur(radius: 10)
+                    .opacity(0.95)
+                    .mask(
+                        LinearGradient(
+                            gradient: Gradient(stops: [
+                                .init(color: .white.opacity(0.0), location: 0.0),
+                                .init(color: .white.opacity(1.0), location: 0.4),
+                                .init(color: .white.opacity(1.0), location: 0.6),
+                                .init(color: .white.opacity(1.0), location: 1.0)
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
                         )
-                        .clipShape(RoundedRectangle(cornerRadius: 20))
-                        .padding(.horizontal)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .padding(.horizontal)
 
-                    // Botón de desbloqueo mágico
-                    MagicalUnlockButton()
-                        .onTapGesture { store.showPaywall = true }
-                }
-                .transition(.opacity)
+                // Botón de desbloqueo mágico
+                MagicalUnlockButton()
+                    .onTapGesture { store.showPaywall = true }
             }
-
+            .transition(.opacity)
         }
     }
+}
+
 
     // MARK: - Magical Unlock Button (slightly larger, perfect balance)
     private struct MagicalUnlockButton: View {

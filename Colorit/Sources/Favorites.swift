@@ -298,7 +298,7 @@ struct FavoritesScreen: View {
                     }
                 }
             }
-            .alert("Clear all favorites?", isPresented: $showClearAlert) {
+            .alert("Clear all Collections?", isPresented: $showClearAlert) {
                 Button("Yes", role: .destructive) { favs.clearAll() }
                 Button("No", role: .cancel) {}
             }
