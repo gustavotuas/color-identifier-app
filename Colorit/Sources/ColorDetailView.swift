@@ -1,7 +1,7 @@
 import SwiftUI
 import UIKit
 
-// Normaliza HEX: quita espacios, "#", y lo pone en UPPERCASE.
+// MARK: - Normalize HEX
 private func normalizeHex(_ hex: String) -> String {
     var s = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
     if s.hasPrefix("#") { s.removeFirst() }
@@ -10,193 +10,316 @@ private func normalizeHex(_ hex: String) -> String {
 
 struct ColorDetailView: View {
     @EnvironmentObject var favs: FavoritesStore
+    @Environment(\.dismiss) private var dismiss
     let color: NamedColor
 
     @State private var selectedTab = "RGB"
-    @State private var copiedText: String? = nil
-    @State private var showCopyAlert = false
+    @State private var toastMessage: String? = nil
     @State private var isFavorite = false
-    @State private var heartPulse = false
+    @State private var animateLike = false
+    @State private var showShareSheet = false
+    @State private var shareItems: [Any] = []
 
     private var rgb: RGB { hexToRGB(color.hex) }
     private let tabs = ["RGB", "HEX", "HSB", "CMYK"]
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                // MARK: - Title
-                Text(color.name)
-                    .font(.system(size: 30, weight: .bold))
-                    .multilineTextAlignment(.center)
-                    .padding(.top, 20)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 24) {
 
-                // MARK: - Color Preview
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(Color(rgb.uiColor))
-                    .frame(height: 200)
-                    .overlay(
-                        VStack {
-                            Spacer()
-                            Text(color.name)
-                                .font(.headline)
-                                .foregroundColor(.black)
-                            Text(color.hex)
-                                .font(.subheadline)
-                                .foregroundColor(.black.opacity(0.8))
-                            Spacer(minLength: 8)
-                        }
-                    )
-                    .shadow(color: .black.opacity(0.1), radius: 6, x: 0, y: 3)
-                    .padding(.horizontal)
-
-                // MARK: - Copy + Favorite Buttons
-                HStack(spacing: 20) {
-                    CopyButton(label: "Copy HEX", value: color.hex, copiedText: $copiedText)
-                    CopyButton(label: "Copy RGB", value: "\(rgb.r),\(rgb.g),\(rgb.b)", copiedText: $copiedText)
-
-                    // ✅ Reemplazo del heart por LikeFavoriteSmallButton
-                    LikeFavoriteSmallButton(hex: color.hex)
-                        .environmentObject(favs)
-                }
-                .padding(.top, 8)
-
-                // MARK: - Tabs
-                Picker("Mode", selection: $selectedTab) {
-                    ForEach(tabs, id: \.self) { tab in
-                        Text(tab).tag(tab)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .padding(.horizontal)
-                .onChange(of: selectedTab) { _ in
-                    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-                }
-
-                // MARK: - Tab content
-                VStack(spacing: 12) {
-                    switch selectedTab {
-                    case "RGB":
-                        ValueRow(label: "Red", value: "\(rgb.r)", color: .red)
-                        ValueRow(label: "Green", value: "\(rgb.g)", color: .green)
-                        ValueRow(label: "Blue", value: "\(rgb.b)", color: .blue)
-
-                    case "HEX":
-                        ValueRow(label: "Hex", value: color.hex, color: .gray)
-
-                    case "HSB":
-                        let (h, s, b) = rgbToHSB(rgb)
-                        ValueRow(label: "Hue", value: "\(Int(h))°", color: .orange)
-                        ValueRow(label: "Saturation", value: "\(Int(s))%", color: .pink)
-                        ValueRow(label: "Brightness", value: "\(Int(b))%", color: .yellow)
-
-                    case "CMYK":
-                        let (c, m, y, k) = rgbToCMYK(rgb)
-                        ValueRow(label: "Cyan", value: "\(Int(c))%", color: .cyan)
-                        ValueRow(label: "Magenta", value: "\(Int(m))%", color: .pink)
-                        ValueRow(label: "Yellow", value: "\(Int(y))%", color: .yellow)
-                        ValueRow(label: "Black", value: "\(Int(k))%", color: .black)
-
-                    default:
-                        EmptyView()
-                    }
-                }
-                .padding()
-                .background(Color(.systemBackground))
-                .cornerRadius(14)
-                .padding(.horizontal)
-
-                // MARK: - Vendor Info
-                if let v = color.vendor {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("Vendor").font(.headline)
-                        if let brand = v.brand, !brand.isEmpty {
-                            InfoRow(label: "Brand", value: brand)
-                        }
-                        if let code = v.code, !code.isEmpty {
-                            HStack(spacing: 8) {
-                                InfoRow(label: "Code", value: code)
-                                Button {
-                                    UIPasteboard.general.string = code
-                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                } label: {
-                                    Image(systemName: "doc.on.doc")
-                                        .foregroundColor(.gray)
-                                }
+                    // MARK: - Color Preview
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(Color(rgb.uiColor))
+                        .frame(height: 200)
+                        .overlay(
+                            VStack(spacing: 4) {
+                                Text(color.name)
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                    .shadow(color: .black.opacity(0.3), radius: 2, y: 1)
+                                Text(color.hex)
+                                    .font(.subheadline)
+                                    .foregroundColor(.white.opacity(0.9))
+                                    .shadow(color: .black.opacity(0.3), radius: 1, y: 1)
                             }
+                            .padding(.vertical, 6)
+                            .padding(.horizontal, 12)
+                            .background(
+                                Color.black.opacity(0.45),
+                                in: RoundedRectangle(cornerRadius: 12)
+                            )
+                        )
+                        .shadow(color: .black.opacity(0.1), radius: 6, x: 0, y: 3)
+                        .padding(.horizontal)
+
+                    // MARK: - Copy + Share + Like
+                    HStack(spacing: 22) {
+                        Button {
+                            copyCurrentValue()
+                        } label: {
+                            Image(systemName: "doc.on.doc")
+                                .font(.title3)
+                                .foregroundColor(.primary)
                         }
-                        if let locator = v.locator, !locator.isEmpty, locator.uppercased() != "N/A" {
-                            InfoRow(label: "Locator", value: locator)
+
+                        Button {
+                            shareCurrentValue()
+                        } label: {
+                            Image(systemName: "square.and.arrow.up")
+                                .font(.title3)
+                                .foregroundColor(.primary)
                         }
-                        if let line = v.line, !line.isEmpty {
-                            InfoRow(label: "Line", value: line)
+
+                        Button {
+                            toggleFavorite()
+                        } label: {
+                            ZStack {
+                                Circle()
+                                    .strokeBorder(isFavorite ? Color.clear : Color.gray.opacity(0.6), lineWidth: 1.4)
+                                    .background(
+                                        Circle()
+                                            .fill(isFavorite ? Color(red: 30/255, green: 215/255, blue: 96/255) : Color.clear)
+                                    )
+                                    .frame(width: 20, height: 20)
+
+                                Image(systemName: isFavorite ? "checkmark" : "plus")
+                                    .font(.system(size: 8, weight: .bold))
+                                    .foregroundColor(isFavorite ? .black : Color.gray.opacity(0.7))
+                            }
+                            .scaleEffect(animateLike ? 1.15 : 1.0)
+                            .animation(.spring(response: 0.3, dampingFraction: 0.5), value: animateLike)
                         }
-                        if let domain = v.domain, !domain.isEmpty {
-                            InfoRow(label: "Domain", value: domain)
+                        .buttonStyle(.plain)
+                    }
+                    .padding(.top, 8)
+
+                    // MARK: - Tabs
+                    Picker("Mode", selection: $selectedTab) {
+                        ForEach(tabs, id: \.self) { tab in
+                            Text(tab).tag(tab)
                         }
-                        if let source = v.source, !source.isEmpty {
-                            InfoRow(label: "Source", value: source)
+                    }
+                    .pickerStyle(.segmented)
+                    .padding(.horizontal)
+                    .onChange(of: selectedTab) { _ in
+                        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+                    }
+
+                    // MARK: - Tab content
+                    VStack(spacing: 12) {
+                        switch selectedTab {
+                        case "RGB":
+                            ValueRow(label: "Red", value: "\(rgb.r)", color: .red)
+                            ValueRow(label: "Green", value: "\(rgb.g)", color: .green)
+                            ValueRow(label: "Blue", value: "\(rgb.b)", color: .blue)
+                        case "HEX":
+                            ValueRow(label: "Hex", value: color.hex, color: .gray)
+                        case "HSB":
+                            let (h, s, b) = rgbToHSB(rgb)
+                            ValueRow(label: "Hue", value: "\(Int(h))°", color: .orange)
+                            ValueRow(label: "Saturation", value: "\(Int(s))%", color: .pink)
+                            ValueRow(label: "Brightness", value: "\(Int(b))%", color: .yellow)
+                        case "CMYK":
+                            let (c, m, y, k) = rgbToCMYK(rgb)
+                            ValueRow(label: "Cyan", value: "\(Int(c))%", color: .cyan)
+                            ValueRow(label: "Magenta", value: "\(Int(m))%", color: .pink)
+                            ValueRow(label: "Yellow", value: "\(Int(y))%", color: .yellow)
+                            ValueRow(label: "Black", value: "\(Int(k))%", color: .black)
+                        default:
+                            EmptyView()
                         }
                     }
                     .padding()
                     .background(Color(.systemBackground))
                     .cornerRadius(14)
                     .padding(.horizontal)
-                }
 
-                Spacer(minLength: 40)
+                    // MARK: - Vendor Info
+                    if let v = color.vendor {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Vendor").font(.headline)
+                            if let brand = v.brand, !brand.isEmpty {
+                                InfoRow(label: "Brand", value: brand)
+                            }
+                            if let code = v.code, !code.isEmpty {
+                                InfoRow(label: "Code", value: code)
+                            }
+                            if let locator = v.locator, !locator.isEmpty, locator.uppercased() != "N/A" {
+                                InfoRow(label: "Locator", value: locator)
+                            }
+                            if let line = v.line, !line.isEmpty {
+                                InfoRow(label: "Line", value: line)
+                            }
+                        }
+                        .padding()
+                        .background(Color(.systemBackground))
+                        .cornerRadius(14)
+                        .padding(.horizontal)
+                    }
+
+                    Spacer(minLength: 40)
+                }
+                .padding(.bottom, 60)
             }
-            .padding(.bottom, 60)
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "xmark.circle.fill")
+                            Text("Close").font(.subheadline.bold())
+                        }
+                    }
+                    .tint(.secondary)
+                }
+            }
+
+            // MARK: - Toast overlay
+            .overlay(alignment: .bottom) {
+                if let message = toastMessage {
+                    Text(message)
+                        .font(.caption.bold())
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
+                        .background(.ultraThinMaterial)
+                        .cornerRadius(14)
+                        .shadow(radius: 4)
+                        .padding(.bottom, 40)
+                        .transition(.opacity.combined(with: .scale))
+                        .onAppear {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                withAnimation { toastMessage = nil }
+                            }
+                        }
+                }
+            }
+            // MARK: - iOS Share Sheet
+            .sheet(isPresented: $showShareSheet) {
+                if !shareItems.isEmpty {
+                    ActivityViewController(items: shareItems)
+                }
+            }
         }
-        .background(Color(.systemGroupedBackground))
         .onAppear {
             isFavorite = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(color.hex) }
         }
-        .overlay(alignment: .bottom) {
-            if let copied = copiedText {
-                Text("Copied \(copied)")
-                    .font(.caption.bold())
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 8)
-                    .background(.ultraThinMaterial)
-                    .cornerRadius(14)
-                    .shadow(radius: 4)
-                    .transition(.opacity.combined(with: .scale))
-                    .onAppear {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
-                            withAnimation { copiedText = nil }
-                        }
-                    }
-                    .padding(.bottom, 40)
-            }
+    }
+
+    // MARK: - Actions
+    private func showToast(_ text: String) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+            toastMessage = text
         }
     }
 
-    // MARK: - Favorite toggle
-    private func toggleFavorite() {
-        let rgb = hexToRGB(color.hex)
-        if isFavorite {
-            favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
-            isFavorite = false
-        } else {
-            let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
-            if !exists { favs.add(color: rgb) }
-            isFavorite = true
-        }
-
+    private func copyCurrentValue() {
+        let text = currentValueString()
+        UIPasteboard.general.string = text
         UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-        heartPulse = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) { heartPulse = false }
+        showToast("Copied to clipboard")
     }
+
+    private func shareCurrentValue() {
+        let text = """
+        🎨 \(color.name)
+        HEX: \(color.hex)
+        RGB: \(rgb.r), \(rgb.g), \(rgb.b)
+        """
+
+        let image = generateColorCard()
+        shareItems = [text, image]
+        showShareSheet = true
+        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+        showToast("Share sheet opened")
+    }
+
+    private func toggleFavorite() {
+        let rgbValue = hexToRGB(color.hex)
+        if isFavorite {
+            favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgbValue.hex) }
+            isFavorite = false
+            showToast("Removed from collections")
+        } else {
+            if !favs.colors.contains(where: { normalizeHex($0.color.hex) == normalizeHex(rgbValue.hex) }) {
+                favs.add(color: rgbValue)
+            }
+            isFavorite = true
+            showToast("Added to collections")
+        }
+        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+        animateLike.toggle()
+    }
+
+    // MARK: - Share Card
+    private func generateColorCard() -> UIImage {
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 600, height: 600))
+        return renderer.image { ctx in
+            let uiColor = rgb.uiColor
+            uiColor.setFill()
+            ctx.fill(CGRect(x: 0, y: 0, width: 600, height: 600))
+
+            let textColor: UIColor = uiColor.isLight ? .black : .white
+            let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.alignment = .center
+
+            let titleAttrs: [NSAttributedString.Key: Any] = [
+                .font: UIFont.boldSystemFont(ofSize: 36),
+                .foregroundColor: textColor,
+                .paragraphStyle: paragraphStyle
+            ]
+
+            let infoAttrs: [NSAttributedString.Key: Any] = [
+                .font: UIFont.systemFont(ofSize: 28, weight: .medium),
+                .foregroundColor: textColor.withAlphaComponent(0.9),
+                .paragraphStyle: paragraphStyle
+            ]
+
+            (color.name as NSString).draw(in: CGRect(x: 0, y: 200, width: 600, height: 50), withAttributes: titleAttrs)
+            ("HEX: \(color.hex)" as NSString).draw(in: CGRect(x: 0, y: 260, width: 600, height: 40), withAttributes: infoAttrs)
+            ("RGB: \(rgb.r), \(rgb.g), \(rgb.b)" as NSString).draw(in: CGRect(x: 0, y: 310, width: 600, height: 40), withAttributes: infoAttrs)
+        }
+    }
+
+    private func currentValueString() -> String {
+        switch selectedTab {
+        case "RGB":
+            return "RGB: \(rgb.r), \(rgb.g), \(rgb.b)"
+        case "HEX":
+            return "HEX: \(color.hex)"
+        case "HSB":
+            let (h, s, b) = rgbToHSB(rgb)
+            return "HSB: \(Int(h))°, \(Int(s))%, \(Int(b))%"
+        case "CMYK":
+            let (c, m, y, k) = rgbToCMYK(rgb)
+            return "CMYK: \(Int(c))%, \(Int(m))%, \(Int(y))%, \(Int(k))%"
+        default:
+            return color.hex
+        }
+    }
+}
+
+// MARK: - UIKit Integration for Share Sheet
+struct ActivityViewController: UIViewControllerRepresentable {
+    let items: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        let controller = UIActivityViewController(activityItems: items, applicationActivities: nil)
+        return controller
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 // MARK: - Helpers
 private func rgbToHSB(_ rgb: RGB) -> (h: CGFloat, s: CGFloat, b: CGFloat) {
-    var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0
+    var hue: CGFloat = 0, sat: CGFloat = 0, bri: CGFloat = 0
     UIColor(red: CGFloat(rgb.r) / 255, green: CGFloat(rgb.g) / 255, blue: CGFloat(rgb.b) / 255, alpha: 1)
-        .getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: nil)
-    return (hue * 360, saturation * 100, brightness * 100)
+        .getHue(&hue, saturation: &sat, brightness: &bri, alpha: nil)
+    return (hue * 360, sat * 100, bri * 100)
 }
 
 private func rgbToCMYK(_ rgb: RGB) -> (c: CGFloat, m: CGFloat, y: CGFloat, k: CGFloat) {
@@ -209,12 +332,19 @@ private func rgbToCMYK(_ rgb: RGB) -> (c: CGFloat, m: CGFloat, y: CGFloat, k: CG
     return (c * 100, m * 100, y * 100, k * 100)
 }
 
-// MARK: - Subviews
+private extension UIColor {
+    var isLight: Bool {
+        var white: CGFloat = 0
+        getWhite(&white, alpha: nil)
+        return white > 0.6
+    }
+}
+
+// MARK: - Reusable Subviews
 private struct ValueRow: View {
     let label: String
     let value: String
     let color: Color
-
     var body: some View {
         HStack {
             Circle().fill(color).frame(width: 12, height: 12)
@@ -233,26 +363,6 @@ private struct InfoRow: View {
             Text(label).font(.subheadline.weight(.medium))
             Spacer()
             Text(value).font(.subheadline)
-        }
-    }
-}
-
-private struct CopyButton: View {
-    let label: String
-    let value: String
-    @Binding var copiedText: String?
-
-    var body: some View {
-        Button {
-            UIPasteboard.general.string = value
-            copiedText = label
-            UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-        } label: {
-            Label(label, systemImage: "doc.on.doc")
-                .font(.caption)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(Color(.systemGray6), in: Capsule())
         }
     }
 }
