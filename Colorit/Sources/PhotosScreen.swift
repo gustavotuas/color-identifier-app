@@ -58,8 +58,7 @@ struct PhotosScreen: View {
     @State private var showSystemPicker = false
     @State private var showPaletteSheet = false
     @State private var showColorPicker = false
-    @State private var toastMessage = ""
-    @State private var showToast = false
+    @State private var toastMessage: String? = nil
 
     private var vendorIDs: [CatalogID] { CatalogID.allCases.filter { $0 != .generic } }
 
@@ -148,19 +147,7 @@ struct PhotosScreen: View {
                 preloadForSelection()
                 rebuildMatches()
             }
-            .overlay(alignment: .top) {
-                if showToast {
-                    Text(toastMessage)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                        .background(.ultraThinMaterial)
-                        .cornerRadius(12)
-                        .padding(.top, 60)
-                        .transition(.move(edge: .top).combined(with: .opacity))
-                        .allowsHitTesting(false)
-                }
-            }
-            .animation(.easeInOut(duration: 0.25), value: showToast)
+            .toast(message: $toastMessage)
         }
     }
 
@@ -294,12 +281,12 @@ struct PhotosScreen: View {
                         let finals = matches.map { $0.closest != nil ? hexToRGB($0.closest!.hex) : $0.color }
                         let unique = Array(Set(finals.map { $0.hex })).compactMap { hexToRGB($0) }
                         favs.addPalette(name: "Detected Palette", colors: unique)
-                        showToast("Palette saved")
+                        showToast("Palette Added to Collections")
                     } else {
                         store.showPaywall = true
                     }
                 } label: {
-                    Label("Save Palette", systemImage: "heart.fill")
+                    Label("Add to Collections", systemImage: "plus")
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 10)
@@ -434,12 +421,9 @@ struct PhotosScreen: View {
     }
 
     private func showToast(_ msg: String) {
-        toastMessage = msg
-        withAnimation { showToast = true }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
-            withAnimation { showToast = false }
-        }
+        withAnimation { toastMessage = msg }
     }
+
 
     private func removeSimilarColors(from colors: [RGB], threshold: Double) -> [RGB] {
         var unique: [RGB] = []
@@ -527,6 +511,7 @@ struct ColorPickerView: View {
     @State private var pickedColor: UIColor = .white
     @State private var hexValue: String = "#FFFFFF"
     @State private var touchPoint: CGPoint? = nil
+    @State private var toastMessage: String? = nil
 
     // Zoom y paneo
     @State private var scale: CGFloat = 1.0
@@ -682,12 +667,15 @@ struct ColorPickerView: View {
                             if store.isPro {
                                 let rgb = hexToRGB(hexValue)
                                 favs.add(color: rgb)
-                                dismiss()
+                                showToast("Color Added to collections")
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                    dismiss()
+                                }
                             } else {
                                 store.showPaywall = true
                             }
                         } label: {
-                            Label("Save Color", systemImage: "heart.fill")
+                            Label("Add Color", systemImage: "plus")
                                 .font(.subheadline.weight(.semibold))
                                 .foregroundColor(.white)
                                 .padding(.horizontal, 24)
@@ -762,6 +750,7 @@ struct ColorPickerView: View {
         }
         .background(Color.black.opacity(0.9))
         .ignoresSafeArea()
+        .toast(message: $toastMessage)
     }
 
     // MARK: - Helpers
@@ -777,6 +766,10 @@ struct ColorPickerView: View {
         var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
         color.getRed(&r, green: &g, blue: &b, alpha: &a)
         return (0.299 * r + 0.587 * g + 0.114 * b) > 0.6
+    }
+
+    private func showToast(_ msg: String) {
+        withAnimation { toastMessage = msg }
     }
 }
 
