@@ -178,26 +178,11 @@ struct ColorDetailView: View {
                     .tint(.secondary)
                 }
             }
+            .toast(message: $toastMessage)
 
-            // MARK: - Toast overlay
-            .overlay(alignment: .bottom) {
-                if let message = toastMessage {
-                    Text(message)
-                        .font(.caption.bold())
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 10)
-                        .background(.ultraThinMaterial)
-                        .cornerRadius(14)
-                        .shadow(radius: 4)
-                        .padding(.bottom, 40)
-                        .transition(.opacity.combined(with: .scale))
-                        .onAppear {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                                withAnimation { toastMessage = nil }
-                            }
-                        }
-                }
-            }
+
+            
+
             // MARK: - iOS Share Sheet
             .sheet(isPresented: $showShareSheet) {
                 if !shareItems.isEmpty {
