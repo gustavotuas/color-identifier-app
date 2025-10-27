@@ -194,7 +194,6 @@ struct FavoritesScreen: View {
                         }
                     }
                     .padding(.horizontal)
-                    .padding(.top, 10)
 
                     // 🎨 Favorite Colors
                     if !filteredColors.isEmpty {
@@ -234,7 +233,7 @@ struct FavoritesScreen: View {
                             Image(systemName: "heart.slash")
                                 .font(.largeTitle)
                                 .foregroundColor(.secondary)
-                            Text("No favorites yet")
+                            Text("No collections yet")
                                 .font(.headline)
                             Text("Save colors and palettes to revisit them here.")
                                 .font(.subheadline)
@@ -244,9 +243,8 @@ struct FavoritesScreen: View {
                         .frame(maxWidth: .infinity)
                     }
                 }
-                .padding(.top)
             }
-            .navigationTitle("Favorites")
+            .navigationTitle("Collections")
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     // Orden asc/desc

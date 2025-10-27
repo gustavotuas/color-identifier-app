@@ -135,6 +135,8 @@ struct PaletteDetailView: View {
                             Image(systemName: "checkmark.circle.fill")
                                 .foregroundColor(.blue)
                                 .font(.system(size: 22))
+                            Text("Done")
+                                .font(.headline)
                         }
                     } else {
                         Button(role: .destructive) {
