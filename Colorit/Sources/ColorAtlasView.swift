@@ -382,42 +382,4 @@ private struct BucketRowItem: View {
 }
 
 
-// MARK: - Spotify Favorite Button (reutilizado)
 
-private struct LikeFavoriteSmallButton: View {
-    @EnvironmentObject var favs: FavoritesStore
-    let hex: String
-
-    private var isFav: Bool {
-        let key = normalizeHex(hex)
-        return favs.colors.contains { normalizeHex($0.color.hex) == key }
-    }
-
-    var body: some View {
-        Button { toggle() } label: {
-            ZStack {
-                Circle()
-                    .strokeBorder(isFav ? Color.clear : Color(red: 179/255, green: 179/255, blue: 179/255), lineWidth: 1.4)
-                    .background(Circle().fill(isFav ? Color(red: 30/255, green: 215/255, blue: 96/255) : Color.clear))
-                    .frame(width: 15, height: 15)
-                Image(systemName: isFav ? "checkmark" : "plus")
-                    .font(.system(size: 6, weight: .bold))
-                    .foregroundColor(isFav ? .black : Color(red: 179/255, green: 179/255, blue: 179/255))
-            }
-        }
-        .buttonStyle(.plain)
-    }
-
-    private func toggle() {
-        let rgb = hexToRGB(hex)
-        withAnimation(.spring(response: 0.25, dampingFraction: 0.7)) {
-            if isFav {
-                favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
-            } else {
-                let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
-                if !exists { favs.add(color: rgb) }
-            }
-        }
-        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-    }
-}

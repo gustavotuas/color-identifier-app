@@ -56,22 +56,9 @@ struct ColorDetailView: View {
                     CopyButton(label: "Copy HEX", value: color.hex, copiedText: $copiedText)
                     CopyButton(label: "Copy RGB", value: "\(rgb.r),\(rgb.g),\(rgb.b)", copiedText: $copiedText)
 
-                    Button(action: toggleFavorite) {
-                        Group {
-                            if #available(iOS 17.0, *) {
-                                Image(systemName: isFavorite ? "heart.fill" : "heart")
-                                    .symbolEffect(.bounce, value: isFavorite)
-                            } else {
-                                Image(systemName: isFavorite ? "heart.fill" : "heart")
-                                    .scaleEffect(heartPulse ? 1.25 : 1.0)
-                            }
-                        }
-                        .font(.title2)
-                        .foregroundColor(isFavorite ? .red : .gray)
-                        .frame(width: 44, height: 44)
-                        .background(.ultraThinMaterial, in: Circle())
-                    }
-                    .animation(.spring(response: 0.3, dampingFraction: 0.6), value: heartPulse)
+                    // ✅ Reemplazo del heart por LikeFavoriteSmallButton
+                    LikeFavoriteSmallButton(hex: color.hex)
+                        .environmentObject(favs)
                 }
                 .padding(.top, 8)
 
