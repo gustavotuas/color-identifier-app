@@ -260,10 +260,7 @@ struct CameraScreen: View {
     @State private var copiedPulse = false
     @State private var flash = false
 
-    @State private var toastVisible = false
-    @State private var toastTitle = ""
-    @State private var toastMessage = ""
-    @State private var toastKind: ToastKind = .success
+    @State private var toastMessage: String? = nil
 
     @State private var matches: MatchesPayload? = nil
 
@@ -338,7 +335,10 @@ struct CameraScreen: View {
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
                                     withAnimation(.easeOut(duration: 0.18)) { copiedPulse = false }
                                 }
-                                showToast("Copied", "Color codes copied to clipboard.", kind: .success)
+                                toastMessage = "Copied to clipboard"
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
+                                    toastMessage = nil
+                                }
                             },
                             onFavorite: {
                                 favs.add(color: engine.currentRGB)
@@ -346,7 +346,10 @@ struct CameraScreen: View {
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
                                     withAnimation(.easeOut(duration: 0.28)) { likedPulse = false }
                                 }
-                                showToast("Saved", "Color added to Favorites.", kind: .success)
+                                toastMessage = "Added to Collections"
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
+                                    toastMessage = nil
+                                }
                             }
                         )
                         .environment(\.copyPulse, copiedPulse)
@@ -389,12 +392,11 @@ struct CameraScreen: View {
             }
         }
         // Toasts
-        .overlay(alignment: .top) {
-            if toastVisible {
-                ToastBanner(title: toastTitle, message: toastMessage, kind: toastKind)
-                    .padding(.top, topSafeInset() + 46)
-                    .padding(.horizontal, 16)
-                    .transition(.move(edge: .top).combined(with: .opacity))
+        .overlay(alignment: .bottom) {
+            if let message = toastMessage {
+                ToastView(message: message)
+                    .padding(.bottom, bottomSafeInset() + 20)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
         .onAppear { engine.start() }
@@ -424,14 +426,9 @@ struct CameraScreen: View {
         let gen = UIImpactFeedbackGenerator(style: .light); gen.impactOccurred()
         let colors = KMeans.palette(from: img, k: 10)
         matches = MatchesPayload(colors: colors, sourceImage: img)
-        showToast("Captured", "Palette generated from live camera.", kind: .success)
-    }
-
-    private func showToast(_ title: String, _ message: String, kind: ToastKind) {
-        toastTitle = title; toastMessage = message; toastKind = kind
-        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) { toastVisible = true }
+        toastMessage = "Palette generated from live camera"
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
-            withAnimation(.easeInOut(duration: 0.25)) { toastVisible = false }
+            toastMessage = nil
         }
     }
 }
@@ -529,27 +526,21 @@ struct ColorIsland: View {
                     .buttonStyle(.bordered)
 
                     Button(action: onFavorite) {
-                        Image(systemName: likePulse ? "heart.fill" : "heart")
+                        Image(systemName: "plus")
                             .font(.subheadline.weight(.bold))
-                            .foregroundColor(likePulse ? .red : .primary)
-                            .scaleEffect(likePulse ? 1.22 : 1.0)
+                            .foregroundColor(.primary)
+                            .scaleEffect(likePulse ? 1.15 : 1.0)
                     }
                     .buttonStyle(.bordered)
+
                 }
             }
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text("HEX: \(color.hex)")
-                Text("RGB: \(color.rgbText)")
-                Text("CMYK: \(color.cmykText)")
-            }
-            .font(.footnote)
-            .foregroundStyle(.secondary)
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(14)
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 18))
+        .padding(.horizontal, 20)
+        .padding(.bottom, 20)
     }
 }
 
