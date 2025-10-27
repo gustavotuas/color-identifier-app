@@ -268,46 +268,14 @@ struct AddColorsToPaletteSheet: View {
                                 let isSelected = selectedColors.contains(fav.color.hex)
                                 let named = makeNamedColor(from: fav.color)
 
-                                ZStack(alignment: .topTrailing) {
-                                    VStack(spacing: 6) {
-                                        RoundedRectangle(cornerRadius: 10)
-                                            .fill(Color(fav.color.uiColor))
-                                            .frame(height: 100)
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 10)
-                                                    .stroke(isSelected ? Color.accentColor : .clear, lineWidth: 3)
-                                            )
-                                            .onTapGesture {
-                                                toggleSelection(fav.color.hex)
-                                            }
-
-                                        VStack(spacing: 2) {
-                                            Text(named.name)
-                                                .font(.caption.bold())
-                                                .foregroundColor(.primary)
-                                                .lineLimit(1)
-
-                                            Text(fav.color.hex.uppercased())
-                                                .font(.caption2)
-                                                .foregroundColor(.secondary)
-
-                                            if let brand = named.vendor?.brand {
-                                                Text(brand)
-                                                    .font(.caption2)
-                                                    .foregroundColor(.secondary)
-                                            }
-                                        }
-                                        .padding(.bottom, 4)
-                                    }
-
-                                    if isSelected {
-                                        Image(systemName: "checkmark.circle.fill")
-                                            .font(.system(size: 18))
-                                            .foregroundColor(.accentColor)
-                                            .padding(6)
-                                    }
-                                }
+                                SelectableColorTile(
+                                    color: fav.color,
+                                    named: named,
+                                    isSelected: isSelected,
+                                    toggle: { toggleSelection(fav.color.hex) }
+                                )
                             }
+
                         }
                         .padding(.horizontal)
                     }

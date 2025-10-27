@@ -347,51 +347,17 @@ struct NewPaletteSheet: View {
                 ScrollView {
                     LazyVGrid(columns: gridColumns, spacing: 16) {
                         ForEach(favs.colors) { fav in
-                            let isSelected = selectedColors.contains(fav.color.hex)
-                            let named = makeNamedColor(from: fav.color)
+                        let isSelected = selectedColors.contains(fav.color.hex)
+                        let named = makeNamedColor(from: fav.color)
 
-                            ZStack(alignment: .topTrailing) {
-                                VStack(spacing: 6) {
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .fill(Color(fav.color.uiColor))
-                                        .frame(height: 100)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 10)
-                                                .stroke(isSelected ? Color.accentColor : .clear, lineWidth: 3)
-                                        )
-                                        .onTapGesture {
-                                            hideKeyboard()
-                                            toggleSelection(fav.color.hex)
-                                        }
+                        SelectableColorTile(
+                            color: fav.color,
+                            named: named,
+                            isSelected: isSelected,
+                            toggle: { toggleSelection(fav.color.hex) }
+                        )
+                    }
 
-                                    // 👇 Nueva sección con nombre y HEX
-                                    VStack(spacing: 2) {
-                                        Text(named.name)
-                                            .font(.caption.bold())
-                                            .foregroundColor(.primary)
-                                            .lineLimit(1)
-
-                                        Text(fav.color.hex.uppercased())
-                                            .font(.caption2)
-                                            .foregroundColor(.secondary)
-
-                                        if let brand = named.vendor?.brand {
-                                            Text(brand)
-                                                .font(.caption2)
-                                                .foregroundColor(.secondary)
-                                        }
-                                    }
-                                    .padding(.bottom, 4)
-                                }
-
-                                if isSelected {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .font(.system(size: 18))
-                                        .foregroundColor(.accentColor)
-                                        .padding(6)
-                                }
-                            }
-                        }
                     }
                     .padding(.horizontal)
                 }
@@ -592,3 +558,61 @@ struct FavoritePaletteTile: View {
         }
     }
 }
+
+// MARK: - SelectableColorTile (igual visual que Search grid3)
+struct SelectableColorTile: View {
+    let color: RGB
+    let named: NamedColor
+    let isSelected: Bool
+    let toggle: () -> Void
+
+    var body: some View {
+        VStack(spacing: 4) {
+            ZStack(alignment: .topTrailing) {
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color(color.uiColor))
+                    .frame(height: 90)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(isSelected ? Color.accentColor : .clear, lineWidth: 3)
+                    )
+                    .onTapGesture { toggle() }
+
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 18))
+                        .foregroundColor(.accentColor)
+                        .padding(6)
+                }
+            }
+
+            VStack(spacing: 1) {
+                Text(named.name)
+                    .font(.caption.bold())
+                    .lineLimit(1)
+
+                HStack(spacing: 4) {
+                    Text(color.hex.uppercased())
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                    if let brand = named.vendor?.brand, let code = named.vendor?.code {
+                        Text("• \(brand) \(code)")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                            .lineLimit(1)
+                    } else if let brand = named.vendor?.brand {
+                        Text("• \(brand)")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                            .lineLimit(1)
+                    }
+                }
+            }
+            .padding(.vertical, 4)
+            .frame(maxWidth: .infinity)
+        }
+        .cornerRadius(10)
+        .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
+    }
+}
+
