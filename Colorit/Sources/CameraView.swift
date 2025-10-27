@@ -205,50 +205,6 @@ struct CameraPreviewView: UIViewRepresentable {
     }
 }
 
-// MARK: - Toast
-
-enum ToastKind { case success, info, error }
-
-struct ToastBanner: View {
-    let title: String
-    let message: String
-    let kind: ToastKind
-
-    private var tint: Color {
-        switch kind {
-        case .success: return .green
-        case .info:    return .blue
-        case .error:   return .red
-        }
-    }
-
-    private var symbol: String {
-        switch kind {
-        case .success: return "checkmark.circle.fill"
-        case .info:    return "info.circle.fill"
-        case .error:   return "xmark.octagon.fill"
-        }
-    }
-
-    var body: some View {
-        HStack(alignment: .top, spacing: 10) {
-            Image(systemName: symbol)
-                .foregroundColor(tint)
-                .font(.title3)
-                .padding(.top, 2)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title).font(.subheadline.bold())
-                Text(message).font(.caption).foregroundStyle(.secondary)
-            }
-            Spacer(minLength: 6)
-        }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 14))
-    }
-}
-
 // MARK: - Camera Screen
 
 struct CameraScreen: View {
@@ -259,59 +215,55 @@ struct CameraScreen: View {
     @State private var likedPulse = false
     @State private var copiedPulse = false
     @State private var flash = false
-
     @State private var toastMessage: String? = nil
-
     @State private var matches: MatchesPayload? = nil
 
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+            Color(.systemBackground)
+                .ignoresSafeArea()
+                .animation(.easeInOut, value: UITraitCollection.current.userInterfaceStyle)
 
             VStack(spacing: 0) {
                 // Top bar
-                // Top bar
-            HStack {
-                let ok = engine.brightness > 0.45
-                Label(ok ? "Good Light" : "Low Light",
-                    systemImage: ok ? "lightbulb.fill" : "cloud.fill")
-                    .font(.caption2)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(.ultraThinMaterial)
-                    .clipShape(Capsule())
-                    .foregroundStyle(ok ? .green : .orange)
+                HStack {
+                    let ok = engine.brightness > 0.45
+                    Label(ok ? "Good Light" : "Low Light",
+                          systemImage: ok ? "lightbulb.fill" : "cloud.fill")
+                        .font(.caption2)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(.ultraThinMaterial)
+                        .clipShape(Capsule())
+                        .foregroundStyle(ok ? .green : .orange)
 
-                Spacer()
+                    Spacer()
 
-                HStack(spacing: 10) {
-                    // Torch button
-                    let showTorch = (engine.activeDevice()?.hasTorch ?? false) && !engine.isUsingFront
-                    if showTorch {
-                        Button { engine.setTorch(!engine.torchOn) } label: {
-                            Image(systemName: "bolt.fill")
+                    HStack(spacing: 10) {
+                        let showTorch = (engine.activeDevice()?.hasTorch ?? false) && !engine.isUsingFront
+                        if showTorch {
+                            Button { engine.setTorch(!engine.torchOn) } label: {
+                                Image(systemName: "bolt.fill")
+                                    .font(.headline)
+                                    .foregroundStyle(.primary)
+                                    .padding(10)
+                                    .background(.thinMaterial)
+                                    .clipShape(Circle())
+                            }
+                        }
+
+                        Button { engine.switchCamera() } label: {
+                            Image(systemName: "arrow.triangle.2.circlepath.camera")
                                 .font(.headline)
-                                .foregroundStyle(.white)
+                                .foregroundStyle(.primary)
                                 .padding(10)
-                                .background(.ultraThinMaterial)
+                                .background(.thinMaterial)
                                 .clipShape(Circle())
                         }
                     }
-
-                    // Flip camera button
-                    Button { engine.switchCamera() } label: {
-                        Image(systemName: "arrow.triangle.2.circlepath.camera")
-                            .font(.headline)
-                            .foregroundStyle(.white)
-                            .padding(10)
-                            .background(.ultraThinMaterial)
-                            .clipShape(Circle())
-                    }
                 }
-            }
-            .padding(.horizontal, 12)
-            .padding(.top, topSafeInset() + 2)
-
+                .padding(.horizontal, 12)
+                .padding(.top, topSafeInset() + 2)
 
                 // Camera preview
                 ZStack {
@@ -327,19 +279,7 @@ struct CameraScreen: View {
                             raw: engine.currentRGB,
                             color: engine.currentRGB,
                             catalog: catalog,
-                            onCopy: {
-                                let c = engine.currentRGB
-                                UIPasteboard.general.string = "HEX: \(c.hex)\nRGB: \(c.rgbText)\nCMYK: \(c.cmykText)"
-                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                withAnimation(.easeInOut(duration: 0.22)) { copiedPulse = true }
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
-                                    withAnimation(.easeOut(duration: 0.18)) { copiedPulse = false }
-                                }
-                                toastMessage = "Copied to clipboard"
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
-                                    toastMessage = nil
-                                }
-                            },
+                            onCopy: {},
                             onFavorite: {
                                 favs.add(color: engine.currentRGB)
                                 withAnimation(.spring(response: 0.3, dampingFraction: 0.55)) { likedPulse = true }
@@ -354,23 +294,20 @@ struct CameraScreen: View {
                         )
                         .environment(\.copyPulse, copiedPulse)
                         .environment(\.likePulse, likedPulse)
-                        .padding(.horizontal, 2)
-                        .padding(.bottom, 0)
                     }
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 26))
-                .overlay(RoundedRectangle(cornerRadius: 26).stroke(.black, lineWidth: 12))
                 .padding(.horizontal, 8)
                 .padding(.top, 8)
 
                 Spacer(minLength: 8)
 
-                // Bottom bar (only shutter + flip)
-                // Bottom bar (only shutter centered)
+                // Bottom bar
                 ZStack {
-                    Rectangle().fill(Color.black).ignoresSafeArea(edges: .bottom)
+                    Rectangle()
+                        .fill(Color(.systemBackground))
+                        .ignoresSafeArea(edges: .bottom)
 
-                    // Shutter button perfectly centered
                     Button {
                         generatePaletteFromLive()
                         withAnimation(.easeOut(duration: 0.06)) { flash = true }
@@ -379,8 +316,8 @@ struct CameraScreen: View {
                         }
                     } label: {
                         ZStack {
-                            Circle().stroke(.white, lineWidth: 4).frame(width: 62, height: 62)
-                            Circle().fill(.white).frame(width: 50, height: 50)
+                            Circle().stroke(Color.primary, lineWidth: 4).frame(width: 62, height: 62)
+                            Circle().fill(Color.primary).opacity(0.2).frame(width: 50, height: 50)
                         }
                         .accessibilityLabel("Generate Palette")
                     }
@@ -391,7 +328,6 @@ struct CameraScreen: View {
                 .frame(height: 110)
             }
         }
-        // Toasts
         .overlay(alignment: .bottom) {
             if let message = toastMessage {
                 ToastView(message: message)
@@ -407,7 +343,7 @@ struct CameraScreen: View {
         }
     }
 
-    // MARK: helpers
+    // MARK: - Helpers
 
     private func topSafeInset() -> CGFloat {
         guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
@@ -431,6 +367,106 @@ struct CameraScreen: View {
             toastMessage = nil
         }
     }
+    
+    // MARK: - Matches View
+
+    struct MatchesView: View {
+        @Environment(\.dismiss) private var dismiss
+        @EnvironmentObject var favs: FavoritesStore
+
+        let payload: MatchesPayload
+
+        var body: some View {
+            NavigationView {
+                ScrollView {
+                    VStack(spacing: 16) {
+                        // Swatch strip
+                        SwatchStrip(colors: payload.colors)
+                            .frame(height: 100)
+                            .clipShape(RoundedRectangle(cornerRadius: 24))
+                            .overlay(RoundedRectangle(cornerRadius: 24)
+                                .stroke(Color.primary.opacity(0.1), lineWidth: 1))
+                            .padding(.horizontal)
+
+                        VStack(spacing: 10) {
+                            ForEach(Array(payload.colors.enumerated()), id: \.offset) { (idx, c) in
+                                ColorBreakdownRow(index: idx+1, color: c)
+                                    .padding(.horizontal)
+                            }
+                        }
+
+                        HStack {
+                            Button {
+                                favs.addPalette(name: nil, colors: payload.colors)
+                            } label: {
+                                Label("Save Palette", systemImage: "square.and.arrow.down")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.borderedProminent)
+                        }
+                        .padding(.horizontal)
+                        .padding(.bottom, 20)
+                    }
+                    .padding(.top, 12)
+                }
+                .navigationTitle("Colour Matches")
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button { dismiss() } label: {
+                            Image(systemName: "xmark")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Supporting Views
+
+    struct ColorBreakdownRow: View {
+        let index: Int
+        let color: RGB
+        var body: some View {
+            HStack(alignment: .center, spacing: 12) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color(uiColor: color.uiColor))
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.primary.opacity(0.1), lineWidth: 1)
+                }
+                .frame(width: 54, height: 54)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("#\(index)").font(.caption).foregroundStyle(.secondary)
+                    Text("HEX: \(color.hex)").font(.subheadline)
+                    Text("RGB: \(color.rgbText)").font(.footnote).foregroundStyle(.secondary)
+                    Text("CMYK: \(color.cmykText)").font(.footnote).foregroundStyle(.secondary)
+                }
+                Spacer()
+            }
+            .padding(12)
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+        }
+    }
+
+    struct SwatchStrip: View {
+        let colors: [RGB]
+        var body: some View {
+            GeometryReader { geo in
+                let w = geo.size.width / CGFloat(max(colors.count, 1))
+                HStack(spacing: 0) {
+                    ForEach(Array(colors.enumerated()), id: \.offset) { (_, c) in
+                        Rectangle()
+                            .fill(Color(uiColor: c.uiColor))
+                            .frame(width: w)
+                            .accessibilityHidden(true)
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 // MARK: - Crosshair + Button styles
@@ -440,9 +476,9 @@ struct CrosshairCenter: View {
     var body: some View {
         ZStack {
             Circle().fill(color)
-            Circle().stroke(.white, lineWidth: 2)
-            Rectangle().fill(.white).frame(width: 2, height: 8)
-            Rectangle().fill(.white).frame(width: 8, height: 2)
+            Circle().stroke(Color.primary, lineWidth: 2)
+            Rectangle().fill(Color.primary).frame(width: 2, height: 8)
+            Rectangle().fill(Color.primary).frame(width: 8, height: 2)
         }
     }
 }
@@ -455,15 +491,13 @@ struct SquishButtonStyle: ButtonStyle {
     }
 }
 
+// MARK: - Matches Payload + Environment keys
 
-// MARK: - Matches Payload
 struct MatchesPayload: Identifiable, Equatable {
     let id = UUID()
     let colors: [RGB]
     let sourceImage: UIImage?
 }
-
-// MARK: - Environment Pulses
 
 private struct CopyPulseKey: EnvironmentKey { static let defaultValue: Bool = false }
 private struct LikePulseKey: EnvironmentKey { static let defaultValue: Bool = false }
@@ -473,7 +507,7 @@ extension EnvironmentValues {
     var likePulse: Bool { get { self[LikePulseKey.self] } set { self[LikePulseKey.self] = newValue } }
 }
 
-// MARK: - Color Island (bottom info panel)
+// MARK: - Color Island (minimal)
 
 struct ColorIsland: View {
     let raw: RGB
@@ -482,7 +516,6 @@ struct ColorIsland: View {
     var onCopy: () -> Void
     var onFavorite: () -> Void
 
-    @Environment(\.copyPulse) private var copyPulse
     @Environment(\.likePulse) private var likePulse
 
     private var precisionText: String {
@@ -497,7 +530,7 @@ struct ColorIsland: View {
                 Circle()
                     .fill(Color(uiColor: color.uiColor))
                     .frame(width: 42, height: 42)
-                    .overlay(Circle().stroke(.white.opacity(0.95), lineWidth: 2))
+                    .overlay(Circle().stroke(Color.primary.opacity(0.15), lineWidth: 1.5))
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(catalog.nearestName(to: color)?.name ?? color.hex)
@@ -510,133 +543,19 @@ struct ColorIsland: View {
 
                 Spacer()
 
-                HStack(spacing: 10) {
-                    Button(action: onCopy) {
-                        ZStack {
-                            Image(systemName: "doc.on.doc")
-                                .font(.subheadline.weight(.semibold))
-                                .scaleEffect(copyPulse ? 1.18 : 1.0)
-                            Image(systemName: "sparkles")
-                                .font(.caption2)
-                                .opacity(copyPulse ? 1 : 0)
-                                .offset(y: -10)
-                                .scaleEffect(copyPulse ? 1.0 : 0.5)
-                        }
-                    }
-                    .buttonStyle(.bordered)
-
-                    Button(action: onFavorite) {
-                        Image(systemName: "plus")
-                            .font(.subheadline.weight(.bold))
-                            .foregroundColor(.primary)
-                            .scaleEffect(likePulse ? 1.15 : 1.0)
-                    }
-                    .buttonStyle(.bordered)
-
+                Button(action: onFavorite) {
+                    Image(systemName: "plus")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundColor(.primary)
+                        .scaleEffect(likePulse ? 1.15 : 1.0)
                 }
+                .buttonStyle(.bordered)
             }
         }
         .padding(14)
-        .background(.ultraThinMaterial)
+        .background(.thinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 18))
         .padding(.horizontal, 20)
         .padding(.bottom, 20)
-    }
-}
-
-// MARK: - Matches View
-
-struct MatchesView: View {
-    @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject var favs: FavoritesStore
-
-    let payload: MatchesPayload
-
-    var body: some View {
-        NavigationView {
-            ScrollView {
-                VStack(spacing: 16) {
-                    // Swatch strip
-                    SwatchStrip(colors: payload.colors)
-                        .frame(height: 100)
-                        .clipShape(RoundedRectangle(cornerRadius: 24))
-                        .overlay(RoundedRectangle(cornerRadius: 24)
-                            .stroke(Color.black.opacity(0.08), lineWidth: 1))
-                        .padding(.horizontal)
-
-                    VStack(spacing: 10) {
-                        ForEach(Array(payload.colors.enumerated()), id: \.offset) { (idx, c) in
-                            ColorBreakdownRow(index: idx+1, color: c)
-                                .padding(.horizontal)
-                        }
-                    }
-
-                    HStack {
-                        Button {
-                            favs.addPalette(name: nil, colors: payload.colors)
-                        } label: {
-                            Label("Save Palette", systemImage: "square.and.arrow.down")
-                                .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(.borderedProminent)
-                    }
-                    .padding(.horizontal)
-                    .padding(.bottom, 20)
-                }
-                .padding(.top, 12)
-            }
-            .navigationTitle("Colour Matches")
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button { dismiss() } label: {
-                        Image(systemName: "xmark")
-                    }
-                }
-            }
-        }
-    }
-}
-
-struct ColorBreakdownRow: View {
-    let index: Int
-    let color: RGB
-    var body: some View {
-        HStack(alignment: .center, spacing: 12) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(Color(uiColor: color.uiColor))
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color.black.opacity(0.08), lineWidth: 1)
-            }
-            .frame(width: 54, height: 54)
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text("#\(index)").font(.caption).foregroundStyle(.secondary)
-                Text("HEX: \(color.hex)").font(.subheadline)
-                Text("RGB: \(color.rgbText)").font(.footnote).foregroundStyle(.secondary)
-                Text("CMYK: \(color.cmykText)").font(.footnote).foregroundStyle(.secondary)
-            }
-            Spacer()
-        }
-        .padding(12)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 14))
-    }
-}
-
-struct SwatchStrip: View {
-    let colors: [RGB]
-    var body: some View {
-        GeometryReader { geo in
-            let w = geo.size.width / CGFloat(max(colors.count, 1))
-            HStack(spacing: 0) {
-                ForEach(Array(colors.enumerated()), id: \.offset) { (_, c) in
-                    Rectangle()
-                        .fill(Color(uiColor: c.uiColor))
-                        .frame(width: w)
-                        .accessibilityHidden(true)
-                }
-            }
-        }
     }
 }
