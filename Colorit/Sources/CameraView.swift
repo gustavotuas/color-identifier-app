@@ -262,6 +262,17 @@ struct CameraPreviewView: UIViewRepresentable {
 
 // MARK: - Camera Screen
 
+// MARK: - Camera Screen
+// MARK: - Helpers globales
+
+/// Normaliza un valor HEX: quita espacios, "#" y lo pasa a mayúsculas
+private func normalizeHex(_ hex: String) -> String {
+    var s = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+    if s.hasPrefix("#") { s.removeFirst() }
+    return s
+}
+
+
 struct CameraScreen: View {
     @EnvironmentObject var favs: FavoritesStore
     @EnvironmentObject var catalog: Catalog
@@ -277,194 +288,140 @@ struct CameraScreen: View {
     @State private var selection: CatalogSelection = VendorSelectionStorage.load() ?? .all
     @State private var showVendorSheet = false
 
+    // MARK: - Body
 
     var body: some View {
         NavigationStack {
-        ZStack {
-            Color(.systemBackground)
-                .ignoresSafeArea()
-                .animation(.easeInOut, value: UITraitCollection.current.userInterfaceStyle)
+            ZStack {
+                Color(.systemBackground)
+                    .ignoresSafeArea()
+                    .animation(.easeInOut, value: UITraitCollection.current.userInterfaceStyle)
 
-            VStack(spacing: 0) {
-                if selection.isFiltered {
-                    HStack(spacing: 8) {
-                        Image(systemName: "line.3.horizontal.decrease.circle")
-                        Text(selection.filterSubtitle).lineLimit(1)
-                        Spacer()
-                        Button {
-                            withAnimation(.easeInOut) {
-                                selection = .all
-                                VendorSelectionStorage.save(selection)
-                                toastMessage = "Vendor filter cleared"
-                            }
-                        } label: {
-                            Label("Clear", systemImage: "xmark.circle.fill")
-                                .labelStyle(.titleAndIcon)
-                        }
-                        .buttonStyle(.bordered)
-                        .tint(.blue)
-                        .font(.caption.bold())
-                    }
-                    .font(.footnote)
-                    .padding(10)
-                    .background(Color.blue.opacity(0.12))
-                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.blue.opacity(0.5)))
-                    .foregroundColor(.blue)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                    .padding(.horizontal)
-                    .padding(.top, 8)
-                    .transition(.move(edge: .top).combined(with: .opacity))
+                VStack(spacing: 0) {
+                    vendorFilterBanner
+                    cameraPreviewSection
+                    bottomBar
                 }
-                // Camera preview
-                ZStack {
-                    CameraPreviewView(engine: engine)
-                        .ignoresSafeArea(edges: .horizontal)
+            }
+            .toolbar { toolbarItems }
+            .onChange(of: selection, perform: handleSelectionChange)
+            .overlay(alignment: .bottom) { toastOverlay }
+            .onAppear(perform: handleAppear)
+            .onDisappear { engine.stop() }
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in engine.stop() }
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in engine.start() }
+            .sheet(item: $matches) { payload in
+                MatchesView(payload: payload)
+                    .environmentObject(favs)
+            }
+            .navigationTitle("Camera")
+            .navigationBarTitleDisplayMode(.large)
+        }
+        .sheet(isPresented: $showVendorSheet) { vendorSheet }
+    }
 
-                    CrosshairCenter(color: Color(uiColor: engine.currentRGB.uiColor))
-                        .frame(width: 22, height: 22)
-                        .allowsHitTesting(false)
+    // MARK: - Subviews
 
-                    VStack(spacing: 0) {
-                        Spacer(minLength: 0)
-                        ColorIsland(
-                            raw: engine.currentRGB,
-                            color: engine.currentRGB,
-                            catalog: catalog,
-                            onCopy: {},
-                            onFavorite: {
-                                favs.add(color: engine.currentRGB)
-                                withAnimation(.spring(response: 0.3, dampingFraction: 0.55)) { likedPulse = true }
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
-                                    withAnimation(.easeOut(duration: 0.28)) { likedPulse = false }
-                                }
-                                toastMessage = "Added to Collections"
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
-                                    toastMessage = nil
-                                }
-                            }
-                        )
-                        .environment(\.copyPulse, copiedPulse)
-                        .environment(\.likePulse, likedPulse)
-                    }
-                }
-                .clipShape(RoundedRectangle(cornerRadius: 26))
-                .padding(.horizontal, 8)
-                .padding(.top, 8)
-
-                Spacer(minLength: 8)
-
-                // Bottom bar
-                ZStack {
-                    Rectangle()
-                        .fill(Color(.systemBackground))
-                        .ignoresSafeArea(edges: .bottom)
-
+    private var vendorFilterBanner: some View {
+        Group {
+            if selection.isFiltered {
+                HStack(spacing: 8) {
+                    Image(systemName: "line.3.horizontal.decrease.circle")
+                    Text(selection.filterSubtitle).lineLimit(1)
+                    Spacer()
                     Button {
-                        generatePaletteFromLive()
-                        withAnimation(.easeOut(duration: 0.06)) { flash = true }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
-                            withAnimation(.easeIn(duration: 0.12)) { flash = false }
+                        withAnimation(.easeInOut) {
+                            selection = .all
+                            VendorSelectionStorage.save(selection)
+                            toastMessage = "Vendor filter cleared"
                         }
                     } label: {
-                        ZStack {
-                            Circle().stroke(Color.primary, lineWidth: 4).frame(width: 62, height: 62)
-                            Circle().fill(Color.primary).opacity(0.2).frame(width: 50, height: 50)
-                        }
-                        .accessibilityLabel("Generate Palette")
+                        Label("Clear", systemImage: "xmark.circle.fill")
+                            .labelStyle(.titleAndIcon)
                     }
-                    .buttonStyle(SquishButtonStyle())
+                    .buttonStyle(.bordered)
+                    .tint(.blue)
+                    .font(.caption.bold())
                 }
-                .padding(.top, 14)
-                .padding(.bottom, bottomSafeInset() + 8)
-                .frame(height: 110)
+                .font(.footnote)
+                .padding(10)
+                .background(Color.blue.opacity(0.12))
+                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.blue.opacity(0.5)))
+                .foregroundColor(.blue)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .padding(.horizontal)
+                .padding(.top, 8)
+                .transition(.move(edge: .top).combined(with: .opacity))
             }
         }
-        .onChange(of: selection) { newValue in
-            withAnimation {
-                if newValue == .all {
-                    toastMessage = "Vendor filter cleared"
-                } else {
-                    toastMessage = "Vendor filter set: \(newValue.filterSubtitle)"
-                }
-            }
-            VendorSelectionStorage.save(newValue)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
-                toastMessage = nil
+    }
+
+    private var cameraPreviewSection: some View {
+        ZStack {
+            CameraPreviewView(engine: engine)
+                .ignoresSafeArea(edges: .horizontal)
+
+            CrosshairCenter(color: Color(uiColor: engine.currentRGB.uiColor))
+                .frame(width: 22, height: 22)
+                .allowsHitTesting(false)
+
+            VStack(spacing: 0) {
+                Spacer(minLength: 0)
+                ColorIsland(
+                    raw: engine.currentRGB,
+                    color: engine.currentRGB,
+                    catalog: catalog,
+                    selection: selection,        // 👈 nuevo
+                    catalogs: catalogs,          // 👈 nuevo
+                    onCopy: {},
+                    onFavorite: handleFavorite
+                )
+                .environment(\.copyPulse, copiedPulse)
+                .environment(\.likePulse, likedPulse)
             }
         }
-        .overlay(alignment: .bottom) {
+        .clipShape(RoundedRectangle(cornerRadius: 26))
+        .padding(.horizontal, 0) // 🔹 sin espacio lateral
+        .padding(.top, 8)
+    }
+
+    private var bottomBar: some View {
+        ZStack {
+            Rectangle()
+                .fill(Color(.systemBackground))
+                .ignoresSafeArea(edges: .bottom)
+
+            Button {
+                generatePaletteFromLive()
+                withAnimation(.easeOut(duration: 0.06)) { flash = true }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
+                    withAnimation(.easeIn(duration: 0.12)) { flash = false }
+                }
+            } label: {
+                ZStack {
+                    Circle().stroke(Color.primary, lineWidth: 4).frame(width: 62, height: 62)
+                    Circle().fill(Color.primary).opacity(0.2).frame(width: 50, height: 50)
+                }
+                .accessibilityLabel("Generate Palette")
+            }
+            .buttonStyle(SquishButtonStyle())
+        }
+        .padding(.top, 14)
+        .padding(.bottom, bottomSafeInset() + 8)
+        .frame(height: 110)
+    }
+
+    private var toastOverlay: some View {
+        Group {
             if let message = toastMessage {
                 ToastView(message: message)
                     .padding(.bottom, bottomSafeInset() + 20)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
-        .onAppear {
-            selection = VendorSelectionStorage.load() ?? .all
+    }
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                engine.stop()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                    engine.start()
-                }
-            }
-        }
-        .onDisappear { engine.stop() }
-        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
-            engine.stop()
-        }
-        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
-            engine.start()
-        }
-        .sheet(item: $matches) { payload in
-            MatchesView(payload: payload)
-                .environmentObject(favs)
-        }
-        .navigationTitle("Camera")
-        .navigationBarTitleDisplayMode(.large)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button { showVendorSheet = true } label: {
-                    Image(systemName: "slider.horizontal.3")
-                }
-                .accessibilityLabel("Select vendor")
-            }
-
-            ToolbarItemGroup(placement: .navigationBarTrailing) {
-                let ok = engine.brightness > 0.45
-                Image(systemName: ok ? "sun.max.fill" : "cloud.fill")
-                    .foregroundStyle(ok ? .yellow : .orange)
-                let showTorch = (engine.activeDevice()?.hasTorch ?? false) && !engine.isUsingFront
-                if showTorch {
-                    Button { engine.setTorch(!engine.torchOn) } label: {
-                        Image(systemName: "bolt.fill")
-                    }
-                }
-                Button { engine.switchCamera() } label: {
-                    Image(systemName: "arrow.triangle.2.circlepath.camera")
-                }
-                if !store.isPro {
-                    Button {
-                        store.showPaywall = true
-                    } label: {
-                        Text("PRO")
-                            .font(.caption.bold())
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 6)
-                            .background(
-                                LinearGradient(colors: [.purple, .pink],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing)
-                            )
-                            .foregroundColor(.white)
-                            .cornerRadius(8)
-                            .shadow(radius: 2)
-                    }
-                }
-            }
-        }
-    } // NavigationStack
-    .sheet(isPresented: $showVendorSheet) {
+    private var vendorSheet: some View {
         VendorListSheet(
             selection: $selection,
             candidates: CatalogID.allCases.filter { $0 != .generic },
@@ -480,15 +437,142 @@ struct CameraScreen: View {
                 }
             }
             VendorSelectionStorage.save(selection)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
-                toastMessage = nil
-            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) { toastMessage = nil }
         }
     }
 
+    // MARK: - Toolbar (colócalo dentro de CameraScreen)
+private var toolbarItems: some ToolbarContent {
+    Group {
+        // Leading
+        ToolbarItem(placement: .navigationBarLeading) {
+            Button { showVendorSheet = true } label: {
+                Image(systemName: "slider.horizontal.3")
+            }
+            .accessibilityLabel("Select vendor")
+        }
+
+        // Trailing
+        ToolbarItemGroup(placement: .navigationBarTrailing) {
+            // Luz/Ambiente
+            Image(systemName: (engine.brightness > 0.45) ? "sun.max.fill" : "cloud.fill")
+                .foregroundStyle((engine.brightness > 0.45) ? .yellow : .orange)
+
+            // Linterna (si disponible y no es cámara frontal)
+            if (engine.activeDevice()?.hasTorch ?? false) && !engine.isUsingFront {
+                Button { engine.setTorch(!engine.torchOn) } label: {
+                    Image(systemName: "bolt.fill")
+                }
+            }
+
+            // Cambiar cámara
+            Button { engine.switchCamera() } label: {
+                Image(systemName: "arrow.triangle.2.circlepath.camera")
+            }
+
+            // Paywall PRO
+            if !store.isPro {
+                Button { store.showPaywall = true } label: {
+                    Text("PRO")
+                        .font(.caption.bold())
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(
+                            LinearGradient(colors: [.purple, .pink],
+                                           startPoint: .topLeading,
+                                           endPoint: .bottomTrailing)
+                        )
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                        .shadow(radius: 2)
+                }
+            }
+        }
     }
+}
+
 
     // MARK: - Helpers
+
+    private func handleFavorite() {
+        let rgb = engine.currentRGB
+        let key = normalizeHex(rgb.hex)
+
+        // Armar pool de colores según el filtro activo (igual que SearchScreen)
+        let pool: [NamedColor]
+        switch selection {
+        case .all:
+            pool = catalog.names + catalogs.colors(for: Set(CatalogID.allCases.filter { $0 != .generic }))
+        case .vendor(let id):
+            pool = catalogs.colors(for: [id])
+        case .genericOnly:
+            pool = catalogs.colors(for: [.generic])
+        }
+
+
+        // Buscar el más cercano usando la misma comparación del PhotosScreen
+        let nearest = pool.min(by: {
+            hexToRGB($0.hex).distance(to: rgb) < hexToRGB($1.hex).distance(to: rgb)
+        })
+
+        // Calcular precisión
+        var precision: Double = 100
+        if let nearest = nearest {
+            let diff = rgb.distance(to: hexToRGB(nearest.hex))
+            let maxDiff = sqrt(3 * pow(255.0, 2.0))
+            precision = max(0, 1 - diff / maxDiff) * 100
+        }
+
+        // Guardar / eliminar favorito
+        if favs.colors.contains(where: { normalizeHex($0.color.hex) == key }) {
+            favs.colors.removeAll { normalizeHex($0.color.hex) == key }
+            toastMessage = "Removed from collections"
+        } else {
+            if let nearest = nearest {
+                // 🔹 Quitamos el parámetro 'name:' para ajustarlo al método actual
+                favs.add(color: rgb)
+                toastMessage = "\(nearest.name) (\(Int(precision))%) added to collections"
+            } else {
+                favs.add(color: rgb)
+                toastMessage = "Added to collections"
+            }
+        }
+
+        // Animación visual igual
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.55)) { likedPulse = true }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
+            withAnimation(.easeOut(duration: 0.28)) { likedPulse = false }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
+            toastMessage = nil
+        }
+    }
+
+
+
+
+
+    private func handleAppear() {
+        selection = VendorSelectionStorage.load() ?? .all
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            engine.stop()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { engine.start() }
+        }
+    }
+
+    private func handleSelectionChange(_ newValue: CatalogSelection) {
+        withAnimation {
+            if newValue == .all {
+                toastMessage = "Vendor filter cleared"
+            } else {
+                toastMessage = "Vendor filter set: \(newValue.filterSubtitle)"
+            }
+        }
+        VendorSelectionStorage.save(newValue)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
+            toastMessage = nil
+        }
+    }
 
     private func topSafeInset() -> CGFloat {
         guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
@@ -512,7 +596,7 @@ struct CameraScreen: View {
             toastMessage = nil
         }
     }
-    
+
     // MARK: - Matches View
 
     struct MatchesView: View {
@@ -525,7 +609,6 @@ struct CameraScreen: View {
             NavigationView {
                 ScrollView {
                     VStack(spacing: 16) {
-                        // Swatch strip
                         SwatchStrip(colors: payload.colors)
                             .frame(height: 100)
                             .clipShape(RoundedRectangle(cornerRadius: 24))
@@ -611,8 +694,8 @@ struct CameraScreen: View {
             }
         }
     }
-
 }
+
 
 struct CrosshairCenter: View {
     let color: Color
@@ -656,49 +739,87 @@ struct ColorIsland: View {
     let raw: RGB
     let color: RGB
     let catalog: Catalog
+    let selection: CatalogSelection
+    let catalogs: CatalogStore
     var onCopy: () -> Void
     var onFavorite: () -> Void
 
     @Environment(\.likePulse) private var likePulse
 
-    private var precisionText: String {
-        let d = raw.distance(to: color)
-        let p = max(0, 1 - d/441.7) * 100
-        return "Precision \(Int(round(p)))%"
+    // Arma el pool de colores según el filtro activo
+    private var filteredPool: [NamedColor] {
+        switch selection {
+        case .all:
+            return catalog.names + catalogs.colors(for: Set(CatalogID.allCases.filter { $0 != .generic }))
+        case .vendor(let id):
+            return catalogs.colors(for: [id]) // ✅ sólo colores del proveedor
+        case .genericOnly:
+            return catalogs.colors(for: [.generic])
+        }
+    }
+
+    // Busca el color más cercano dentro del pool filtrado
+    private var nearest: NamedColor? {
+        guard !filteredPool.isEmpty else { return nil }
+        return filteredPool.min(by: {
+            hexToRGB($0.hex).distance(to: color) < hexToRGB($1.hex).distance(to: color)
+        })
+    }
+
+    // Calcula precisión con base al color más cercano
+    private var precisionValue: Double {
+        guard let nearest = nearest else { return 0 }
+        let diff = color.distance(to: hexToRGB(nearest.hex))
+        let maxDiff = sqrt(3 * pow(255.0, 2.0))
+        return max(0, 1 - diff / maxDiff) * 100
+    }
+
+    private var precisionColor: Color {
+        switch precisionValue {
+        case 80...100: return .green
+        case 50..<80: return .yellow
+        default: return .red
+        }
     }
 
     var body: some View {
         VStack(spacing: 10) {
             HStack(spacing: 12) {
+                // Preview del color actual detectado
                 Circle()
                     .fill(Color(uiColor: color.uiColor))
                     .frame(width: 42, height: 42)
-                    .overlay(Circle().stroke(Color.primary.opacity(0.15), lineWidth: 1.5))
+                    .overlay(
+                        Circle().stroke(Color.white.opacity(0.25), lineWidth: 1.5)
+                    )
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(catalog.nearestName(to: color)?.name ?? color.hex)
+                    Text(nearest?.name ?? color.hex)
                         .font(.headline)
+                        .foregroundColor(.white)
                         .lineLimit(1)
-                    Text(precisionText)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+
+                    Text(String(format: "Precision %.0f%%", precisionValue))
+                        .font(.caption.bold())
+                        .foregroundStyle(precisionColor)
                 }
 
                 Spacer()
 
                 Button(action: onFavorite) {
-                    Image(systemName: "plus")
-                        .font(.subheadline.weight(.bold))
-                        .foregroundColor(.primary)
-                        .scaleEffect(likePulse ? 1.15 : 1.0)
+                    Image(systemName: "plus.circle.fill")
+                        .font(.title3.weight(.bold))
+                        .foregroundColor(.white)
+                        .symbolEffect(.bounce, value: likePulse)
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(.plain)
             }
         }
         .padding(14)
-        .background(.thinMaterial)
+        .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 18))
         .padding(.horizontal, 20)
         .padding(.bottom, 20)
+        .id(selection.filterSubtitle) // 🔥 fuerza a SwiftUI a refrescar al cambiar vendor
     }
 }
