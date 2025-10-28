@@ -318,6 +318,7 @@ struct CameraScreen: View {
                 // Camera preview
                 ZStack {
                     CameraPreviewView(engine: engine)
+                        .ignoresSafeArea(edges: .horizontal)
 
                     CrosshairCenter(color: Color(uiColor: engine.currentRGB.uiColor))
                         .frame(width: 22, height: 22)
