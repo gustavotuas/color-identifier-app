@@ -210,6 +210,7 @@ struct CameraPreviewView: UIViewRepresentable {
 struct CameraScreen: View {
     @EnvironmentObject var favs: FavoritesStore
     @EnvironmentObject var catalog: Catalog
+    @EnvironmentObject var store: StoreVM
     @StateObject private var engine = CameraEngine()
 
     @State private var likedPulse = false
@@ -219,51 +220,13 @@ struct CameraScreen: View {
     @State private var matches: MatchesPayload? = nil
 
     var body: some View {
+        NavigationStack {
         ZStack {
             Color(.systemBackground)
                 .ignoresSafeArea()
                 .animation(.easeInOut, value: UITraitCollection.current.userInterfaceStyle)
 
             VStack(spacing: 0) {
-                // Top bar
-                HStack {
-                    let ok = engine.brightness > 0.45
-                    Label(ok ? "Good Light" : "Low Light",
-                          systemImage: ok ? "lightbulb.fill" : "cloud.fill")
-                        .font(.caption2)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(.ultraThinMaterial)
-                        .clipShape(Capsule())
-                        .foregroundStyle(ok ? .green : .orange)
-
-                    Spacer()
-
-                    HStack(spacing: 10) {
-                        let showTorch = (engine.activeDevice()?.hasTorch ?? false) && !engine.isUsingFront
-                        if showTorch {
-                            Button { engine.setTorch(!engine.torchOn) } label: {
-                                Image(systemName: "bolt.fill")
-                                    .font(.headline)
-                                    .foregroundStyle(.primary)
-                                    .padding(10)
-                                    .background(.thinMaterial)
-                                    .clipShape(Circle())
-                            }
-                        }
-
-                        Button { engine.switchCamera() } label: {
-                            Image(systemName: "arrow.triangle.2.circlepath.camera")
-                                .font(.headline)
-                                .foregroundStyle(.primary)
-                                .padding(10)
-                                .background(.thinMaterial)
-                                .clipShape(Circle())
-                        }
-                    }
-                }
-                .padding(.horizontal, 12)
-                .padding(.top, topSafeInset() + 2)
 
                 // Camera preview
                 ZStack {
@@ -341,6 +304,30 @@ struct CameraScreen: View {
             MatchesView(payload: payload)
                 .environmentObject(favs)
         }
+        .navigationTitle("Camera")
+        .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                let ok = engine.brightness > 0.45
+                Image(systemName: ok ? "sun.max.fill" : "cloud.fill")
+                    .foregroundStyle(ok ? .yellow : .orange)
+                let showTorch = (engine.activeDevice()?.hasTorch ?? false) && !engine.isUsingFront
+                if showTorch {
+                    Button { engine.setTorch(!engine.torchOn) } label: {
+                        Image(systemName: "bolt.fill")
+                    }
+                }
+                Button { engine.switchCamera() } label: {
+                    Image(systemName: "arrow.triangle.2.circlepath.camera")
+                }
+                if !store.isPro {
+                    Button { store.showPaywall = true } label: {
+                        Image(systemName: "crown.fill")
+                    }
+                }
+            }
+        }
+    } // NavigationStack
     }
 
     // MARK: - Helpers
