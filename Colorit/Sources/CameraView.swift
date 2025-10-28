@@ -443,8 +443,21 @@ struct CameraScreen: View {
                     Image(systemName: "arrow.triangle.2.circlepath.camera")
                 }
                 if !store.isPro {
-                    Button { store.showPaywall = true } label: {
-                        Image(systemName: "crown.fill")
+                    Button {
+                        store.showPaywall = true
+                    } label: {
+                        Text("PRO")
+                            .font(.caption.bold())
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(
+                                LinearGradient(colors: [.purple, .pink],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing)
+                            )
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                            .shadow(radius: 2)
                     }
                 }
             }
