@@ -380,8 +380,8 @@ struct CameraScreen: View {
                 .environment(\.likePulse, likedPulse)
             }
         }
-        .clipShape(RoundedRectangle(cornerRadius: 26))
-        .padding(.horizontal, 0) // 🔹 sin espacio lateral
+        //.clipShape(RoundedRectangle(cornerRadius: 26))
+        //.padding(.horizontal, 0) // 🔹 sin espacio lateral
         .padding(.top, 8)
     }
 
@@ -494,59 +494,60 @@ private var toolbarItems: some ToolbarContent {
 
     // MARK: - Helpers
 
-    private func handleFavorite() {
-        let rgb = engine.currentRGB
-        let key = normalizeHex(rgb.hex)
+ private func handleFavorite() {
+    let rgb = engine.currentRGB
+    let key = normalizeHex(rgb.hex)
 
-        // Armar pool de colores según el filtro activo (igual que SearchScreen)
-        let pool: [NamedColor]
-        switch selection {
-        case .all:
-            pool = catalog.names + catalogs.colors(for: Set(CatalogID.allCases.filter { $0 != .generic }))
-        case .vendor(let id):
-            pool = catalogs.colors(for: [id])
-        case .genericOnly:
-            pool = catalogs.colors(for: [.generic])
-        }
-
-
-        // Buscar el más cercano usando la misma comparación del PhotosScreen
-        let nearest = pool.min(by: {
-            hexToRGB($0.hex).distance(to: rgb) < hexToRGB($1.hex).distance(to: rgb)
-        })
-
-        // Calcular precisión
-        var precision: Double = 100
-        if let nearest = nearest {
-            let diff = rgb.distance(to: hexToRGB(nearest.hex))
-            let maxDiff = sqrt(3 * pow(255.0, 2.0))
-            precision = max(0, 1 - diff / maxDiff) * 100
-        }
-
-        // Guardar / eliminar favorito
-        if favs.colors.contains(where: { normalizeHex($0.color.hex) == key }) {
-            favs.colors.removeAll { normalizeHex($0.color.hex) == key }
-            toastMessage = "Removed from collections"
-        } else {
-            if let nearest = nearest {
-                // 🔹 Quitamos el parámetro 'name:' para ajustarlo al método actual
-                favs.add(color: rgb)
-                toastMessage = "\(nearest.name) (\(Int(precision))%) added to collections"
-            } else {
-                favs.add(color: rgb)
-                toastMessage = "Added to collections"
-            }
-        }
-
-        // Animación visual igual
-        withAnimation(.spring(response: 0.3, dampingFraction: 0.55)) { likedPulse = true }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
-            withAnimation(.easeOut(duration: 0.28)) { likedPulse = false }
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
-            toastMessage = nil
-        }
+    // 1️⃣ Construir pool de colores según el filtro activo
+    let pool: [NamedColor]
+    switch selection {
+    case .all:
+        pool = catalog.names + catalogs.colors(for: Set(CatalogID.allCases.filter { $0 != .generic }))
+    case .vendor(let id):
+        pool = catalogs.colors(for: [id])
+    case .genericOnly:
+        pool = catalogs.colors(for: [.generic])
     }
+
+    // 2️⃣ Buscar el color más cercano en el catálogo filtrado
+    guard let nearest = pool.min(by: {
+        hexToRGB($0.hex).distance(to: rgb) < hexToRGB($1.hex).distance(to: rgb)
+    }) else {
+        toastMessage = "No match found"
+        return
+    }
+
+    // 3️⃣ Calcular precisión
+    let diff = rgb.distance(to: hexToRGB(nearest.hex))
+    let maxDiff = sqrt(3 * pow(255.0, 2.0))
+    let precision = max(0, 1 - diff / maxDiff) * 100
+
+    // 4️⃣ Convertir el color coincidente a RGB para el FavoritesStore
+    let matchedRGB = hexToRGB(nearest.hex)
+
+    // 5️⃣ Guardar o eliminar
+    if favs.colors.contains(where: { normalizeHex($0.color.hex) == normalizeHex(nearest.hex) }) {
+        favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(nearest.hex) }
+        toastMessage = "Removed from collections"
+    } else {
+        favs.add(color: matchedRGB)
+        toastMessage = "\(nearest.name) (\(Int(precision))%) added to collections"
+    }
+
+    // 6️⃣ Animación del corazón
+    withAnimation(.spring(response: 0.3, dampingFraction: 0.55)) {
+        likedPulse = true
+    }
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
+        withAnimation(.easeOut(duration: 0.28)) { likedPulse = false }
+    }
+
+    // 7️⃣ Ocultar el toast
+    DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
+        toastMessage = nil
+    }
+}
+
 
 
 
