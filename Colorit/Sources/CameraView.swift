@@ -172,11 +172,16 @@ struct CameraPreviewView: UIViewRepresentable {
 
     func makeUIView(context: Context) -> PreviewView {
         let v = PreviewView()
+        
         v.videoLayer.session = engine.session
         v.videoLayer.videoGravity = .resizeAspectFill
 
         let pinch = UIPinchGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.onPinch(_:)))
         v.addGestureRecognizer(pinch)
+
+        let tap = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.focusTap(_:)))
+        v.addGestureRecognizer(tap)
+
         return v
     }
 
@@ -202,6 +207,35 @@ struct CameraPreviewView: UIViewRepresentable {
             default: break
             }
         }
+
+        @objc func focusTap(_ gesture: UITapGestureRecognizer) {
+        guard let device = engine.activeDevice(),
+            device.isFocusPointOfInterestSupported else { return }
+
+        let view = gesture.view!
+        let location = gesture.location(in: view)
+        let normalizedPoint = CGPoint(x: location.x / view.bounds.size.width,
+                                    y: location.y / view.bounds.size.height)
+
+        do {
+            try device.lockForConfiguration()
+
+            if device.isFocusPointOfInterestSupported {
+                device.focusPointOfInterest = normalizedPoint
+                device.focusMode = .autoFocus
+            }
+
+            if device.isExposurePointOfInterestSupported {
+                device.exposurePointOfInterest = normalizedPoint
+                device.exposureMode = .autoExpose
+            }
+
+            device.unlockForConfiguration()
+        } catch {
+            print("Focus error: \(error.localizedDescription)")
+        }
+    }
+
     }
 }
 
@@ -456,19 +490,17 @@ struct CameraScreen: View {
 
 }
 
-// MARK: - Crosshair + Button styles
-
 struct CrosshairCenter: View {
     let color: Color
     var body: some View {
         ZStack {
-            Circle().fill(color)
             Circle().stroke(Color.white, lineWidth: 2)
             Rectangle().fill(Color.white).frame(width: 2, height: 8)
             Rectangle().fill(Color.white).frame(width: 8, height: 2)
         }
     }
 }
+
 
 struct SquishButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
