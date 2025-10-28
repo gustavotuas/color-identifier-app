@@ -365,6 +365,9 @@ struct CameraScreen: View {
                 }
             }
             VendorSelectionStorage.save(newValue)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
+                toastMessage = nil
+            }
         }
         .overlay(alignment: .bottom) {
             if let message = toastMessage {
@@ -430,6 +433,9 @@ struct CameraScreen: View {
                 }
             }
             VendorSelectionStorage.save(selection)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
+                toastMessage = nil
+            }
         }
     }
 
