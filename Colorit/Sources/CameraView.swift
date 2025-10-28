@@ -50,7 +50,7 @@ final class CameraEngine: NSObject, ObservableObject {
     private let ci = CIContext(options: [.workingColorSpace: kCFNull!])
 
     private var lastFrameTime: CFTimeInterval = 0
-    private let frameInterval: CFTimeInterval = 0.14
+    private let frameInterval: CFTimeInterval = 0.25
 
     override init() {
         super.init()
@@ -90,7 +90,10 @@ final class CameraEngine: NSObject, ObservableObject {
         guard session.isRunning else { return }
         queue.async { [weak self] in
             self?.session.stopRunning()
-            DispatchQueue.main.async { self?.isRunning = false }
+            DispatchQueue.main.async {
+                self?.isRunning = false
+                self?.lastFrame = nil   // 👈 Evita mostrar frame congelado
+            }
         }
     }
 
@@ -118,18 +121,32 @@ final class CameraEngine: NSObject, ObservableObject {
 
     func switchCamera() {
         guard let current = videoInput else { return }
+
+        // 🔹 Detenemos el envío de frames temporalmente
+        videoOut.setSampleBufferDelegate(nil, queue: nil)
+
         session.beginConfiguration()
         session.removeInput(current)
+
         let newPos: AVCaptureDevice.Position = (current.device.position == .back) ? .front : .back
+
         guard let newDev = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: newPos),
-              let newInput = try? AVCaptureDeviceInput(device: newDev),
-              session.canAddInput(newInput) else {
-            session.addInput(current); session.commitConfiguration(); return
+            let newInput = try? AVCaptureDeviceInput(device: newDev),
+            session.canAddInput(newInput) else {
+            session.addInput(current)
+            session.commitConfiguration()
+            // 🔹 Restauramos el delegate
+            videoOut.setSampleBufferDelegate(self, queue: queue)
+            return
         }
+
         session.addInput(newInput)
         videoInput = newInput
         isUsingFront = (newPos == .front)
         session.commitConfiguration()
+
+        // 🔹 Una vez configurada la cámara nueva, reactivamos el delegate
+        videoOut.setSampleBufferDelegate(self, queue: queue)
     }
 
     var brightness: Double {
@@ -150,7 +167,9 @@ extension CameraEngine: AVCaptureVideoDataOutputSampleBufferDelegate {
             let b = Int(px.load(fromByteOffset: 0, as: UInt8.self))
             let g = Int(px.load(fromByteOffset: 1, as: UInt8.self))
             let r = Int(px.load(fromByteOffset: 2, as: UInt8.self))
-            Task { @MainActor in self.currentRGB = RGB(r: r, g: g, b: b) }
+            DispatchQueue.main.async {
+                self.currentRGB = RGB(r: r, g: g, b: b)
+            }
         }
         CVPixelBufferUnlockBaseAddress(pb, .readOnly)
 
@@ -160,7 +179,9 @@ extension CameraEngine: AVCaptureVideoDataOutputSampleBufferDelegate {
         let ciImage = CIImage(cvImageBuffer: pb)
         if let cg = ci.createCGImage(ciImage, from: ciImage.extent) {
             let img = UIImage(cgImage: cg, scale: UIScreen.main.scale, orientation: .right)
-            Task { @MainActor in self.lastFrame = img }
+            DispatchQueue.main.async {
+                self.lastFrame = img
+            }
         }
     }
 }
@@ -291,6 +312,7 @@ struct CameraScreen: View {
                     .foregroundColor(.blue)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                     .padding(.horizontal)
+                    .padding(.top, 8)
                     .transition(.move(edge: .top).combined(with: .opacity))
                 }
                 // Camera preview
@@ -376,12 +398,23 @@ struct CameraScreen: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
-        .onAppear { 
-            engine.start() 
-            // Sincroniza el filtro guardado
+        .onAppear {
             selection = VendorSelectionStorage.load() ?? .all
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                engine.stop()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                    engine.start()
+                }
+            }
         }
         .onDisappear { engine.stop() }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
+            engine.stop()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+            engine.start()
+        }
         .sheet(item: $matches) { payload in
             MatchesView(payload: payload)
                 .environmentObject(favs)
