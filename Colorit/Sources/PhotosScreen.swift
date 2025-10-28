@@ -696,7 +696,7 @@ struct ColorPickerView: View {
                             if store.isPro {
                                 let rgb = hexToRGB(hexValue)
                                 favs.add(color: rgb)
-                                showToast("Color Added to collections")
+                                showToast("Color Added to Collections")
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                                     dismiss()
                                 }

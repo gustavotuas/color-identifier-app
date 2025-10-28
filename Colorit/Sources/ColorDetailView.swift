@@ -228,13 +228,13 @@ struct ColorDetailView: View {
         if isFavorite {
             favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgbValue.hex) }
             isFavorite = false
-            showToast("Removed from collections")
+            showToast("Removed from Collections")
         } else {
             if !favs.colors.contains(where: { normalizeHex($0.color.hex) == normalizeHex(rgbValue.hex) }) {
                 favs.add(color: rgbValue)
             }
             isFavorite = true
-            showToast("Added to collections")
+            showToast("Added to Collections")
         }
         UIImpactFeedbackGenerator(style: .soft).impactOccurred()
         animateLike.toggle()

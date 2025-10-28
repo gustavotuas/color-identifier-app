@@ -50,7 +50,12 @@ final class CameraEngine: NSObject, ObservableObject {
     private let ci = CIContext(options: [.workingColorSpace: kCFNull!])
 
     private var lastFrameTime: CFTimeInterval = 0
-    private let frameInterval: CFTimeInterval = 0.25
+    private let frameInterval: CFTimeInterval = 0.5
+
+    // 🔹 Filtro de suavizado de color
+    private var recentColors: [RGB] = []
+    private let maxSamples = 5
+
 
     override init() {
         super.init()
@@ -161,21 +166,41 @@ extension CameraEngine: AVCaptureVideoDataOutputSampleBufferDelegate {
 
         CVPixelBufferLockBaseAddress(pb, .readOnly)
         let w = CVPixelBufferGetWidth(pb), h = CVPixelBufferGetHeight(pb), bpr = CVPixelBufferGetBytesPerRow(pb)
+
         if let base = CVPixelBufferGetBaseAddress(pb) {
-            let x = w/2, y = h/2
-            let px = base.advanced(by: y*bpr + x*4)
+            let x = w / 2, y = h / 2
+            let px = base.advanced(by: y * bpr + x * 4)
             let b = Int(px.load(fromByteOffset: 0, as: UInt8.self))
             let g = Int(px.load(fromByteOffset: 1, as: UInt8.self))
             let r = Int(px.load(fromByteOffset: 2, as: UInt8.self))
-            DispatchQueue.main.async {
-                self.currentRGB = RGB(r: r, g: g, b: b)
+            let newColor = RGB(r: r, g: g, b: b)
+
+            // 🔹 1. Calcular diferencia con el color actual
+            let diff = currentRGB.distance(to: newColor)
+
+            // 🔹 2. Solo actualizar si el cambio es relevante (> 20 en promedio RGB)
+            if diff > 20 {
+                // 🔹 3. Suavizado: promedio de últimos 5 colores
+                addToRecentColors(newColor)
+
+                let avgR = recentColors.map(\.r).reduce(0, +) / recentColors.count
+                let avgG = recentColors.map(\.g).reduce(0, +) / recentColors.count
+                let avgB = recentColors.map(\.b).reduce(0, +) / recentColors.count
+                let averaged = RGB(r: avgR, g: avgG, b: avgB)
+
+                DispatchQueue.main.async {
+                    self.currentRGB = averaged
+                }
             }
         }
+
         CVPixelBufferUnlockBaseAddress(pb, .readOnly)
 
+        // 🔹 4. Captura periódica del frame (sin tocar el suavizado)
         let now = CACurrentMediaTime()
         guard now - lastFrameTime >= frameInterval else { return }
         lastFrameTime = now
+
         let ciImage = CIImage(cvImageBuffer: pb)
         if let cg = ci.createCGImage(ciImage, from: ciImage.extent) {
             let img = UIImage(cgImage: cg, scale: UIScreen.main.scale, orientation: .right)
@@ -184,7 +209,16 @@ extension CameraEngine: AVCaptureVideoDataOutputSampleBufferDelegate {
             }
         }
     }
+
+    // MARK: - Suavizado (promedio de últimos colores)
+    private func addToRecentColors(_ color: RGB) {
+        if recentColors.count >= maxSamples {
+            recentColors.removeFirst()
+        }
+        recentColors.append(color)
+    }
 }
+
 
 // MARK: - Preview View
 
@@ -380,8 +414,8 @@ struct CameraScreen: View {
                 .environment(\.likePulse, likedPulse)
             }
         }
-        //.clipShape(RoundedRectangle(cornerRadius: 26))
-        //.padding(.horizontal, 0) // 🔹 sin espacio lateral
+        .clipShape(RoundedRectangle(cornerRadius: 26))
+        .padding(.horizontal, 12) // 🔹 sin espacio lateral
         .padding(.top, 8)
     }
 
@@ -528,10 +562,10 @@ private var toolbarItems: some ToolbarContent {
     // 5️⃣ Guardar o eliminar
     if favs.colors.contains(where: { normalizeHex($0.color.hex) == normalizeHex(nearest.hex) }) {
         favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(nearest.hex) }
-        toastMessage = "Removed from collections"
+        toastMessage = "Removed from Collections"
     } else {
         favs.add(color: matchedRGB)
-        toastMessage = "\(nearest.name) (\(Int(precision))%) added to collections"
+        toastMessage = "Added to Collections \(nearest.name) (\(Int(precision))%)"
     }
 
     // 6️⃣ Animación del corazón

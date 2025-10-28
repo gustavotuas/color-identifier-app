@@ -585,13 +585,13 @@ struct ColorRow: View {
         if isFavoriteNormalized {
             favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
             // ✅ Toast remove
-            toast = "Removed from collections"
+            toast = "Removed from Collections"
         } else {
             let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
             if !exists {
                 favs.add(color: rgb)
                 // ✅ Toast add
-                toast = "Added to collections"
+                toast = "Added to Collections"
             }
         }
     }
@@ -711,13 +711,13 @@ struct ColorTile: View {
         if isFavoriteNormalized {
             favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
             // ✅ Toast remove
-            toast = "Removed from collections"
+            toast = "Removed from Collections"
         } else {
             let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
             if !exists {
                 favs.add(color: rgb)
                 // ✅ Toast add
-                toast = "Added to collections"
+                toast = "Added to Collections"
             }
         }
     }
