@@ -244,6 +244,7 @@ struct CameraPreviewView: UIViewRepresentable {
 struct CameraScreen: View {
     @EnvironmentObject var favs: FavoritesStore
     @EnvironmentObject var catalog: Catalog
+    @EnvironmentObject var catalogs: CatalogStore
     @EnvironmentObject var store: StoreVM
     @StateObject private var engine = CameraEngine()
 
@@ -252,6 +253,9 @@ struct CameraScreen: View {
     @State private var flash = false
     @State private var toastMessage: String? = nil
     @State private var matches: MatchesPayload? = nil
+    @State private var selection: CatalogSelection = VendorSelectionStorage.load() ?? .all
+    @State private var showVendorSheet = false
+
 
     var body: some View {
         NavigationStack {
@@ -261,7 +265,34 @@ struct CameraScreen: View {
                 .animation(.easeInOut, value: UITraitCollection.current.userInterfaceStyle)
 
             VStack(spacing: 0) {
-
+                if selection.isFiltered {
+                    HStack(spacing: 8) {
+                        Image(systemName: "line.3.horizontal.decrease.circle")
+                        Text(selection.filterSubtitle).lineLimit(1)
+                        Spacer()
+                        Button {
+                            withAnimation(.easeInOut) {
+                                selection = .all
+                                VendorSelectionStorage.save(selection)
+                                toastMessage = "Vendor filter cleared"
+                            }
+                        } label: {
+                            Label("Clear", systemImage: "xmark.circle.fill")
+                                .labelStyle(.titleAndIcon)
+                        }
+                        .buttonStyle(.bordered)
+                        .tint(.blue)
+                        .font(.caption.bold())
+                    }
+                    .font(.footnote)
+                    .padding(10)
+                    .background(Color.blue.opacity(0.12))
+                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.blue.opacity(0.5)))
+                    .foregroundColor(.blue)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .padding(.horizontal)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                }
                 // Camera preview
                 ZStack {
                     CameraPreviewView(engine: engine)
@@ -325,6 +356,16 @@ struct CameraScreen: View {
                 .frame(height: 110)
             }
         }
+        .onChange(of: selection) { newValue in
+            withAnimation {
+                if newValue == .all {
+                    toastMessage = "Vendor filter cleared"
+                } else {
+                    toastMessage = "Vendor filter set: \(newValue.filterSubtitle)"
+                }
+            }
+            VendorSelectionStorage.save(newValue)
+        }
         .overlay(alignment: .bottom) {
             if let message = toastMessage {
                 ToastView(message: message)
@@ -332,7 +373,11 @@ struct CameraScreen: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
-        .onAppear { engine.start() }
+        .onAppear { 
+            engine.start() 
+            // Sincroniza el filtro guardado
+            selection = VendorSelectionStorage.load() ?? .all
+        }
         .onDisappear { engine.stop() }
         .sheet(item: $matches) { payload in
             MatchesView(payload: payload)
@@ -341,6 +386,13 @@ struct CameraScreen: View {
         .navigationTitle("Camera")
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button { showVendorSheet = true } label: {
+                    Image(systemName: "slider.horizontal.3")
+                }
+                .accessibilityLabel("Select vendor")
+            }
+
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 let ok = engine.brightness > 0.45
                 Image(systemName: ok ? "sun.max.fill" : "cloud.fill")
@@ -362,6 +414,25 @@ struct CameraScreen: View {
             }
         }
     } // NavigationStack
+    .sheet(isPresented: $showVendorSheet) {
+        VendorListSheet(
+            selection: $selection,
+            candidates: CatalogID.allCases.filter { $0 != .generic },
+            catalogs: catalogs
+        )
+        .presentationDetents([.medium, .large])
+        .onDisappear {
+            withAnimation {
+                if selection == .all {
+                    toastMessage = "Vendor filter cleared"
+                } else {
+                    toastMessage = "Vendor filter set: \(selection.filterSubtitle)"
+                }
+            }
+            VendorSelectionStorage.save(selection)
+        }
+    }
+
     }
 
     // MARK: - Helpers
