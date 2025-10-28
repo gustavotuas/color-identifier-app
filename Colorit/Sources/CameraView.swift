@@ -463,9 +463,9 @@ struct CrosshairCenter: View {
     var body: some View {
         ZStack {
             Circle().fill(color)
-            Circle().stroke(Color.primary, lineWidth: 2)
-            Rectangle().fill(Color.primary).frame(width: 2, height: 8)
-            Rectangle().fill(Color.primary).frame(width: 8, height: 2)
+            Circle().stroke(Color.white, lineWidth: 2)
+            Rectangle().fill(Color.white).frame(width: 2, height: 8)
+            Rectangle().fill(Color.white).frame(width: 8, height: 2)
         }
     }
 }
