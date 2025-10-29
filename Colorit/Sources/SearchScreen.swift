@@ -289,12 +289,21 @@ struct SearchScreen: View {
         }
 
         ToolbarItemGroup(placement: .navigationBarTrailing) {
-            Button {
-                ascending.toggle()
-                sortFilteredInPlace()
-            } label: {
-                Image(systemName: ascending ? "arrow.up" : "arrow.down")
-            }
+            // 🔹 Botón de orden por nombre (A–Z / Z–A)
+Button {
+    withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+        ascending.toggle()
+        sortFilteredInPlace()
+    }
+    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+} label: {
+    Image(systemName: "arrow.up.arrow.down")
+        .rotationEffect(.degrees(ascending ? 0 : 180))
+        .animation(.spring(response: 0.3, dampingFraction: 0.6), value: ascending)
+}
+.accessibilityLabel("Sort by name")
+
+
 
             Button {
                 withAnimation(.spring()) { toggleLayout() }
@@ -481,19 +490,14 @@ struct SearchScreen: View {
     }
 
     private func sortFilteredInPlace() {
-        func luminance(_ rgb: RGB) -> Double {
-            // Luma 709
-            return 0.2126 * Double(rgb.r) + 0.7152 * Double(rgb.g) + 0.0722 * Double(rgb.b)
-        }
-
-        filteredColors.sort {
-            let rgb1 = hexToRGB($0.hex)
-            let rgb2 = hexToRGB($1.hex)
-            let l1 = luminance(rgb1)
-            let l2 = luminance(rgb2)
-            return ascending ? l1 < l2 : l1 > l2
-        }
+    // Orden alfabético por nombre (A–Z o Z–A)
+    filteredColors.sort {
+        ascending
+        ? $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+        : $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedDescending
     }
+}
+
 }
 
 
