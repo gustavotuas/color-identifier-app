@@ -830,12 +830,16 @@ struct ColorIsland: View {
                 Spacer()
 
                 Button(action: onFavorite) {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title3.weight(.bold))
-                        .foregroundColor(.white)
+                    Label("Save", systemImage: "square.and.arrow.down")
+                        .labelStyle(.iconOnly)
+                        .font(.title3.weight(.semibold))
+                        .foregroundStyle(.white)
                         .symbolEffect(.bounce, value: likePulse)
+                        .shadow(color: .black.opacity(0.25), radius: 2, y: 1)
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel("Save color to collections")
+
             }
         }
         .padding(14)
