@@ -27,7 +27,7 @@ struct LivePaletteDetailView: View {
 
                         // MARK: - Header title + save button
                         HStack {
-                            Text("Colour Matches")
+                            Text("Color Matches")
                                 .font(.largeTitle.bold())
                             Spacer()
                             Button {
@@ -74,7 +74,7 @@ struct LivePaletteDetailView: View {
                                 let named = nearestNamedColor(for: rgb)
                                 LiveColorRow(named: named, rgb: rgb, toast: $toastMessage)
                                     .environmentObject(favs)
-                                    .background(.ultraThinMaterial)
+                                    //.background(.ultraThinMaterial)
                                     .clipShape(RoundedRectangle(cornerRadius: 12))
                                     .shadow(color: .black.opacity(0.05), radius: 2, y: 1)
                                     .padding(.horizontal)
@@ -86,11 +86,17 @@ struct LivePaletteDetailView: View {
                 }
 
                 // MARK: - Toast
+                // MARK: - Toast (bottom aligned)
                 if let message = toastMessage {
-                    ToastView(message: message)
-                        .padding(.bottom, 40)
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                    VStack {
+                        Spacer()
+                        ToastView(message: message)
+                            .padding(.bottom, bottomSafeInset() + 20)
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
+                    .animation(.spring(response: 0.3, dampingFraction: 0.8), value: toastMessage)
                 }
+
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -108,8 +114,24 @@ struct LivePaletteDetailView: View {
         .onAppear {
             visibleColors = payload.colors.sorted { ascending ? $0.hex < $1.hex : $0.hex > $1.hex }
         }
-        .toast(message: $toastMessage)
+        .onChange(of: toastMessage) { newValue in
+            guard newValue != nil else { return }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
+                withAnimation {
+                    toastMessage = nil
+                }
+            }
+        }
+
     }
+
+    // MARK: - Safe inset helper
+    private func bottomSafeInset() -> CGFloat {
+        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+            let win = scene.windows.first else { return 0 }
+        return win.safeAreaInsets.bottom
+    }
+
 
     // MARK: - Helpers
 
@@ -120,7 +142,7 @@ struct LivePaletteDetailView: View {
             withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
                 addedPalette = true
             }
-            toastMessage = "Palette saved to Collections"
+            toastMessage = "Palette Added to Collections"
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
                 withAnimation { toastMessage = nil }
                 addedPalette = false
