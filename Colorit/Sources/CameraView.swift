@@ -345,8 +345,11 @@ struct CameraScreen: View {
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in engine.stop() }
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in engine.start() }
             .sheet(item: $matches) { payload in
-                MatchesView(payload: payload)
+                LivePaletteDetailView(payload: payload)
                     .environmentObject(favs)
+                    .environmentObject(catalog)
+                    .environmentObject(catalogs)
+                    .environmentObject(store)
             }
             .navigationTitle("Camera")
             .navigationBarTitleDisplayMode(.large)
@@ -629,58 +632,6 @@ private var toolbarItems: some ToolbarContent {
         toastMessage = "Palette generated from live camera"
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
             toastMessage = nil
-        }
-    }
-
-    // MARK: - Matches View
-
-    struct MatchesView: View {
-        @Environment(\.dismiss) private var dismiss
-        @EnvironmentObject var favs: FavoritesStore
-
-        let payload: MatchesPayload
-
-        var body: some View {
-            NavigationView {
-                ScrollView {
-                    VStack(spacing: 16) {
-                        SwatchStrip(colors: payload.colors)
-                            .frame(height: 100)
-                            .clipShape(RoundedRectangle(cornerRadius: 24))
-                            .overlay(RoundedRectangle(cornerRadius: 24)
-                                .stroke(Color.primary.opacity(0.1), lineWidth: 1))
-                            .padding(.horizontal)
-
-                        VStack(spacing: 10) {
-                            ForEach(Array(payload.colors.enumerated()), id: \.offset) { (idx, c) in
-                                ColorBreakdownRow(index: idx+1, color: c)
-                                    .padding(.horizontal)
-                            }
-                        }
-
-                        HStack {
-                            Button {
-                                favs.addPalette(name: nil, colors: payload.colors)
-                            } label: {
-                                Label("Save Palette", systemImage: "square.and.arrow.down")
-                                    .frame(maxWidth: .infinity)
-                            }
-                            .buttonStyle(.borderedProminent)
-                        }
-                        .padding(.horizontal)
-                        .padding(.bottom, 20)
-                    }
-                    .padding(.top, 12)
-                }
-                .navigationTitle("Colour Matches")
-                .toolbar {
-                    ToolbarItem(placement: .topBarLeading) {
-                        Button { dismiss() } label: {
-                            Image(systemName: "xmark")
-                        }
-                    }
-                }
-            }
         }
     }
 
