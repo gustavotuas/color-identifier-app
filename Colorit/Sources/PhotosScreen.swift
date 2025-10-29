@@ -155,12 +155,24 @@ private func savePhotoPalette() {
                     }
             }
             .sheet(isPresented: $showPaletteSheet) {
-                DetectedPaletteSheet(matches: matches)
-                    .environmentObject(favs)
-                    .environmentObject(catalog)
-                    .environmentObject(catalogs)
-                    .presentationDetents([.fraction(0.8), .large])
-            }
+    let detectedColors = matches.map { $0.closest != nil ? hexToRGB($0.closest!.hex) : $0.color }
+    let unique = Array(Set(detectedColors.map { $0.hex })).compactMap { hexToRGB($0) }
+    let payload = MatchesPayload(colors: unique, sourceImage: image)
+
+    NavigationStack {
+        PhotoPaletteDetailView(payload: payload)
+            .id("photo_palette_detail_view") // 👈 fuerza identidad única
+            .environmentObject(favs)
+            .environmentObject(catalog)
+            .environmentObject(catalogs)
+            .environmentObject(store)
+    }
+    .presentationDetents([.large])
+}
+
+
+
+
             .fullScreenCover(isPresented: $showSystemPicker) {
                 SystemPhotoPicker(isPresented: $showSystemPicker, image: $image) { uiimg in
                     let raw = KMeans.palette(from: uiimg, k: 15)
@@ -323,7 +335,7 @@ Button {
     HStack(spacing: 6) {
         Image(systemName: addedPalette ? "checkmark.circle.fill" : "square.and.arrow.down")
             .font(.system(size: 17, weight: .semibold))
-        Text(addedPalette ? "Palette Saved" : "Palette Added to Collections")
+        Text(addedPalette ? "Palette Saved" : "Add Palette to Collections")
             .font(.system(size: 17, weight: .semibold))
     }
     .foregroundColor(Color.accentColor)
@@ -482,7 +494,11 @@ Button {
 
     private func showToast(_ msg: String) {
         withAnimation { toastMessage = msg }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
+            withAnimation { toastMessage = nil }
+        }
     }
+
 
 
     private func removeSimilarColors(from colors: [RGB], threshold: Double) -> [RGB] {
@@ -830,7 +846,11 @@ struct ColorPickerView: View {
 
     private func showToast(_ msg: String) {
         withAnimation { toastMessage = msg }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
+            withAnimation { toastMessage = nil }
+        }
     }
+
 }
 
 // MARK: - Mini botón PRO
