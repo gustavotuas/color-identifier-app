@@ -141,7 +141,18 @@ struct LivePaletteDetailView: View {
     private func savePalette() {
         if store.isPro {
             let unique = Array(Set(payload.colors.map { $0.hex })).compactMap { hexToRGB($0) }
-            favs.addPalette(name: "Live Palette", colors: unique)
+
+            // 🕒 Formatear fecha actual (ejemplo: "Oct 29, 2025 • 03:42 AM")
+            let formatter = DateFormatter()
+            formatter.dateFormat = "MMM d, yyyy • hh:mm a"
+            let dateString = formatter.string(from: Date())
+
+            // 🔹 Nombre de la paleta con timestamp
+            let paletteName = "Live Palette – \(dateString)"
+
+            // Guardar en favoritos con nombre y colores únicos
+            favs.addPalette(name: paletteName, colors: unique)
+
             withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
                 addedPalette = true
             }
@@ -154,6 +165,7 @@ struct LivePaletteDetailView: View {
             store.showPaywall = true
         }
     }
+
 
     private func nearestNamedColor(for rgb: RGB) -> NamedColor {
         let pool: [NamedColor]
