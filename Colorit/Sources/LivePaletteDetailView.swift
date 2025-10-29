@@ -30,22 +30,6 @@ struct LivePaletteDetailView: View {
                             Text("Color Matches")
                                 .font(.largeTitle.bold())
                             Spacer()
-                            Button {
-                                savePalette()
-                            } label: {
-                                HStack(spacing: 8) {
-                                    Image(systemName: addedPalette ? "checkmark.circle.fill" : "square.and.arrow.down")
-                                        .symbolEffect(.bounce, value: addedPalette)
-                                    Text(addedPalette ? "Saved" : "Save Palette")
-                                }
-                                .font(.headline)
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 8)
-                                .background(.ultraThinMaterial)
-                                .clipShape(Capsule())
-                                .shadow(color: .black.opacity(0.15), radius: 3, y: 2)
-                            }
-                            .buttonStyle(.plain)
                         }
                         .padding(.horizontal)
                         .padding(.top, 8)
@@ -65,6 +49,23 @@ struct LivePaletteDetailView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                         .shadow(color: .black.opacity(0.1), radius: 3, y: 2)
                         .padding(.horizontal)
+
+                        Button {
+                            savePalette()
+                        } label: {
+                            HStack(spacing: 8) {
+                                Image(systemName: addedPalette ? "checkmark.circle.fill" : "square.and.arrow.down")
+                                    .symbolEffect(.bounce, value: addedPalette)
+                                Text(addedPalette ? "Saved" : "Save Palette")
+                            }
+                            .font(.headline)
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 8)
+                            .background(.ultraThinMaterial)
+                            .clipShape(Capsule())
+                            .shadow(color: .black.opacity(0.15), radius: 3, y: 2)
+                        }
+                        .buttonStyle(.plain)
 
                         Divider().padding(.horizontal)
 
