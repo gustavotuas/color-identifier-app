@@ -251,14 +251,19 @@ struct FavoritesScreen: View {
             .navigationTitle("Collections")
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    // Orden asc/desc
+                    // 🔹 Botón de orden (asc/desc)
                     if !sortedColors.isEmpty {
                         Button {
-                            ascending.toggle()
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                                ascending.toggle()
+                            }
                             UIImpactFeedbackGenerator(style: .soft).impactOccurred()
                         } label: {
-                            Image(systemName: ascending ? "arrow.up" : "arrow.down")
+                            Image(systemName: "arrow.up.arrow.down")
+                                .rotationEffect(.degrees(ascending ? 0 : 180))
+                                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: ascending)
                         }
+                        .accessibilityLabel("Sort by brightness")
                     }
 
                     // Nueva paleta (solo si es Pro)
