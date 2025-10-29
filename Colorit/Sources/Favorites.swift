@@ -279,18 +279,6 @@ struct FavoritesScreen: View {
                         .accessibilityLabel("Sort by alphabetic")
                     }
 
-                    // 🔹 Nuevo botón: ordenar por brillo (luminance)
-                    Button {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-                            ascending.toggle()
-                        }
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                    } label: {
-                        Image(systemName: "circle.bottomhalf.filled")
-                            .imageScale(.medium)
-                    }
-                    .accessibilityLabel("Sort by brightness")
-
                     // Limpiar todo
                     if !favs.colors.isEmpty || !favs.palettes.isEmpty {
                         Button(role: .destructive) {

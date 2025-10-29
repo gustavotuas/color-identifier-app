@@ -89,6 +89,7 @@ struct SearchScreen: View {
     @State private var query = ""
     @State private var layout: LayoutMode = .grid3
     @State private var ascending = true
+    @State private var ascendingBrightness = true     // Orden por brillo
     @State private var selection: CatalogSelection = .all
     @State private var showVendorSheet = false
     @State private var visibleCount = 100
@@ -307,9 +308,11 @@ struct SearchScreen: View {
             Button {
                 sortByLuminance()
             } label: {
-                Image(systemName: ascending ? "circle.tophalf.filled" : "circle.bottomhalf.filled")
-                    .transition(.scale.combined(with: .opacity))
-                    .animation(.spring(response: 0.3, dampingFraction: 0.6), value: ascending)
+                Image(systemName: "circle.tophalf.filled")
+                .rotationEffect(.degrees(ascendingBrightness ? 0 : 180))
+                .imageScale(.medium)
+                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: ascendingBrightness)
+
 
             }
             .accessibilityLabel("Sort by brightness")
@@ -397,13 +400,13 @@ struct SearchScreen: View {
         }
 
         // ✅ Alterna la dirección en cada tap
-        ascending.toggle()
+        ascendingBrightness.toggle()
 
         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
             filteredColors.sort {
                 let l1 = luminance(hexToRGB($0.hex))
                 let l2 = luminance(hexToRGB($1.hex))
-                return ascending ? l1 < l2 : l1 > l2
+                return ascendingBrightness ? l1 < l2 : l1 > l2
             }
         }
 
