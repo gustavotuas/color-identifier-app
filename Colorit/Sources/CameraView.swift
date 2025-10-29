@@ -641,14 +641,32 @@ private var toolbarItems: some ToolbarContent {
 
     private func generatePaletteFromLive() {
         guard let img = engine.lastFrame else { return }
-        let gen = UIImpactFeedbackGenerator(style: .light); gen.impactOccurred()
-        let colors = KMeans.palette(from: img, k: 10)
+
+        // Vibración ligera al capturar
+        let gen = UIImpactFeedbackGenerator(style: .light)
+        gen.impactOccurred()
+
+        // 🎨 Generar paleta con KMeans
+        var colors = KMeans.palette(from: img, k: 10)
+
+        // 🟡 Color actual del crosshair
+        let current = engine.currentRGB
+
+        // Si el color detectado no está en la lista, agrégalo al inicio
+        if !colors.contains(where: { $0.hex.lowercased() == current.hex.lowercased() }) {
+            colors.insert(current, at: 0)
+        }
+
+        // Crear payload incluyendo el color actual
         matches = MatchesPayload(colors: colors, sourceImage: img)
+
+        // Mostrar toast
         toastMessage = "Palette generated from live camera"
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
             toastMessage = nil
         }
     }
+
 
     // MARK: - Supporting Views
 
