@@ -652,12 +652,15 @@ private var toolbarItems: some ToolbarContent {
         // 🟡 Color actual del crosshair
         let current = engine.currentRGB
 
-        // Si el color detectado no está en la lista, agrégalo al inicio
+        // Si el color detectado no está en la lista, agrégalo
         if !colors.contains(where: { $0.hex.lowercased() == current.hex.lowercased() }) {
-            colors.insert(current, at: 0)
+            colors.append(current)
         }
 
-        // Crear payload incluyendo el color actual
+        // 🔹 Ordenar la paleta completa por luminancia (para mantener consistencia global)
+        colors = sortPalette(colors)
+
+        // Crear payload incluyendo la imagen fuente
         matches = MatchesPayload(colors: colors, sourceImage: img)
 
         // Mostrar toast
@@ -666,6 +669,7 @@ private var toolbarItems: some ToolbarContent {
             toastMessage = nil
         }
     }
+
 
 
     // MARK: - Supporting Views

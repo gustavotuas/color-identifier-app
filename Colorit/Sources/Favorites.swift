@@ -76,7 +76,8 @@ final class FavoritesStore: ObservableObject {
     }
 
     func addPalette(name: String?, colors: [RGB]) {
-        let pal = FavoritePalette(colors: colors, name: name)
+        let ordered = sortPalette(colors)
+        let pal = FavoritePalette(colors: ordered, name: name)
         palettes.insert(pal, at: 0)
         persist()
         hasNewFavorites = true // 👈 igual aquí
@@ -149,9 +150,12 @@ struct FavoritesScreen: View {
 
     private var sortedColors: [FavoriteColor] {
         favs.colors.sorted {
-            ascending ? $0.color.hex < $1.color.hex : $0.color.hex > $1.color.hex
+            let l1 = 0.2126 * Double($0.color.r) + 0.7152 * Double($0.color.g) + 0.0722 * Double($0.color.b)
+            let l2 = 0.2126 * Double($1.color.r) + 0.7152 * Double($1.color.g) + 0.0722 * Double($1.color.b)
+            return ascending ? l1 < l2 : l1 > l2
         }
     }
+
 
     private var filteredColors: [FavoriteColor] {
         selectedFilter == .all || selectedFilter == .colors ? sortedColors : []

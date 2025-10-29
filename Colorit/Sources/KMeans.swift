@@ -71,6 +71,15 @@ enum KMeans {
             }
         }
 
-        return centroids
+        return sortPalette(centroids)
+    }
+}
+
+func sortPalette(_ colors: [RGB]) -> [RGB] {
+    colors.sorted {
+        // Orden perceptual por luminancia (de oscuro a claro)
+        let l1 = 0.2126 * Double($0.r) + 0.7152 * Double($0.g) + 0.0722 * Double($0.b)
+        let l2 = 0.2126 * Double($1.r) + 0.7152 * Double($1.g) + 0.0722 * Double($1.b)
+        return l1 < l2
     }
 }

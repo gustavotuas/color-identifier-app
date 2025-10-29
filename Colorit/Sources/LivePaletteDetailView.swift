@@ -36,7 +36,7 @@ struct LivePaletteDetailView: View {
 
                         // MARK: - Color strip
                         HStack(spacing: 0) {
-                            ForEach(payload.colors, id: \.hex) { c in
+                            ForEach(visibleColors, id: \.hex) { c in
                                 Rectangle()
                                     .fill(Color(uiColor: c.uiColor))
                                     .overlay(
@@ -99,7 +99,7 @@ struct LivePaletteDetailView: View {
 
                         // MARK: - List style like SearchScreen
                         VStack(alignment: .leading, spacing: 10) {
-                            ForEach(payload.colors, id: \.hex) { rgb in
+                            ForEach(visibleColors, id: \.hex) { rgb in
                                 let named = nearestNamedColor(for: rgb)
                                 LiveColorRow(toast: $toastMessage, named: named, rgb: rgb)
                                     .environmentObject(favs)
@@ -131,7 +131,7 @@ struct LivePaletteDetailView: View {
             }
         }
         .onAppear {
-            visibleColors = payload.colors.sorted { ascending ? $0.hex < $1.hex : $0.hex > $1.hex }
+            visibleColors = sortPalette(payload.colors)
         }
         .toast(message: $toastMessage)
     }

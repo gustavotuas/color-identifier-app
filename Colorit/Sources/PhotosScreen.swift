@@ -177,7 +177,7 @@ private func savePhotoPalette() {
                 SystemPhotoPicker(isPresented: $showSystemPicker, image: $image) { uiimg in
                     let raw = KMeans.palette(from: uiimg, k: 15)
                     let filtered = removeSimilarColors(from: raw.compactMap { hexToRGB($0.hex) }, threshold: 0.02)
-                    palette = filtered
+                    palette = sortPalette(filtered)
                     rebuildMatches()
                 }
                 .ignoresSafeArea()

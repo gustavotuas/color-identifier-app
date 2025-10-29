@@ -481,15 +481,17 @@ struct SearchScreen: View {
     }
 
     private func sortFilteredInPlace() {
-        func key(_ c: NamedColor) -> String {
-            let brand = c.vendor?.brand ?? ""
-            let code  = c.vendor?.code  ?? ""
-            return "\(c.name)|\(brand)|\(code)|\(normalizeHex(c.hex))"
+        func luminance(_ rgb: RGB) -> Double {
+            // Luma 709
+            return 0.2126 * Double(rgb.r) + 0.7152 * Double(rgb.g) + 0.0722 * Double(rgb.b)
         }
-        if ascending {
-            filteredColors.sort { key($0) < key($1) }
-        } else {
-            filteredColors.sort { key($0) > key($1) }
+
+        filteredColors.sort {
+            let rgb1 = hexToRGB($0.hex)
+            let rgb2 = hexToRGB($1.hex)
+            let l1 = luminance(rgb1)
+            let l2 = luminance(rgb2)
+            return ascending ? l1 < l2 : l1 > l2
         }
     }
 }

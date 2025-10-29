@@ -129,9 +129,7 @@ struct PhotoPaletteDetailView: View {
             }
         }
         .onAppear {
-            if visibleColors.isEmpty {
-                visibleColors = payload.colors.sorted { ascending ? $0.hex < $1.hex : $0.hex > $1.hex }
-            }
+            visibleColors = sortPalette(payload.colors)
         }
         .toast(message: $toastMessage)
     }
