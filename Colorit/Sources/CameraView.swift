@@ -398,6 +398,24 @@ struct CameraScreen: View {
             CameraPreviewView(engine: engine)
                 .ignoresSafeArea(edges: .horizontal)
 
+        // Luz / exposición (sol o nube)
+        HStack {
+            Image(systemName: engine.brightness > 0.45 ? "sun.max.fill" : "cloud.fill")
+                .font(.system(size: 22, weight: .semibold))
+                .foregroundStyle(engine.brightness > 0.45 ? .yellow : .gray)
+                //.padding(10)
+                //.background(.ultraThinMaterial, in: Circle())
+                .shadow(color: .black.opacity(0.25), radius: 4, y: 2)
+                .padding(.leading, 12)
+                .padding(.top, 12)
+                .transition(.opacity.combined(with: .scale))
+                .animation(.easeInOut(duration: 0.25), value: engine.brightness > 0.45)
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .ignoresSafeArea(edges: .top)
+
+
             CrosshairCenter(color: Color(uiColor: engine.currentRGB.uiColor))
                 .frame(width: 22, height: 22)
                 .allowsHitTesting(false)
@@ -491,9 +509,6 @@ private var toolbarItems: some ToolbarContent {
 
         // Trailing
         ToolbarItemGroup(placement: .navigationBarTrailing) {
-            // Luz/Ambiente
-            Image(systemName: (engine.brightness > 0.45) ? "sun.max.fill" : "cloud.fill")
-                .foregroundStyle((engine.brightness > 0.45) ? .yellow : .orange)
 
             // Linterna (si disponible y no es cámara frontal)
             if (engine.activeDevice()?.hasTorch ?? false) && !engine.isUsingFront {
