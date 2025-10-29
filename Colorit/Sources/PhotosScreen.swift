@@ -60,7 +60,42 @@ struct PhotosScreen: View {
     @State private var showColorPicker = false
     @State private var toastMessage: String? = nil
     @State private var addedToCollection = false
-    @State private var addedPalette = false
+    @State private var addedPalette: Bool = false // Asegúrate de tener este state en la vista
+
+private func savePhotoPalette() {
+    // Haptic (idéntico patrón de guardado)
+    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+
+    // TODO: Ajusta la fuente de colores según tu lógica actual.
+    // Si ya tienes `matches` y conversión a HEX/NamedColor, mantén eso:
+    // Ejemplo: tomamos colores detectados únicos por HEX.
+    let finals: [RGB] = matches.map { $0.closest != nil ? hexToRGB($0.closest!.hex) : $0.color }
+    let unique = Array(Set(finals.map { $0.hex })).compactMap { hexToRGB($0) }
+
+    // 🕒 Formatear fecha actual (ejemplo: "Oct 29, 2025 • 03:42 AM")
+    let formatter = DateFormatter()
+    formatter.dateFormat = "MMM d, yyyy • hh:mm a"
+    let dateString = formatter.string(from: Date())
+
+    // 🔹 Nombre de la paleta con timestamp
+    let paletteName = "Photo Palette – \(dateString)"
+
+    // Guardar en colecciones (usa tu store/favs actual)
+    favs.addPalette(name: paletteName, colors: unique)
+
+    // Cambios visuales + toast (idénticos)
+    withAnimation(.spring(response: 0.25, dampingFraction: 0.7)) {
+        addedPalette = true
+    }
+    showToast("Palette Added to Collections")
+
+    // Volver al estado normal después de un momento (mismo feel de rebote)
+    DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
+            addedPalette = false
+        }
+    }
+}
 
 
 
@@ -280,53 +315,49 @@ private var paletteCard: some View {
             .shadow(color: .black.opacity(0.1), radius: 3, y: 2)
             .onTapGesture { showPaletteSheet = true }
 
-            // 💾 Botón Add to Collections con animación visual y toast
-            Button {
-                if store.isPro {
-                    if !addedPalette {
-                        let finals = matches.map {
-                            $0.closest != nil ? hexToRGB($0.closest!.hex) : $0.color
-                        }
-                        let unique = Array(Set(finals.map { $0.hex })).compactMap { hexToRGB($0) }
-                        favs.addPalette(name: "Detected Palette", colors: unique)
-                        showToast("Added to Collections")
-                        withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
-                            addedPalette = true
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            withAnimation { addedPalette = false }
-                        }
-                    }
-                } else {
-                    store.showPaywall = true
-                }
-            } label: {
-                HStack(spacing: 8) {
-                    Image(systemName: addedPalette ? "checkmark.circle.fill" : "plus.circle")
-                        .font(.system(size: 18, weight: .semibold))
-                        .symbolEffect(.bounce, value: addedPalette)
-                    Text(addedPalette ? "Added!" : "Add to Collections")
-                        .font(.headline)
-                        .animation(.easeInOut(duration: 0.2), value: addedPalette)
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
-                .background(
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(addedPalette ? Color.green.opacity(0.15)
-                                           : Color.white.opacity(0.85))
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(addedPalette ? Color.green.opacity(0.5)
-                                             : Color.blue.opacity(0.3),
-                                lineWidth: 1)
-                )
-                .foregroundColor(addedPalette ? .green : .blue)
-                .cornerRadius(10)
-                .animation(.easeInOut(duration: 0.25), value: addedPalette)
-            }
-            .buttonStyle(.plain)
+            // 💾 Botón Add to Collections con animación visual, haptic y toast (estilo Camera)
+            // MARK: - Add Palette Button (Adaptive Native Style) — IDÉNTICO
+Button {
+    savePhotoPalette()
+} label: {
+    HStack(spacing: 6) {
+        Image(systemName: addedPalette ? "checkmark.circle.fill" : "square.and.arrow.down")
+            .font(.system(size: 17, weight: .semibold))
+        Text(addedPalette ? "Palette Saved" : "Palette Added to Collections")
+            .font(.system(size: 17, weight: .semibold))
+    }
+    .foregroundColor(Color.accentColor)
+    .frame(maxWidth: .infinity)
+    .padding(.vertical, 12)
+    .background(
+        RoundedRectangle(cornerRadius: 16, style: .continuous)
+            .fill(
+                Color(uiColor: UIColor { trait in
+                    trait.userInterfaceStyle == .dark
+                    ? UIColor.systemGray5 // más claro en dark
+                    : UIColor.systemGray6 // más neutro en light
+                })
+            )
+            .shadow(color: Color.black.opacity(0.1), radius: 1, y: 1)
+    )
+    .overlay(
+        RoundedRectangle(cornerRadius: 16, style: .continuous)
+            .stroke(
+                Color(uiColor: UIColor { trait in
+                    trait.userInterfaceStyle == .dark
+                    ? UIColor.white.withAlphaComponent(0.15)
+                    : UIColor.black.withAlphaComponent(0.1)
+                }),
+                lineWidth: 0.6
+            )
+    )
+}
+.buttonStyle(.plain)
+.scaleEffect(addedPalette ? 0.96 : 1.0)
+.animation(.spring(response: 0.25, dampingFraction: 0.7), value: addedPalette)
+.padding(.horizontal)
+.padding(.top, 10)
+
         }
         .padding(14)
         .background(.ultraThinMaterial)
