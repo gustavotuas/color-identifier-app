@@ -84,19 +84,6 @@ struct LivePaletteDetailView: View {
                         .padding(.bottom, 30)
                     }
                 }
-
-                // MARK: - Toast
-                // MARK: - Toast (bottom aligned)
-                if let message = toastMessage {
-                    VStack {
-                        Spacer()
-                        ToastView(message: message)
-                            .padding(.bottom, bottomSafeInset() + 20)
-                            .transition(.move(edge: .bottom).combined(with: .opacity))
-                    }
-                    .animation(.spring(response: 0.3, dampingFraction: 0.8), value: toastMessage)
-                }
-
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -117,24 +104,8 @@ struct LivePaletteDetailView: View {
         .onAppear {
             visibleColors = payload.colors.sorted { ascending ? $0.hex < $1.hex : $0.hex > $1.hex }
         }
-        .onChange(of: toastMessage) { newValue in
-            guard newValue != nil else { return }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
-                withAnimation {
-                    toastMessage = nil
-                }
-            }
-        }
-
+        .toast(message: $toastMessage)
     }
-
-    // MARK: - Safe inset helper
-    private func bottomSafeInset() -> CGFloat {
-        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-            let win = scene.windows.first else { return 0 }
-        return win.safeAreaInsets.bottom
-    }
-
 
     // MARK: - Helpers
 
@@ -229,6 +200,10 @@ private struct LiveColorRow: View {
         }
         .padding(.vertical, 6)
         .contentShape(Rectangle())
+        .onTapGesture(count: 2) {
+            toggleFavorite()
+            UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+        }
     }
 
     private var isFavorite: Bool {
@@ -246,6 +221,7 @@ private struct LiveColorRow: View {
         }
     }
 }
+
 
 // MARK: - Shared Helper
 @inline(__always)
