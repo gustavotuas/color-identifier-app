@@ -290,19 +290,29 @@ struct SearchScreen: View {
 
         ToolbarItemGroup(placement: .navigationBarTrailing) {
             // 🔹 Botón de orden por nombre (A–Z / Z–A)
-Button {
-    withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-        ascending.toggle()
-        sortFilteredInPlace()
-    }
-    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-} label: {
-    Image(systemName: "arrow.up.arrow.down")
-        .rotationEffect(.degrees(ascending ? 0 : 180))
-        .animation(.spring(response: 0.3, dampingFraction: 0.6), value: ascending)
-}
-.accessibilityLabel("Sort by name")
+            Button {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                    ascending.toggle()
+                    sortFilteredInPlace()
+                }
+                UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+            } label: {
+                Image(systemName: "arrow.up.arrow.down")
+                    .rotationEffect(.degrees(ascending ? 0 : 180))
+                    .animation(.spring(response: 0.3, dampingFraction: 0.6), value: ascending)
+            }
+            .accessibilityLabel("Sort by name")
 
+            // 🔹 Ordenar por brillo (Luminance)
+            Button {
+                sortByLuminance()
+            } label: {
+                Image(systemName: ascending ? "circle.tophalf.filled" : "circle.bottomhalf.filled")
+                    .transition(.scale.combined(with: .opacity))
+                    .animation(.spring(response: 0.3, dampingFraction: 0.6), value: ascending)
+
+            }
+            .accessibilityLabel("Sort by brightness")
 
 
             Button {
@@ -377,6 +387,30 @@ Button {
             }
         }
     }
+
+    // MARK: - Ordenar por brillo (Luminance)
+    /// Ordena los colores por brillo (Luminance)
+    private func sortByLuminance() {
+        func luminance(_ rgb: RGB) -> Double {
+            // Fórmula perceptual (Luma 709)
+            return 0.2126 * Double(rgb.r) + 0.7152 * Double(rgb.g) + 0.0722 * Double(rgb.b)
+        }
+
+        // ✅ Alterna la dirección en cada tap
+        ascending.toggle()
+
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+            filteredColors.sort {
+                let l1 = luminance(hexToRGB($0.hex))
+                let l2 = luminance(hexToRGB($1.hex))
+                return ascending ? l1 < l2 : l1 > l2
+            }
+        }
+
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+    }
+
+
 
     private func preloadForSelection() {
         switch selection {

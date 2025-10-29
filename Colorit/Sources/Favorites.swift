@@ -251,6 +251,19 @@ struct FavoritesScreen: View {
             .navigationTitle("Collections")
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
+
+                    // Nueva paleta (solo si es Pro)
+                    Button {
+                        if store.isPro {
+                            showNewPaletteSheet = true
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        } else {
+                            store.showPaywall = true
+                        }
+                    } label: {
+                        Image(systemName: "plus.circle.fill")
+                    }
+
                     // 🔹 Botón de orden (asc/desc)
                     if !sortedColors.isEmpty {
                         Button {
@@ -263,20 +276,20 @@ struct FavoritesScreen: View {
                                 .rotationEffect(.degrees(ascending ? 0 : 180))
                                 .animation(.spring(response: 0.3, dampingFraction: 0.6), value: ascending)
                         }
-                        .accessibilityLabel("Sort by brightness")
+                        .accessibilityLabel("Sort by alphabetic")
                     }
 
-                    // Nueva paleta (solo si es Pro)
+                    // 🔹 Nuevo botón: ordenar por brillo (luminance)
                     Button {
-                        if store.isPro {
-                            showNewPaletteSheet = true
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        } else {
-                            store.showPaywall = true
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                            ascending.toggle()
                         }
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     } label: {
-                        Image(systemName: "square.on.square")
+                        Image(systemName: "circle.bottomhalf.filled")
+                            .imageScale(.medium)
                     }
+                    .accessibilityLabel("Sort by brightness")
 
                     // Limpiar todo
                     if !favs.colors.isEmpty || !favs.palettes.isEmpty {
