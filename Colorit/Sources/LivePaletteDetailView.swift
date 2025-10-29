@@ -56,7 +56,7 @@ struct LivePaletteDetailView: View {
                             HStack(spacing: 8) {
                                 Image(systemName: addedPalette ? "checkmark.circle.fill" : "square.and.arrow.down")
                                     .symbolEffect(.bounce, value: addedPalette)
-                                Text(addedPalette ? "Saved" : "Save Palette")
+                                Text(addedPalette ? "Added!" : "Add Palette to Collections")
                             }
                             .font(.headline)
                             .padding(.horizontal, 14)
