@@ -50,22 +50,34 @@ struct LivePaletteDetailView: View {
                         .shadow(color: .black.opacity(0.1), radius: 3, y: 2)
                         .padding(.horizontal)
 
+                        // MARK: - Add Palette Button (Enhanced)
+                        // MARK: - Add Palette Button (Refined Gradient Style)
+                        // MARK: - Add Palette Button (Native iOS Style)
                         Button {
                             savePalette()
                         } label: {
-                            HStack(spacing: 8) {
+                            HStack(spacing: 6) {
                                 Image(systemName: addedPalette ? "checkmark.circle.fill" : "square.and.arrow.down")
-                                    .symbolEffect(.bounce, value: addedPalette)
-                                Text(addedPalette ? "Added!" : "Add Palette to Collections")
+                                    .font(.system(size: 17, weight: .semibold))
+                                Text(addedPalette ? "Palette Saved" : "Add Palette to Collections")
+                                    .font(.system(size: 17, weight: .semibold))
                             }
-                            .font(.headline)
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 8)
-                            .background(.ultraThinMaterial)
-                            .clipShape(Capsule())
-                            .shadow(color: .black.opacity(0.15), radius: 3, y: 2)
+                            .foregroundColor(Color.accentColor)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(
+                                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                    .fill(Color(.systemGray6))
+                                    .shadow(color: .black.opacity(0.05), radius: 1, y: 1)
+                            )
                         }
                         .buttonStyle(.plain)
+                        .scaleEffect(addedPalette ? 0.96 : 1.0)
+                        .animation(.spring(response: 0.25, dampingFraction: 0.7), value: addedPalette)
+                        .padding(.horizontal)
+                        .padding(.top, 10)
+
+
 
                         Divider().padding(.horizontal)
 
