@@ -101,7 +101,7 @@ struct LivePaletteDetailView: View {
                         VStack(alignment: .leading, spacing: 10) {
                             ForEach(payload.colors, id: \.hex) { rgb in
                                 let named = nearestNamedColor(for: rgb)
-                                LiveColorRow(named: named, rgb: rgb, toast: $toastMessage)
+                                LiveColorRow(toast: $toastMessage, named: named, rgb: rgb)
                                     .environmentObject(favs)
                                     //.background(.ultraThinMaterial)
                                     .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -178,11 +178,17 @@ struct LivePaletteDetailView: View {
 
 
 // MARK: - LiveColorRow (list row style similar to SearchScreen)
+// MARK: - LiveColorRow (Enhanced with match + CameraScreen logic)
 private struct LiveColorRow: View {
     @EnvironmentObject var favs: FavoritesStore
+    @EnvironmentObject var catalog: Catalog
+    @EnvironmentObject var catalogs: CatalogStore
+    @Binding var toast: String?
+    @State private var likedPulse = false
+
     let named: NamedColor
     let rgb: RGB
-    @Binding var toast: String?
+    @State var selection: CatalogSelection = VendorSelectionStorage.load() ?? .all
 
     var body: some View {
         HStack(spacing: 12) {
@@ -194,14 +200,17 @@ private struct LiveColorRow: View {
                 Text(named.name)
                     .font(.headline)
                     .lineLimit(1)
+
                 HStack(spacing: 6) {
                     Text(named.hex)
                         .font(.caption)
                         .foregroundColor(.secondary)
+
                     if let brand = named.vendor?.brand, let code = named.vendor?.code {
                         Text("• \(brand) \(code)")
                             .font(.caption)
                             .foregroundColor(.secondary)
+                            .lineLimit(1)
                     }
                 }
             }
@@ -214,15 +223,20 @@ private struct LiveColorRow: View {
             } label: {
                 ZStack {
                     Circle()
-                        .strokeBorder(isFavorite ? Color.clear : Color.gray.opacity(0.4), lineWidth: 1.4)
+                        .strokeBorder(
+                            isFavorite ? Color.green.opacity(0.8) : Color.gray.opacity(0.4),
+                            lineWidth: 1.4
+                        )
                         .background(
                             Circle()
                                 .fill(isFavorite ? Color.green.opacity(0.9) : Color.clear)
                         )
-                        .frame(width: 16, height: 16)
+                        .frame(width: 22, height: 22)
+
                     Image(systemName: isFavorite ? "checkmark" : "plus")
-                        .font(.system(size: 7, weight: .bold))
-                        .foregroundColor(isFavorite ? .black : .gray)
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundColor(isFavorite ? .white : .gray)
+                        .symbolEffect(.bounce, value: likedPulse)
                 }
             }
             .buttonStyle(.plain)
@@ -235,21 +249,63 @@ private struct LiveColorRow: View {
         }
     }
 
+    // MARK: - Favorite state
     private var isFavorite: Bool {
         favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
     }
 
+    // MARK: - Save logic identical to CameraScreen
     private func toggleFavorite() {
         let key = normalizeHex(rgb.hex)
-        if favs.colors.contains(where: { normalizeHex($0.color.hex) == key }) {
-            favs.colors.removeAll { normalizeHex($0.color.hex) == key }
+
+        // Pool de colores según filtro actual
+        let pool: [NamedColor]
+        switch selection {
+        case .all:
+            pool = catalog.names + catalogs.colors(for: Set(CatalogID.allCases.filter { $0 != .generic }))
+        case .vendor(let id):
+            pool = catalogs.colors(for: [id])
+        case .genericOnly:
+            pool = catalogs.colors(for: [.generic])
+        }
+
+        // Buscar coincidencia más cercana
+        guard let nearest = pool.min(by: {
+            hexToRGB($0.hex).distance(to: rgb) < hexToRGB($1.hex).distance(to: rgb)
+        }) else {
+            toast = "No match found"
+            return
+        }
+
+        // Calcular precisión
+        let diff = rgb.distance(to: hexToRGB(nearest.hex))
+        let maxDiff = sqrt(3 * pow(255.0, 2.0))
+        let precision = max(0, 1 - diff / maxDiff) * 100
+
+        // Guardar o eliminar
+        if favs.colors.contains(where: { normalizeHex($0.color.hex) == normalizeHex(nearest.hex) }) {
+            favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(nearest.hex) }
             toast = "Removed from Collections"
         } else {
-            favs.add(color: rgb)
-            toast = "Added to Collections"
+            favs.add(color: hexToRGB(nearest.hex))
+            toast = "Added to Collections \(nearest.name) (\(Int(precision))%)"
+        }
+
+        // Animación
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.55)) {
+            likedPulse.toggle()
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+            withAnimation(.easeOut(duration: 0.25)) { likedPulse = false }
+        }
+
+        // Ocultar toast
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
+            toast = nil
         }
     }
 }
+
 
 
 // MARK: - Shared Helper
