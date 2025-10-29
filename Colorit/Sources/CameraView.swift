@@ -795,15 +795,37 @@ struct ColorIsland: View {
                     )
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(nearest?.name ?? color.hex)
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .lineLimit(1)
+                // Nombre del color o hex si no tiene nombre
+                Text(nearest?.name ?? color.hex)
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .lineLimit(1)
 
-                    Text(String(format: "Precision %.0f%%", precisionValue))
-                        .font(.caption.bold())
-                        .foregroundStyle(precisionColor)
+                // Nueva línea: HEX + vendor brand/code si existen
+                if let nearest = nearest {
+                    HStack(spacing: 6) {
+                        Text(nearest.hex)
+                            .font(.caption)
+                            .foregroundColor(.white.opacity(0.8))
+                        if let brand = nearest.vendor?.brand, let code = nearest.vendor?.code {
+                            Text("• \(brand) \(code)")
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.8))
+                                .lineLimit(1)
+                        }
+                    }
+                } else {
+                    Text(color.hex)
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.8))
                 }
+
+                // Línea existente de precisión (queda igual)
+                Text(String(format: "Precision %.0f%%", precisionValue))
+                    .font(.caption.bold())
+                    .foregroundStyle(precisionColor)
+            }
+
 
                 Spacer()
 
