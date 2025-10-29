@@ -50,9 +50,7 @@ struct LivePaletteDetailView: View {
                         .shadow(color: .black.opacity(0.1), radius: 3, y: 2)
                         .padding(.horizontal)
 
-                        // MARK: - Add Palette Button (Enhanced)
-                        // MARK: - Add Palette Button (Refined Gradient Style)
-                        // MARK: - Add Palette Button (Native iOS Style)
+                        // MARK: - Add Palette Button (Adaptive Native Style)
                         Button {
                             savePalette()
                         } label: {
@@ -67,8 +65,25 @@ struct LivePaletteDetailView: View {
                             .padding(.vertical, 12)
                             .background(
                                 RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                    .fill(Color(.systemGray6))
-                                    .shadow(color: .black.opacity(0.05), radius: 1, y: 1)
+                                    .fill(
+                                        Color(uiColor: UIColor { trait in
+                                            trait.userInterfaceStyle == .dark
+                                            ? UIColor.systemGray5 // más claro en dark
+                                            : UIColor.systemGray6 // más neutro en light
+                                        })
+                                    )
+                                    .shadow(color: Color.black.opacity(0.1), radius: 1, y: 1)
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                    .stroke(
+                                        Color(uiColor: UIColor { trait in
+                                            trait.userInterfaceStyle == .dark
+                                            ? UIColor.white.withAlphaComponent(0.15)
+                                            : UIColor.black.withAlphaComponent(0.1)
+                                        }),
+                                        lineWidth: 0.6
+                                    )
                             )
                         }
                         .buttonStyle(.plain)
@@ -76,6 +91,7 @@ struct LivePaletteDetailView: View {
                         .animation(.spring(response: 0.25, dampingFraction: 0.7), value: addedPalette)
                         .padding(.horizontal)
                         .padding(.top, 10)
+
 
 
 
