@@ -94,6 +94,8 @@ struct SearchScreen: View {
     @State private var showVendorSheet = false
     @State private var visibleCount = 100
     private let batchSize = 100
+    @State private var isSearching = false
+
 
     @State private var filteredColors: [NamedColor] = []
     @State private var searchEngine: ColorSearchEngine?
@@ -116,28 +118,112 @@ struct SearchScreen: View {
 
     private var vendorIDs: [CatalogID] { CatalogID.allCases.filter { $0 != .generic } }
 
+    private var searchOptionsBar: some View {
+    HStack {
+        // 🔹 1. Filtro (izquierda)
+        Button {
+            showVendorSheet = true
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        } label: {
+            Image(systemName: "slider.horizontal.3")
+                .imageScale(.large)
+                .foregroundColor(iconColor) // 👈 color adaptativo
+        }
+        .accessibilityLabel("Select vendor")
+
+        Spacer()
+
+        // 🔹 2. Orden alfabético (A–Z / Z–A)
+        Button {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                ascending.toggle()
+                sortFilteredInPlace()
+            }
+            UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+        } label: {
+            Image(systemName: "arrow.up.arrow.down")
+                .rotationEffect(.degrees(ascending ? 0 : 180))
+                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: ascending)
+                .imageScale(.large)
+                .foregroundColor(iconColor)
+        }
+        .accessibilityLabel("Sort alphabetically")
+
+        // 🔹 3. Orden por brillo (Luminance)
+        Button {
+            sortByLuminance()
+        } label: {
+            Image(systemName: "circle.tophalf.filled")
+                .rotationEffect(.degrees(ascendingBrightness ? 0 : 180))
+                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: ascendingBrightness)
+                .imageScale(.large)
+                .foregroundColor(iconColor)
+        }
+        .accessibilityLabel("Sort by brightness")
+
+        // 🔹 4. Layout (lista / grid / rueda)
+        Button {
+            withAnimation(.spring()) { toggleLayout() }
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        } label: {
+            Image(systemName: layout.icon)
+                .imageScale(.large)
+                .foregroundColor(iconColor)
+        }
+        .accessibilityLabel("Toggle layout")
+    }
+    .padding(.horizontal, 8)
+    .padding(.vertical, 8)
+    .background(Color.clear)
+    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    .shadow(color: .black.opacity(0.05), radius: 1, x: 0, y: 1)
+    .padding(.horizontal)
+}
+
+private var iconColor: Color {
+    colorScheme == .dark ? .white : .black
+}
+
+
+
+
+
     // MARK: - Body
     var body: some View {
         NavigationStack {
-            mainContent
-                .navigationTitle("Colors")
-                .toolbar { toolbarContent }
-                .sheet(isPresented: $showVendorSheet) { vendorSheet }
-                .searchable(
-                    text: $query,
-                    placement: .navigationBarDrawer(displayMode: .always),
-                    prompt: "Search by name, hex, brand or code"
-                )
-                .onAppear {
-                    setupSearchBar(for: colorScheme)
-                    initialize()
+            VStack(spacing: 10) {
+                // 👇 Solo se muestra mientras se escribe algo en el search
+                if isSearching {
+                    searchOptionsBar
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                        .animation(.spring(response: 0.4, dampingFraction: 0.7), value: isSearching)
                 }
-                .onChange(of: colorScheme) { setupSearchBar(for: $0) }
-                .onChange(of: query) { performAsyncFilter($0) }
-                .onChange(of: selection) { _ in selectionChanged() }
-                .onReceive(catalogs.$loaded) { _ in rebuildEngineAndRefilter() }
+
+                mainContent
+            }
+            .navigationTitle("Colors")
+            .toolbar { toolbarContent }
+            .sheet(isPresented: $showVendorSheet) { vendorSheet }
+            .searchable(
+                text: $query,
+                isPresented: $isSearching, // 👈 Detecta cuándo el search está activo
+                placement: .navigationBarDrawer(displayMode: .always),
+                prompt: "Search by name, hex, brand or code"
+            )
+            .onChange(of: query) { text in
+                performAsyncFilter(text)
+            }
+            .onSubmit(of: .search) {
+                isSearching = true
+            }
+            .onAppear {
+                setupSearchBar(for: colorScheme)
+                initialize()
+            }
+            .onChange(of: colorScheme) { setupSearchBar(for: $0) }
+            .onChange(of: selection) { _ in selectionChanged() }
+            .onReceive(catalogs.$loaded) { _ in rebuildEngineAndRefilter() }
         }
-        // ✅ Muestra toast globalmente
         .toast(message: $toastMessage)
     }
 
