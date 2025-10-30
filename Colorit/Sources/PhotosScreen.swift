@@ -282,7 +282,7 @@ private func savePhotoPalette() {
             } else {
                 VStack(spacing: 14) {
                     Image(systemName: "photo.on.rectangle.angled")
-                        .font(.system(size: 60))
+                        .font(.largeTitle)
                         .foregroundColor(.secondary)
                     Text("Choose an image to find matching colors")
                         .multilineTextAlignment(.center)
