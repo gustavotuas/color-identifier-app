@@ -162,12 +162,15 @@ struct ColorDetailView: View {
                             .pickerStyle(.segmented)
 
                             HarmonyStrip(base: rgb, mode: harmonyMode) { tapped in
-                                // Busca coincidencia real en tus catálogos
-                                if let found = findNamedColor(hex: tapped.hex) {
-                                    selectedHarmonyColor = found
-                                    showHarmonySheet = true
+                                if store.isPro {
+                                    if let found = findNamedColor(hex: tapped.hex) {
+                                        selectedHarmonyColor = found
+                                        showHarmonySheet = true
+                                    } else {
+                                        showToast("Color not found in library")
+                                    }
                                 } else {
-                                    showToast("Color not found in library")
+                                    store.showPaywall = true
                                 }
                             }
                         }
@@ -176,6 +179,13 @@ struct ColorDetailView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                         .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
                         .padding(.horizontal)
+                        .overlay {
+                            if !store.isPro {
+                                ProBlurOverlay()
+                                    .padding(.horizontal, 0)
+                            }
+                        }
+
 
 
                         // MARK: - Shades & Tints Section
@@ -308,69 +318,130 @@ struct ColorDetailView: View {
     }
 
     private func shareCurrentValue() {
-    let isProUser = store.isPro
-    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-    showToast("Preparing share preview...")
+        let isProUser = store.isPro
+        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+        showToast("Preparing share preview...")
 
-    Task.detached(priority: .userInitiated) {
-        // 1️⃣ Generar imagen
-        let image = await generateShareImage()
-        let tempDir = FileManager.default.temporaryDirectory
-        let safeName = color.name.replacingOccurrences(of: " ", with: "_")
-        let fileURL = tempDir.appendingPathComponent("Colorit_\(safeName).png")
+        Task.detached(priority: .userInitiated) {
+            // 1️⃣ Generar imagen
+            let image = await generateShareImage()
+            let tempDir = FileManager.default.temporaryDirectory
+            let safeName = color.name.replacingOccurrences(of: " ", with: "_")
+            let fileURL = tempDir.appendingPathComponent("Colorit_\(safeName).png")
 
-        if let data = image.pngData() {
-            try? data.write(to: fileURL)
-        }
+            if let data = image.pngData() {
+                try? data.write(to: fileURL)
+            }
 
-        // 2️⃣ Preparar texto
-        var message = """
-        🎨 \(color.name)
-        HEX: \(color.hex)
-        RGB: \(rgb.r), \(rgb.g), \(rgb.b)
-        """
-
-        if isProUser {
-            let (h, s, b) = rgbToHSB(rgb)
-            let (c, m, y, k) = rgbToCMYK(rgb)
-            message += """
-
-            HSB: \(Int(h))°, \(Int(s))%, \(Int(b))%
-            CMYK: \(Int(c))%, \(Int(m))%, \(Int(y))%, \(Int(k))%
+            // 2️⃣ Preparar texto
+            var message = """
+            🎨 \(color.name)
+            HEX: \(color.hex)
+            RGB: \(rgb.r), \(rgb.g), \(rgb.b)
             """
 
-            if let v = color.vendor {
+            if isProUser {
+                let (h, s, b) = rgbToHSB(rgb)
+                let (c, m, y, k) = rgbToCMYK(rgb)
                 message += """
 
-                🏷️ Vendor: \(v.brand ?? "—")
-                Code: \(v.code ?? "—")
-                Line: \(v.line ?? "—")
+                HSB: \(Int(h))°, \(Int(s))%, \(Int(b))%
+                CMYK: \(Int(c))%, \(Int(m))%, \(Int(y))%, \(Int(k))%
                 """
-            }
-        } else {
-            message += "\n\n📱 Made with Colorit – www.colorit.app"
-        }
 
-        // 3️⃣ Volver al main thread para mostrar el share sheet
-        DispatchQueue.main.async {
-            showToast("Opening share sheet...")
+                if let v = color.vendor {
+                    message += """
 
-            let activityVC = UIActivityViewController(activityItems: [message, fileURL], applicationActivities: nil)
-            activityVC.excludedActivityTypes = [.assignToContact, .addToReadingList]
-
-            // ✅ Presentación compatible con SwiftUI
-            if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-               let rootVC = scene.windows.first?.rootViewController {
-                var top = rootVC
-                while let presented = top.presentedViewController { top = presented }
-                top.present(activityVC, animated: true)
+                    🏷️ Vendor: \(v.brand ?? "—")
+                    Code: \(v.code ?? "—")
+                    Line: \(v.line ?? "—")
+                    """
+                }
             } else {
-                print("⚠️ Could not find a valid rootViewController to present share sheet.")
-                showToast("Failed to open share sheet.")
+                message += "\n\n📱 Made with Colorit – www.colorit.app"
+            }
+
+            // 3️⃣ Volver al main thread para mostrar el share sheet
+            DispatchQueue.main.async {
+                showToast("Opening share sheet...")
+
+                let activityVC = UIActivityViewController(activityItems: [message, fileURL], applicationActivities: nil)
+                activityVC.excludedActivityTypes = [.assignToContact, .addToReadingList]
+
+                // ✅ Presentación compatible con SwiftUI
+                if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                let rootVC = scene.windows.first?.rootViewController {
+                    var top = rootVC
+                    while let presented = top.presentedViewController { top = presented }
+                    top.present(activityVC, animated: true)
+                } else {
+                    print("⚠️ Could not find a valid rootViewController to present share sheet.")
+                    showToast("Failed to open share sheet.")
+                }
             }
         }
     }
-}
+
+    // MARK: - Pro Unlock Overlay (reutilizado de PhotosScreen)
+    private struct ProBlurOverlay: View {
+        @EnvironmentObject var store: StoreVM
+
+        var body: some View {
+            ZStack {
+                // Capa base de blur con degradado vertical
+                Rectangle()
+                    .fill(.ultraThinMaterial)
+                    .blur(radius: 10)
+                    .opacity(0.95)
+                    .mask(
+                        LinearGradient(
+                            gradient: Gradient(stops: [
+                                .init(color: .white.opacity(0.0), location: 0.0),
+                                .init(color: .white.opacity(1.0), location: 0.35),
+                                .init(color: .white.opacity(1.0), location: 0.65),
+                                .init(color: .white.opacity(1.0), location: 1.0)
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+
+                // Botón mágico de desbloqueo
+                MagicalUnlockButtonSmall(title: "Unlock Pro")
+                    .onTapGesture { store.showPaywall = true }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 18))
+            .transition(.opacity)
+        }
+    }
+
+    private struct MagicalUnlockButtonSmall: View {
+        let title: String
+
+        var body: some View {
+            Text(title.uppercased())
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(.white)
+                .padding(.horizontal, 22)
+                .padding(.vertical, 10)
+                .background(
+                    LinearGradient(
+                        colors: [Color.purple, Color.pink, Color.orange],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .clipShape(Capsule())
+                .shadow(color: Color.pink.opacity(0.3), radius: 5, y: 2)
+                .overlay(
+                    Capsule().stroke(Color.white.opacity(0.4), lineWidth: 1)
+                )
+                .scaleEffect(1.02)
+                .padding(.vertical, 4)
+                .animation(.spring(response: 0.35, dampingFraction: 0.7), value: title)
+        }
+    }
 
 
 
@@ -433,14 +504,31 @@ private func generateShareImage() -> UIImage {
             .shadow(color: .black.opacity(0.08), radius: 6, y: 2)
 
         // MARK: - Color Harmony
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Color Harmony").font(.headline)
-            HarmonyStrip(base: rgb, mode: harmonyMode) { _ in }
+        if store.isPro {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Color Harmony").font(.headline)
+                HarmonyStrip(base: rgb, mode: harmonyMode) { _ in }
+            }
+            .padding(16)
+            .background(Color.white)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
+        } else {
+            VStack(alignment: .center, spacing: 14) {
+                Text("Unlock Pro to view Harmony & Tints")
+                    .font(.headline)
+                    .foregroundColor(.secondary)
+                MagicalUnlockButtonSmall(title: "Unlock Pro")
+                    .padding(.top, 4)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(30)
+            .background(Color.white.opacity(0.9))
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
         }
-        .padding(16)
-        .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
+
+
 
         // MARK: - Shades & Tints
         VStack(alignment: .leading, spacing: 12) {
@@ -476,128 +564,6 @@ private func generateShareImage() -> UIImage {
     renderer.scale = UIScreen.main.scale
     return renderer.uiImage ?? UIImage()
 }
-
-
-
-
-    private func generateColorCard(isPro: Bool) -> UIImage {
-    let safeRGB = rgb
-    let baseColor = safeRGB.uiColor
-
-    // Tamaño vertical tipo retrato (ideal para compartir)
-    let size = CGSize(width: 1080, height: 1350)
-    let rendererFormat = UIGraphicsImageRendererFormat()
-    rendererFormat.scale = UIScreen.main.scale
-    rendererFormat.opaque = true
-    let renderer = UIGraphicsImageRenderer(size: size, format: rendererFormat)
-
-    return renderer.image { ctx in
-        let cg = ctx.cgContext
-        let bgColor = UIColor.systemBackground
-        bgColor.setFill()
-        cg.fill(CGRect(origin: .zero, size: size))
-
-        // MARK: - 1️⃣ Color block principal
-        let colorRect = CGRect(x: 90, y: 120, width: size.width - 180, height: 450)
-        cg.setFillColor(baseColor.cgColor)
-        cg.fill(colorRect)
-
-        // borde blanco
-        cg.setStrokeColor(UIColor.white.cgColor)
-        cg.setLineWidth(20)
-        cg.stroke(colorRect)
-
-        // MARK: - 2️⃣ Nombre y HEX
-        let textColor: UIColor = baseColor.isLight ? .black : .white
-        let paragraph = NSMutableParagraphStyle()
-        paragraph.alignment = .center
-
-        let nameAttrs: [NSAttributedString.Key: Any] = [
-            .font: UIFont.boldSystemFont(ofSize: 64),
-            .foregroundColor: textColor,
-            .paragraphStyle: paragraph
-        ]
-        (color.name as NSString).draw(in: CGRect(x: 0, y: 610, width: size.width, height: 80), withAttributes: nameAttrs)
-
-        let hexAttrs: [NSAttributedString.Key: Any] = [
-            .font: UIFont.monospacedSystemFont(ofSize: 44, weight: .semibold),
-            .foregroundColor: textColor.withAlphaComponent(0.85),
-            .paragraphStyle: paragraph
-        ]
-        (color.hex as NSString).draw(in: CGRect(x: 0, y: 680, width: size.width, height: 60), withAttributes: hexAttrs)
-
-        // MARK: - 3️⃣ Harmony strip
-        let harmonies = [
-            complementaryColor(for: safeRGB),
-            hsbToRGB(hue: rgbToHSB(safeRGB).h + 30, s: rgbToHSB(safeRGB).s, b: rgbToHSB(safeRGB).b),
-            hsbToRGB(hue: rgbToHSB(safeRGB).h - 30, s: rgbToHSB(safeRGB).s, b: rgbToHSB(safeRGB).b)
-        ]
-        var xOffset: CGFloat = 140
-        for h in harmonies {
-            let rect = CGRect(x: xOffset, y: 790, width: 120, height: 120)
-            cg.setFillColor(h.uiColor.cgColor)
-            cg.fill(rect)
-            cg.setStrokeColor(UIColor.white.cgColor)
-            cg.setLineWidth(6)
-            cg.stroke(rect)
-            xOffset += 150
-        }
-
-        // MARK: - 4️⃣ Shades & tints
-        let shades = shadesAndTints(for: safeRGB)
-        xOffset = 140
-        for s in shades {
-            let rect = CGRect(x: xOffset, y: 950, width: 120, height: 120)
-            cg.setFillColor(s.uiColor.cgColor)
-            cg.fill(rect)
-            cg.setStrokeColor(UIColor.white.cgColor)
-            cg.setLineWidth(5)
-            cg.stroke(rect)
-            xOffset += 150
-        }
-
-        // MARK: - 5️⃣ Contrast preview
-        let blackRatio = contrastRatio(fg: .black, bg: baseColor)
-        let whiteRatio = contrastRatio(fg: .white, bg: baseColor)
-        let contrastTextAttrs: [NSAttributedString.Key: Any] = [
-            .font: UIFont.systemFont(ofSize: 32, weight: .medium),
-            .foregroundColor: UIColor.label,
-            .paragraphStyle: paragraph
-        ]
-        ("Contrast to Black: \(String(format: "%.1f", blackRatio)):1" as NSString)
-            .draw(in: CGRect(x: 0, y: 1090, width: size.width, height: 40), withAttributes: contrastTextAttrs)
-        ("Contrast to White: \(String(format: "%.1f", whiteRatio)):1" as NSString)
-            .draw(in: CGRect(x: 0, y: 1130, width: size.width, height: 40), withAttributes: contrastTextAttrs)
-
-        // MARK: - 6️⃣ Info técnica
-        let (h, s, b) = rgbToHSB(safeRGB)
-        let (c, m, y, k) = rgbToCMYK(safeRGB)
-        var info = """
-        RGB: \(safeRGB.r), \(safeRGB.g), \(safeRGB.b)
-        HSB: \(Int(h))°, \(Int(s))%, \(Int(b))%
-        CMYK: \(Int(c))%, \(Int(m))%, \(Int(y))%, \(Int(k))%
-        """
-        if isPro, let v = color.vendor {
-            info += "\nVendor: \(v.brand ?? "—") \(v.code ?? "")"
-        }
-
-        let infoAttrs: [NSAttributedString.Key: Any] = [
-            .font: UIFont.monospacedSystemFont(ofSize: 30, weight: .regular),
-            .foregroundColor: UIColor.secondaryLabel,
-            .paragraphStyle: paragraph
-        ]
-        (info as NSString).draw(in: CGRect(x: 0, y: 1180, width: size.width, height: 150), withAttributes: infoAttrs)
-
-        // MARK: - 7️⃣ Footer
-        let footerAttrs: [NSAttributedString.Key: Any] = [
-            .font: UIFont.systemFont(ofSize: 26, weight: .semibold),
-            .foregroundColor: UIColor.systemGray,
-            .paragraphStyle: paragraph
-        ]
-        ("Made with Colorit.app" as NSString).draw(in: CGRect(x: 0, y: size.height - 60, width: size.width, height: 40), withAttributes: footerAttrs)
-    }
-}
-
 
 
 
