@@ -234,7 +234,7 @@ struct FavoritesScreen: View {
                     // Empty State
                     if filteredColors.isEmpty && filteredPalettes.isEmpty {
                         VStack(spacing: 20) {
-                            Image(systemName: "heart.slash")
+                            Image(systemName: "rectangle.stack.fill")
                                 .font(.largeTitle)
                                 .foregroundColor(.secondary)
                             Text("No collections yet")
