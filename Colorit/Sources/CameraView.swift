@@ -321,6 +321,9 @@ struct CameraScreen: View {
     @State private var matches: MatchesPayload? = nil
     @State private var selection: CatalogSelection = VendorSelectionStorage.load() ?? .all
     @State private var showVendorSheet = false
+    @State private var trialProgress: CGFloat = 0
+    @State private var trialTimerActive = false
+
 
     // MARK: - Body
 
@@ -394,17 +397,15 @@ struct CameraScreen: View {
     }
 
     private var cameraPreviewSection: some View {
-        ZStack {
-            CameraPreviewView(engine: engine)
-                .ignoresSafeArea(edges: .horizontal)
+    ZStack {
+        CameraPreviewView(engine: engine)
+            .ignoresSafeArea(edges: .horizontal)
 
-        // Luz / exposición (sol o nube)
+        // ☀️ Luz / exposición
         HStack {
             Image(systemName: engine.brightness > 0.45 ? "sun.max.fill" : "cloud.fill")
                 .font(.system(size: 22, weight: .semibold))
                 .foregroundStyle(engine.brightness > 0.45 ? .yellow : .gray)
-                //.padding(10)
-                //.background(.ultraThinMaterial, in: Circle())
                 .shadow(color: .black.opacity(0.25), radius: 4, y: 2)
                 .padding(.leading, 12)
                 .padding(.top, 12)
@@ -415,30 +416,90 @@ struct CameraScreen: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .ignoresSafeArea(edges: .top)
 
+        // 🎯 Crosshair central
+        CrosshairCenter(color: Color(uiColor: engine.currentRGB.uiColor))
+            .frame(width: 22, height: 22)
+            .allowsHitTesting(false)
 
-            CrosshairCenter(color: Color(uiColor: engine.currentRGB.uiColor))
-                .frame(width: 22, height: 22)
-                .allowsHitTesting(false)
-
-            VStack(spacing: 0) {
-                Spacer(minLength: 0)
-                ColorIsland(
-                    raw: engine.currentRGB,
-                    color: engine.currentRGB,
-                    catalog: catalog,
-                    selection: selection,        // 👈 nuevo
-                    catalogs: catalogs,          // 👈 nuevo
-                    onCopy: {},
-                    onFavorite: handleFavorite
-                )
-                .environment(\.copyPulse, copiedPulse)
-                .environment(\.likePulse, likedPulse)
-            }
+        // 🎨 Island inferior
+        VStack(spacing: 0) {
+            Spacer(minLength: 0)
+            ColorIsland(
+                raw: engine.currentRGB,
+                color: engine.currentRGB,
+                catalog: catalog,
+                selection: selection,
+                catalogs: catalogs,
+                onCopy: {},
+                onFavorite: handleFavorite
+            )
+            .environment(\.copyPulse, copiedPulse)
+            .environment(\.likePulse, likedPulse)
         }
-        .clipShape(RoundedRectangle(cornerRadius: 26))
-        .padding(.horizontal, 12) // 🔹 sin espacio lateral
-        .padding(.top, 8)
+
+        // 🧩 Overlay para usuarios no Pro
+        // 🧩 Overlay de preview (barra de tiempo)
+        if !store.isPro && trialTimerActive {
+            VStack(spacing: 0) {
+                // 🔵 Barra progresiva arriba
+                GeometryReader { geo in
+                    Rectangle()
+                        .fill(
+                            LinearGradient(colors: [.purple, .pink],
+                                        startPoint: .leading,
+                                        endPoint: .trailing)
+                        )
+                        .frame(width: geo.size.width * trialProgress, height: 4)
+                        .cornerRadius(2)
+                }
+                .frame(height: 4)
+                Spacer()
+            }
+            .transition(.opacity)
+        }
+                
+        // 🧩 Overlay final (bloqueo completo)
+        if !store.isPro && !trialTimerActive && !engine.isRunning {
+            ZStack {
+                Color.black.opacity(0.6).ignoresSafeArea()
+                VStack(spacing: 14) {
+                    Image(systemName: "lock.fill")
+                        .font(.system(size: 40))
+                        .foregroundColor(.white.opacity(0.9))
+                        .padding(.bottom, 4)
+
+                    Text("Unlock Full Camera Access")
+                        .font(.title3.bold())
+                        .foregroundColor(.white)
+
+                    Button {
+                        store.showPaywall = true
+                    } label: {
+                        Text("Go Pro")
+                            .font(.headline)
+                            .padding(.horizontal, 30)
+                            .padding(.vertical, 10)
+                            .background(
+                                LinearGradient(colors: [.purple, .pink],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing)
+                            )
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                            .shadow(radius: 4)
+                    }
+                }
+                .padding(20)
+            }
+            .transition(.opacity)
+        }
+
     }
+    .clipShape(RoundedRectangle(cornerRadius: 26))
+    .padding(.horizontal, 12)
+    .padding(.top, 8)
+}
+
 
     private var bottomBar: some View {
         ZStack {
@@ -606,12 +667,40 @@ private var toolbarItems: some ToolbarContent {
 
 
     private func handleAppear() {
-        selection = VendorSelectionStorage.load() ?? .all
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            engine.stop()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { engine.start() }
+    selection = VendorSelectionStorage.load() ?? .all
+
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        engine.stop()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+            engine.start()
+
+            // 🎬 Solo preview temporal si no es Pro
+            if !store.isPro {
+                trialProgress = 0
+                trialTimerActive = true
+                let duration: Double = 8.0 // segundos de preview
+                
+                // Animar la barra de progreso
+                withAnimation(.linear(duration: duration)) {
+                    trialProgress = 1.0
+                }
+
+                // Al terminar el preview
+                DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
+                    engine.stop()
+                    trialTimerActive = false
+                    toastMessage = "Preview ended – Unlock full camera"
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) {
+                        toastMessage = nil
+                        store.showPaywall = true
+                    }
+                }
+            }
         }
     }
+}
+
+
 
     private func handleSelectionChange(_ newValue: CatalogSelection) {
         withAnimation {

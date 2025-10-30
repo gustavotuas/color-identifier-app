@@ -1,167 +1,203 @@
 import SwiftUI
 import UIKit
 
-// MARK: - Normalize HEX
+// MARK: - Local helpers
 private func normalizeHex(_ hex: String) -> String {
     var s = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
     if s.hasPrefix("#") { s.removeFirst() }
     return s
 }
 
+enum ColorInfoMode: String, CaseIterable { case rgb = "RGB", hex = "HEX", hsb = "HSB", cmyk = "CMYK" }
+enum HarmonyMode: String, CaseIterable { case analogous = "Analogous", complementary = "Complementary", triadic = "Triadic", monochromatic = "Monochromatic" }
+
+// MARK: - Main
 struct ColorDetailView: View {
     @EnvironmentObject var favs: FavoritesStore
+    @EnvironmentObject var store: StoreVM
+    @EnvironmentObject var catalog: Catalog
+    @EnvironmentObject var catalogs: CatalogStore
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var scheme
+
     let color: NamedColor
 
-    @State private var selectedTab = "RGB"
+    @State private var selectedTab: ColorInfoMode = .rgb
+    @State private var harmonyMode: HarmonyMode = .analogous
     @State private var toastMessage: String? = nil
+
     @State private var isFavorite = false
-    @State private var animateLike = false
+    @State private var likePulse = false
+
     @State private var showShareSheet = false
     @State private var shareItems: [Any] = []
 
+    @State private var selectedHarmonyColor: NamedColor? = nil
+    @State private var showHarmonySheet = false
+
     private var rgb: RGB { hexToRGB(color.hex) }
-    private let tabs = ["RGB", "HEX", "HSB", "CMYK"]
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 24) {
+            ZStack {
+                Color(.systemBackground).ignoresSafeArea()
 
-                    // MARK: - Color Preview
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(Color(rgb.uiColor))
-                        .frame(height: 200)
-                        .overlay(
-                            VStack(spacing: 4) {
-                                Text(color.name)
-                                    .font(.system(size: 22, weight: .semibold)) // antes 30 → más pequeño
-                                    .foregroundColor(.white)
-                                    .shadow(color: .black.opacity(0.4), radius: 3, y: 1)
-                                Text(color.hex)
-                                    .font(.subheadline)
-                                    .foregroundColor(.white.opacity(0.9))
-                                    .shadow(color: .black.opacity(0.3), radius: 2, y: 1)
-                            }
-                            .padding(.vertical, 8)
-                            .padding(.horizontal, 14)
-                            .background(
-                                Color.black.opacity(0.45),
-                                in: RoundedRectangle(cornerRadius: 14)
+                ScrollView {
+                    VStack(spacing: 22) {
+
+                        // MARK: - Preview
+                        RoundedRectangle(cornerRadius: 22)
+                            .fill(Color(rgb.uiColor))
+                            .frame(height: 220)
+                            .overlay(
+                                VStack(spacing: 4) {
+                                    let textColor: Color = rgb.uiColor.isLight ? .black : .white
+                                    Text(color.name)
+                                        .font(.system(size: 26, weight: .bold))
+                                        .foregroundColor(textColor)
+                                        .shadow(color: .black.opacity(0.35), radius: 2, y: 1)
+                                    Text(color.hex)
+                                        .font(.subheadline)
+                                        .foregroundColor(textColor.opacity(0.92))
+                                }
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 8)
+                                .background(Color.black.opacity(0.28), in: RoundedRectangle(cornerRadius: 14))
                             )
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        )
-                        .shadow(color: .black.opacity(0.1), radius: 6, x: 0, y: 3)
+                            .shadow(color: .black.opacity(0.12), radius: 6, x: 0, y: 3)
+                            .padding(.horizontal)
+
+                        // MARK: - Actions (Copy / Share / Add)
+                        HStack(spacing: 30) {
+                            // Copy
+                            VStack(spacing: 6) {
+                                Button(action: copyCurrentValue) {
+                                    Image(systemName: "doc.on.doc").font(.title3)
+                                }
+                                Text("Copy").font(.caption2)
+                            }
+
+                            // Share
+                            VStack(spacing: 6) {
+                                Button(action: shareCurrentValue) {
+                                    Image(systemName: "square.and.arrow.up").font(.title3)
+                                }
+                                Text("Share").font(.caption2)
+                            }
+
+                            // Add (+) → Added (check)
+                            VStack(spacing: 6) {
+                                Button(action: addOrRemoveFavorite) {
+                                    Image(systemName: isFavorite ? "checkmark.circle.fill" : "plus.circle")
+                                        .font(.title3)
+                                        .foregroundStyle(isFavorite ? .green : .primary)
+                                        .scaleEffect(likePulse ? 1.12 : 1.0)
+                                        .animation(.spring(response: 0.28, dampingFraction: 0.65), value: likePulse)
+                                }
+                                Text(isFavorite ? "Added" : "Add").font(.caption2)
+                            }
+                        }
+                        .foregroundColor(.primary)
+                        .padding(.top, 2)
+
+                        // MARK: - Color Info (container)
+                        VStack(alignment: .leading, spacing: 12) {
+                            Picker("Mode", selection: $selectedTab) {
+                                ForEach(ColorInfoMode.allCases, id: \.self) { tab in
+                                    Text(tab.rawValue).tag(tab)
+                                }
+                            }
+                            .pickerStyle(.segmented)
+                            .onChange(of: selectedTab) { _ in UIImpactFeedbackGenerator(style: .soft).impactOccurred() }
+
+                            VStack(spacing: 10) {
+                                switch selectedTab {
+                                case .rgb:
+                                    ValueRow(label: "Red",   value: "\(rgb.r)", color: .red,   onCopy: copyFromRow)
+                                    ValueRow(label: "Green", value: "\(rgb.g)", color: .green, onCopy: copyFromRow)
+                                    ValueRow(label: "Blue",  value: "\(rgb.b)", color: .blue,  onCopy: copyFromRow)
+                                case .hex:
+                                    ValueRow(label: "Hex", value: color.hex, color: .gray, onCopy: copyFromRow)
+                                case .hsb:
+                                    let (h, s, b) = rgbToHSB(rgb)
+                                    ValueRow(label: "Hue",        value: "\(Int(h))°", color: .orange, onCopy: copyFromRow)
+                                    ValueRow(label: "Saturation", value: "\(Int(s))%", color: .pink,   onCopy: copyFromRow)
+                                    ValueRow(label: "Brightness", value: "\(Int(b))%", color: .yellow, onCopy: copyFromRow)
+                                case .cmyk:
+                                    let (c, m, y, k) = rgbToCMYK(rgb)
+                                    ValueRow(label: "Cyan",    value: "\(Int(c))%", color: .cyan,   onCopy: copyFromRow)
+                                    ValueRow(label: "Magenta", value: "\(Int(m))%", color: .pink,   onCopy: copyFromRow)
+                                    ValueRow(label: "Yellow",  value: "\(Int(y))%", color: .yellow, onCopy: copyFromRow)
+                                    ValueRow(label: "Black",   value: "\(Int(k))%", color: .black,  onCopy: copyFromRow)
+                                }
+                            }
+                            .padding(12)
+                            .background(scheme == .dark ? Color(.secondarySystemBackground) : .white)
+                            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                            .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
+                        }
                         .padding(.horizontal)
 
-                    // MARK: - Copy + Share + Like
-                    HStack(spacing: 22) {
-                        Button {
-                            copyCurrentValue()
-                        } label: {
-                            Image(systemName: "doc.on.doc")
-                                .font(.title3)
-                                .foregroundColor(.primary)
-                        }
-
-                        Button {
-                            shareCurrentValue()
-                        } label: {
-                            Image(systemName: "square.and.arrow.up")
-                                .font(.title3)
-                                .foregroundColor(.primary)
-                        }
-
-                        Button {
-                            toggleFavorite()
-                        } label: {
-                            ZStack {
-                                Circle()
-                                    .strokeBorder(isFavorite ? Color.clear : Color.gray.opacity(0.6), lineWidth: 1.4)
-                                    .background(
-                                        Circle()
-                                            .fill(isFavorite ? Color(red: 30/255, green: 215/255, blue: 96/255) : Color.clear)
-                                    )
-                                    .frame(width: 20, height: 20)
-
-                                Image(systemName: isFavorite ? "checkmark" : "plus")
-                                    .font(.system(size: 8, weight: .bold))
-                                    .foregroundColor(isFavorite ? .black : Color.gray.opacity(0.7))
+                        // MARK: - Vendor Info (container)
+                        if let v = color.vendor {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("Vendor").font(.headline)
+                                if let brand = v.brand, !brand.isEmpty { InfoRow(label: "Brand", value: brand) }
+                                if let code = v.code, !code.isEmpty { InfoRow(label: "Code", value: code) }
+                                if let locator = v.locator, !locator.isEmpty, locator.uppercased() != "N/A" {
+                                    InfoRow(label: "Locator", value: locator)
+                                    if let url = URL(string: locator), UIApplication.shared.canOpenURL(url) {
+                                        Button("Open Vendor Page") { UIApplication.shared.open(url) }
+                                            .buttonStyle(.borderedProminent)
+                                            .tint(.accentColor)
+                                            .padding(.top, 6)
+                                    }
+                                }
+                                if let line = v.line, !line.isEmpty { InfoRow(label: "Line", value: line) }
                             }
-                            .scaleEffect(animateLike ? 1.15 : 1.0)
-                            .animation(.spring(response: 0.3, dampingFraction: 0.5), value: animateLike)
+                            .padding(12)
+                            .background(scheme == .dark ? Color(.secondarySystemBackground) : .white)
+                            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                            .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
+                            .padding(.horizontal)
                         }
-                        .buttonStyle(.plain)
-                    }
-                    .padding(.top, 8)
 
-                    // MARK: - Tabs
-                    Picker("Mode", selection: $selectedTab) {
-                        ForEach(tabs, id: \.self) { tab in
-                            Text(tab).tag(tab)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    .padding(.horizontal)
-                    .onChange(of: selectedTab) { _ in
-                        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-                    }
+                        // MARK: - Harmony (container)
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                Text("Color Harmony").font(.headline)
+                                Spacer()
+                            }
 
-                    // MARK: - Tab content
-                    VStack(spacing: 12) {
-                        switch selectedTab {
-                        case "RGB":
-                            ValueRow(label: "Red", value: "\(rgb.r)", color: .red)
-                            ValueRow(label: "Green", value: "\(rgb.g)", color: .green)
-                            ValueRow(label: "Blue", value: "\(rgb.b)", color: .blue)
-                        case "HEX":
-                            ValueRow(label: "Hex", value: color.hex, color: .gray)
-                        case "HSB":
-                            let (h, s, b) = rgbToHSB(rgb)
-                            ValueRow(label: "Hue", value: "\(Int(h))°", color: .orange)
-                            ValueRow(label: "Saturation", value: "\(Int(s))%", color: .pink)
-                            ValueRow(label: "Brightness", value: "\(Int(b))%", color: .yellow)
-                        case "CMYK":
-                            let (c, m, y, k) = rgbToCMYK(rgb)
-                            ValueRow(label: "Cyan", value: "\(Int(c))%", color: .cyan)
-                            ValueRow(label: "Magenta", value: "\(Int(m))%", color: .pink)
-                            ValueRow(label: "Yellow", value: "\(Int(y))%", color: .yellow)
-                            ValueRow(label: "Black", value: "\(Int(k))%", color: .black)
-                        default:
-                            EmptyView()
-                        }
-                    }
-                    .padding()
-                    .background(Color(.systemBackground))
-                    .cornerRadius(14)
-                    .padding(.horizontal)
+                            Picker("Harmony", selection: $harmonyMode) {
+                                ForEach(HarmonyMode.allCases, id: \.self) { mode in
+                                    Text(mode.rawValue).tag(mode)
+                                }
+                            }
+                            .pickerStyle(.segmented)
 
-                    // MARK: - Vendor Info
-                    if let v = color.vendor {
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text("Vendor").font(.headline)
-                            if let brand = v.brand, !brand.isEmpty {
-                                InfoRow(label: "Brand", value: brand)
-                            }
-                            if let code = v.code, !code.isEmpty {
-                                InfoRow(label: "Code", value: code)
-                            }
-                            if let locator = v.locator, !locator.isEmpty, locator.uppercased() != "N/A" {
-                                InfoRow(label: "Locator", value: locator)
-                            }
-                            if let line = v.line, !line.isEmpty {
-                                InfoRow(label: "Line", value: line)
+                            HarmonyStrip(base: rgb, mode: harmonyMode) { tapped in
+                                // Busca coincidencia real en tus catálogos
+                                if let found = findNamedColor(hex: tapped.hex) {
+                                    selectedHarmonyColor = found
+                                    showHarmonySheet = true
+                                } else {
+                                    showToast("Color not found in library")
+                                }
                             }
                         }
-                        .padding()
-                        .background(Color(.systemBackground))
-                        .cornerRadius(14)
+                        .padding(12)
+                        .background(scheme == .dark ? Color(.secondarySystemBackground) : .white)
+                        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                        .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
                         .padding(.horizontal)
-                    }
 
-                    Spacer(minLength: 40)
+                        Spacer(minLength: 40)
+                    }
+                    .padding(.bottom, 60)
                 }
-                .padding(.bottom, 60)
+
+                // Toast inferior (usa tu ToastView a través del modifier .toast)
             }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
@@ -170,23 +206,34 @@ struct ColorDetailView: View {
                     Button {
                         dismiss()
                     } label: {
-                        HStack(spacing: 4) {
+                        HStack(spacing: 6) {
                             Image(systemName: "xmark.circle.fill")
-                            Text("Close").font(.subheadline.bold())
+                            Text("Close")
                         }
+                        .font(.headline)
+                        .foregroundColor(.secondary)
                     }
-                    .tint(.secondary)
                 }
             }
-            .toast(message: $toastMessage)
+            .toast(message: $toastMessage) // <- tu ToastView inferior
 
-
-            
-
-            // MARK: - iOS Share Sheet
+            // iOS share sheet
             .sheet(isPresented: $showShareSheet) {
                 if !shareItems.isEmpty {
                     ActivityViewController(items: shareItems)
+                }
+            }
+            // Harmony detail (sin requerir Identifiable)
+            .sheet(isPresented: Binding(
+                get: { showHarmonySheet && selectedHarmonyColor != nil },
+                set: { if !$0 { showHarmonySheet = false; selectedHarmonyColor = nil } }
+            )) {
+                if let c = selectedHarmonyColor {
+                    ColorDetailView(color: c)
+                        .environmentObject(favs)
+                        .environmentObject(store)
+                        .environmentObject(catalog)
+                        .environmentObject(catalogs)
                 }
             }
         }
@@ -197,8 +244,9 @@ struct ColorDetailView: View {
 
     // MARK: - Actions
     private func showToast(_ text: String) {
-        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-            toastMessage = text
+        withAnimation { toastMessage = text }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
+            withAnimation { toastMessage = nil }
         }
     }
 
@@ -215,7 +263,6 @@ struct ColorDetailView: View {
         HEX: \(color.hex)
         RGB: \(rgb.r), \(rgb.g), \(rgb.b)
         """
-
         let image = generateColorCard()
         shareItems = [text, image]
         showShareSheet = true
@@ -223,27 +270,34 @@ struct ColorDetailView: View {
         showToast("Share sheet opened")
     }
 
-    private func toggleFavorite() {
+    private func addOrRemoveFavorite() {
         let rgbValue = hexToRGB(color.hex)
-        if isFavorite {
-            favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgbValue.hex) }
+        let key = normalizeHex(rgbValue.hex)
+
+        if favs.colors.contains(where: { normalizeHex($0.color.hex) == key }) {
+            favs.colors.removeAll { normalizeHex($0.color.hex) == key }
             isFavorite = false
             showToast("Removed from Collections")
         } else {
-            if !favs.colors.contains(where: { normalizeHex($0.color.hex) == normalizeHex(rgbValue.hex) }) {
-                favs.add(color: rgbValue)
-            }
+            favs.add(color: rgbValue) // agrega a favoritos individuales
             isFavorite = true
             showToast("Added to Collections")
         }
+
         UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-        animateLike.toggle()
+        withAnimation(.spring(response: 0.28, dampingFraction: 0.65)) { likePulse.toggle() }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { likePulse = false }
     }
 
-    // MARK: - Share Card (watermark auto contrast)
+    private func copyFromRow(_ text: String) {
+        UIPasteboard.general.string = text
+        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+        showToast("Copied \(text)")
+    }
+
     private func generateColorCard() -> UIImage {
         let renderer = UIGraphicsImageRenderer(size: CGSize(width: 600, height: 600))
-        let isProUser = false // ⬅️ Cambia según tu lógica real
+        let isProUser = store.isPro
 
         return renderer.image { ctx in
             let uiColor = rgb.uiColor
@@ -259,103 +313,138 @@ struct ColorDetailView: View {
                 .foregroundColor: textColor,
                 .paragraphStyle: paragraphStyle
             ]
-
             let infoAttrs: [NSAttributedString.Key: Any] = [
                 .font: UIFont.systemFont(ofSize: 28, weight: .medium),
                 .foregroundColor: textColor.withAlphaComponent(0.9),
                 .paragraphStyle: paragraphStyle
             ]
 
-            // 🎨 Info principal
             (color.name as NSString).draw(in: CGRect(x: 0, y: 200, width: 600, height: 50), withAttributes: titleAttrs)
             ("HEX: \(color.hex)" as NSString).draw(in: CGRect(x: 0, y: 260, width: 600, height: 40), withAttributes: infoAttrs)
             ("RGB: \(rgb.r), \(rgb.g), \(rgb.b)" as NSString).draw(in: CGRect(x: 0, y: 310, width: 600, height: 40), withAttributes: infoAttrs)
 
-            // 🪄 Marca de agua con contraste automático
             if !isProUser {
                 let watermarkColor: UIColor = uiColor.isLight ? .black.withAlphaComponent(0.35) : .white.withAlphaComponent(0.4)
-
-                if let logo = UIImage(named: "AppIcon") {
-                    let logoSize: CGFloat = 70
-                    let logoRect = CGRect(x: (600 - logoSize)/2, y: 470, width: logoSize, height: logoSize)
-                    logo.withTintColor(watermarkColor, renderingMode: .alwaysOriginal).draw(in: logoRect, blendMode: .normal, alpha: 0.9)
-                }
-
-                let watermarkAttrs: [NSAttributedString.Key: Any] = [
-                    .font: UIFont.boldSystemFont(ofSize: 28),
-                    .foregroundColor: watermarkColor,
-                    .paragraphStyle: paragraphStyle
-                ]
-                ("Colorit" as NSString).draw(in: CGRect(x: 0, y: 545, width: 600, height: 40), withAttributes: watermarkAttrs)
+                ("Colorit" as NSString).draw(in: CGRect(x: 0, y: 545, width: 600, height: 40),
+                                             withAttributes: [.font: UIFont.boldSystemFont(ofSize: 28),
+                                                              .foregroundColor: watermarkColor,
+                                                              .paragraphStyle: paragraphStyle])
             }
         }
     }
 
     private func currentValueString() -> String {
         switch selectedTab {
-        case "RGB":
-            return "RGB: \(rgb.r), \(rgb.g), \(rgb.b)"
-        case "HEX":
-            return "HEX: \(color.hex)"
-        case "HSB":
+        case .rgb: return "RGB: \(rgb.r), \(rgb.g), \(rgb.b)"
+        case .hex: return "HEX: \(color.hex)"
+        case .hsb:
             let (h, s, b) = rgbToHSB(rgb)
             return "HSB: \(Int(h))°, \(Int(s))%, \(Int(b))%"
-        case "CMYK":
+        case .cmyk:
             let (c, m, y, k) = rgbToCMYK(rgb)
             return "CMYK: \(Int(c))%, \(Int(m))%, \(Int(y))%, \(Int(k))%"
-        default:
-            return color.hex
+        }
+    }
+
+    // MARK: - Catalog matching
+    private func findNamedColor(hex: String) -> NamedColor? {
+        let target = normalizeHex(hex)
+        // 1) genéricos
+        if let exact = catalog.names.first(where: { normalizeHex($0.hex) == target }) {
+            return exact
+        }
+        // 2) vendors
+        let vendorIDs = Set(CatalogID.allCases.filter { $0 != .generic })
+        let vendorColors = catalogs.colors(for: vendorIDs)
+        if let match = vendorColors.first(where: { normalizeHex($0.hex) == target }) {
+            return match
+        }
+        // 3) fallback: el más cercano (si quieres)
+        let pool = (catalogs.loaded[.generic] ?? catalog.names) + vendorColors
+        return pool.min { a, b in
+            hexToRGB(a.hex).distance(to: hexToRGB(hex)) < hexToRGB(b.hex).distance(to: hexToRGB(hex))
         }
     }
 }
 
-// MARK: - UIKit Integration for Share Sheet
-struct ActivityViewController: UIViewControllerRepresentable {
-    let items: [Any]
-    func makeUIViewController(context: Context) -> UIActivityViewController {
-        UIActivityViewController(activityItems: items, applicationActivities: nil)
+// MARK: - Harmony Strip
+private struct HarmonyStrip: View {
+    let base: RGB
+    let mode: HarmonyMode
+    let onTap: (RGB) -> Void
+
+    var body: some View {
+        HStack(spacing: 8) {
+            ForEach(colors(for: mode), id: \.hex) { c in
+                Button {
+                    onTap(c)
+                    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+                } label: {
+                    VStack(spacing: 6) {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color(c.uiColor))
+                            .frame(width: 64, height: 64)
+                            .shadow(color: .black.opacity(0.08), radius: 3, y: 2)
+                        Text("#\(normalizeHex(c.hex))")
+                            .font(.caption2.monospaced())
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .buttonStyle(.plain)
+            }
+        }
     }
-    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
-}
 
-// MARK: - Helpers
-private func rgbToHSB(_ rgb: RGB) -> (h: CGFloat, s: CGFloat, b: CGFloat) {
-    var hue: CGFloat = 0, sat: CGFloat = 0, bri: CGFloat = 0
-    UIColor(red: CGFloat(rgb.r) / 255, green: CGFloat(rgb.g) / 255, blue: CGFloat(rgb.b) / 255, alpha: 1)
-        .getHue(&hue, saturation: &sat, brightness: &bri, alpha: nil)
-    return (hue * 360, sat * 100, bri * 100)
-}
-
-private func rgbToCMYK(_ rgb: RGB) -> (c: CGFloat, m: CGFloat, y: CGFloat, k: CGFloat) {
-    let r = CGFloat(rgb.r) / 255, g = CGFloat(rgb.g) / 255, b = CGFloat(rgb.b) / 255
-    let k = 1 - max(r, max(g, b))
-    if k == 1 { return (0, 0, 0, 100) }
-    let c = (1 - r - k) / (1 - k)
-    let m = (1 - g - k) / (1 - k)
-    let y = (1 - b - k) / (1 - k)
-    return (c * 100, m * 100, y * 100, k * 100)
-}
-
-private extension UIColor {
-    var isLight: Bool {
-        var white: CGFloat = 0
-        getWhite(&white, alpha: nil)
-        return white > 0.6
+    private func colors(for mode: HarmonyMode) -> [RGB] {
+        switch mode {
+        case .analogous:
+            let (h, s, b) = rgbToHSB(base)
+            return [hsbToRGB(hue: h - 30, s: s, b: b),
+                    base,
+                    hsbToRGB(hue: h + 30, s: s, b: b)]
+        case .complementary:
+            return [base, complementaryColor(for: base)]
+        case .triadic:
+            let (h, s, b) = rgbToHSB(base)
+            return [base,
+                    hsbToRGB(hue: h + 120, s: s, b: b),
+                    hsbToRGB(hue: h - 120, s: s, b: b)]
+        case .monochromatic:
+            return monochromaticColors(for: base)
+        }
     }
 }
 
-// MARK: - Subviews
+// MARK: - Value / Info rows
 private struct ValueRow: View {
     let label: String
     let value: String
     let color: Color
+    let onCopy: (String) -> Void
+    @State private var copied = false
+
     var body: some View {
-        HStack {
+        HStack(spacing: 10) {
             Circle().fill(color).frame(width: 12, height: 12)
             Text(label).font(.subheadline)
-            Spacer()
+            Spacer(minLength: 10)
             Text(value).font(.body.monospaced())
+
+            Button {
+                onCopy(value)
+                withAnimation(.spring()) { copied = true }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.05) {
+                    withAnimation(.easeOut) { copied = false }
+                }
+            } label: {
+                Image(systemName: copied ? "checkmark.circle.fill" : "doc.on.doc")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(copied ? .green : .secondary)
+                    .transition(.scale.combined(with: .opacity))
+            }
+            .buttonStyle(.plain)
         }
+        .padding(.vertical, 4)
     }
 }
 
@@ -368,5 +457,88 @@ private struct InfoRow: View {
             Spacer()
             Text(value).font(.subheadline)
         }
+    }
+}
+
+// MARK: - Share sheet
+struct ActivityViewController: UIViewControllerRepresentable {
+    let items: [Any]
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+}
+
+// MARK: - Math & conversions
+private func rgbToHSB(_ rgb: RGB) -> (h: CGFloat, s: CGFloat, b: CGFloat) {
+    var hue: CGFloat = 0, sat: CGFloat = 0, bri: CGFloat = 0
+    UIColor(red: CGFloat(rgb.r)/255, green: CGFloat(rgb.g)/255, blue: CGFloat(rgb.b)/255, alpha: 1)
+        .getHue(&hue, saturation: &sat, brightness: &bri, alpha: nil)
+    return (hue*360, sat*100, bri*100)
+}
+
+private func rgbToCMYK(_ rgb: RGB) -> (c: CGFloat, m: CGFloat, y: CGFloat, k: CGFloat) {
+    let r = CGFloat(rgb.r)/255, g = CGFloat(rgb.g)/255, b = CGFloat(rgb.b)/255
+    let k = 1 - max(r, max(g, b))
+    if k == 1 { return (0, 0, 0, 100) }
+    let c = (1 - r - k) / (1 - k)
+    let m = (1 - g - k) / (1 - k)
+    let y = (1 - b - k) / (1 - k)
+    return (c*100, m*100, y*100, k*100)
+}
+
+private func hsbToRGB(hue h: CGFloat, s: CGFloat, b: CGFloat) -> RGB {
+    let H = ((h.truncatingRemainder(dividingBy: 360)) + 360).truncatingRemainder(dividingBy: 360) / 60
+    let S = max(0, min(100, s)) / 100
+    let V = max(0, min(100, b)) / 100
+
+    let i = floor(H), f = H - i
+    let p = V * (1 - S)
+    let q = V * (1 - S * f)
+    let t = V * (1 - S * (1 - f))
+
+    let (r, g, bl): (CGFloat, CGFloat, CGFloat)
+    switch Int(i) {
+    case 0: (r, g, bl) = (V, t, p)
+    case 1: (r, g, bl) = (q, V, p)
+    case 2: (r, g, bl) = (p, V, t)
+    case 3: (r, g, bl) = (p, q, V)
+    case 4: (r, g, bl) = (t, p, V)
+    default: (r, g, bl) = (V, p, q)
+    }
+
+    return RGB(r: Int(round(r * 255)), g: Int(round(g * 255)), b: Int(round(bl * 255)))
+}
+
+private func complementaryColor(for rgb: RGB) -> RGB {
+    let (h, s, b) = rgbToHSB(rgb)
+    return hsbToRGB(hue: h + 180, s: s, b: b)
+}
+
+private func monochromaticColors(for rgb: RGB) -> [RGB] {
+    let (h, s, b) = rgbToHSB(rgb)
+    let steps: [CGFloat] = [-30, -15, 0, 15, 30]
+    return steps.map { delta in
+        hsbToRGB(hue: h, s: s, b: max(0, min(100, b + delta)))
+    }
+}
+
+// MARK: - Adaptive background
+@ViewBuilder
+private func adaptiveCardBackground(_ scheme: ColorScheme) -> some View {
+    if scheme == .light {
+        Color.clear.background(.ultraThinMaterial)
+    } else {
+        Color(.systemBackground)
+    }
+}
+
+// MARK: - UIColor helper
+extension UIColor {
+    var isLight: Bool {
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        getRed(&r, green: &g, blue: &b, alpha: &a)
+        let luminance = (0.299 * r + 0.587 * g + 0.114 * b)
+        return luminance > 0.6
     }
 }
