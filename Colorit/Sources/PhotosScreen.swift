@@ -284,7 +284,7 @@ private func savePhotoPalette() {
                     Image(systemName: "photo.on.rectangle.angled")
                         .font(.system(size: 60))
                         .foregroundColor(.secondary)
-                    Text("Select an image to extract its colors")
+                    Text("Choose an image to find matching colors")
                         .multilineTextAlignment(.center)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
@@ -293,8 +293,6 @@ private func savePhotoPalette() {
                         showSystemPicker = true
                     } label: {
                         HStack(spacing: 6) {
-                            Image(systemName: "photo.on.rectangle.angled")
-                                .font(.system(size: 17, weight: .semibold))
                             Text("Choose Photo")
                                 .font(.system(size: 17, weight: .semibold))
                         }
