@@ -252,17 +252,25 @@ struct FavoritesScreen: View {
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
 
-                    // Nueva paleta (solo si es Pro)
-                    Button {
-                        if store.isPro {
-                            showNewPaletteSheet = true
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        } else {
-                            store.showPaywall = true
-                        }
-                    } label: {
-                        Image(systemName: "plus.circle.fill")
+
+            Button {
+                if store.isPro {
+                    showNewPaletteSheet = true
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                } else {
+                    if favs.palettes.isEmpty {
+                        // permitir crear una sola paleta para no-Pro
+                        showNewPaletteSheet = true
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    } else {
+                        // ya tiene una paleta -> mostrar paywall
+                        store.showPaywall = true
                     }
+                }
+            } label: {
+                Image(systemName: "plus.circle.fill")
+            }
+
 
                     // 🔹 Botón de orden (asc/desc)
                     if !sortedColors.isEmpty {
