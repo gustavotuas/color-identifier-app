@@ -81,9 +81,15 @@ struct ColorDetailView: View {
 
                             // Share
                             VStack(spacing: 6) {
-                                Button(action: shareCurrentValue) {
-                                    Image(systemName: "square.and.arrow.up").font(.title3)
+                                Button(action: {
+                                    withAnimation(.spring()) {
+                                        shareCurrentValue()
+                                    }
+                                }) {
+                                    Image(systemName: "square.and.arrow.up")
+                                        .font(.title3)
                                 }
+
                                 Text("Share").font(.caption2)
                             }
 
@@ -302,17 +308,72 @@ struct ColorDetailView: View {
     }
 
     private func shareCurrentValue() {
-        let text = """
+    let isProUser = store.isPro
+    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+    showToast("Preparing share preview...")
+
+    DispatchQueue.global(qos: .userInitiated).async {
+        // 1️⃣ Generar imagen
+        let image = generateColorCard(isPro: isProUser)
+        let tempDir = FileManager.default.temporaryDirectory
+        let safeName = color.name.replacingOccurrences(of: " ", with: "_")
+        let fileURL = tempDir.appendingPathComponent("Colorit_\(safeName).png")
+
+        if let data = image.pngData() {
+            try? data.write(to: fileURL)
+        }
+
+        // 2️⃣ Preparar texto
+        var message = """
         🎨 \(color.name)
         HEX: \(color.hex)
         RGB: \(rgb.r), \(rgb.g), \(rgb.b)
         """
-        let image = generateColorCard()
-        shareItems = [text, image]
-        showShareSheet = true
-        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-        showToast("Share sheet opened")
+
+        if isProUser {
+            let (h, s, b) = rgbToHSB(rgb)
+            let (c, m, y, k) = rgbToCMYK(rgb)
+            message += """
+
+            HSB: \(Int(h))°, \(Int(s))%, \(Int(b))%
+            CMYK: \(Int(c))%, \(Int(m))%, \(Int(y))%, \(Int(k))%
+            """
+
+            if let v = color.vendor {
+                message += """
+
+                🏷️ Vendor: \(v.brand ?? "—")
+                Code: \(v.code ?? "—")
+                Line: \(v.line ?? "—")
+                """
+            }
+        } else {
+            message += "\n\n📱 Made with Colorit – www.colorit.app"
+        }
+
+        // 3️⃣ Volver al main thread para mostrar el share sheet
+        DispatchQueue.main.async {
+            showToast("Opening share sheet...")
+
+            let activityVC = UIActivityViewController(activityItems: [message, fileURL], applicationActivities: nil)
+            activityVC.excludedActivityTypes = [.assignToContact, .addToReadingList]
+
+            // ✅ Presentación compatible con SwiftUI
+            if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let rootVC = scene.windows.first?.rootViewController {
+                var top = rootVC
+                while let presented = top.presentedViewController { top = presented }
+                top.present(activityVC, animated: true)
+            } else {
+                print("⚠️ Could not find a valid rootViewController to present share sheet.")
+                showToast("Failed to open share sheet.")
+            }
+        }
     }
+}
+
+
+
 
     private func addOrRemoveFavorite() {
         let rgbValue = hexToRGB(color.hex)
@@ -339,43 +400,90 @@ struct ColorDetailView: View {
         showToast("Copied \(text)")
     }
 
-    private func generateColorCard() -> UIImage {
-        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 600, height: 600))
-        let isProUser = store.isPro
+    private func generateColorCard(isPro: Bool) -> UIImage {
+    // Validamos color
+    let safeRGB = rgb.r == 0 && rgb.g == 0 && rgb.b == 0 && normalizeHex(color.hex) == "" ? RGB(r: 255, g: 255, b: 255) : rgb
+    let baseColor = safeRGB.uiColor.withAlphaComponent(1)
 
-        return renderer.image { ctx in
-            let uiColor = rgb.uiColor
-            uiColor.setFill()
-            ctx.fill(CGRect(x: 0, y: 0, width: 600, height: 600))
+    // Renderer seguro
+    let rendererFormat = UIGraphicsImageRendererFormat()
+    rendererFormat.scale = UIScreen.main.scale
+    rendererFormat.opaque = true
+    let size = CGSize(width: 800, height: 800)
+    let renderer = UIGraphicsImageRenderer(size: size, format: rendererFormat)
 
-            let textColor: UIColor = uiColor.isLight ? .black : .white
-            let paragraphStyle = NSMutableParagraphStyle()
-            paragraphStyle.alignment = .center
+    return renderer.image { ctx in
+        // --- Fondo sólido
+        baseColor.setFill()
+        ctx.fill(CGRect(origin: .zero, size: size))
 
-            let titleAttrs: [NSAttributedString.Key: Any] = [
-                .font: UIFont.boldSystemFont(ofSize: 36),
-                .foregroundColor: textColor,
-                .paragraphStyle: paragraphStyle
-            ]
-            let infoAttrs: [NSAttributedString.Key: Any] = [
-                .font: UIFont.systemFont(ofSize: 28, weight: .medium),
-                .foregroundColor: textColor.withAlphaComponent(0.9),
-                .paragraphStyle: paragraphStyle
-            ]
+        // --- Degradado suave inferior para contraste
+        let gradient = CGGradient(
+            colorsSpace: CGColorSpaceCreateDeviceRGB(),
+            colors: [baseColor.cgColor, UIColor.black.withAlphaComponent(0.25).cgColor] as CFArray,
+            locations: [0.0, 1.0]
+        )!
+        ctx.cgContext.drawLinearGradient(
+            gradient,
+            start: CGPoint(x: 0, y: 400),
+            end: CGPoint(x: 0, y: 800),
+            options: []
+        )
 
-            (color.name as NSString).draw(in: CGRect(x: 0, y: 200, width: 600, height: 50), withAttributes: titleAttrs)
-            ("HEX: \(color.hex)" as NSString).draw(in: CGRect(x: 0, y: 260, width: 600, height: 40), withAttributes: infoAttrs)
-            ("RGB: \(rgb.r), \(rgb.g), \(rgb.b)" as NSString).draw(in: CGRect(x: 0, y: 310, width: 600, height: 40), withAttributes: infoAttrs)
+        // --- Texto
+        let textColor: UIColor = baseColor.isLight ? .black : .white
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.alignment = .center
 
-            if !isProUser {
-                let watermarkColor: UIColor = uiColor.isLight ? .black.withAlphaComponent(0.35) : .white.withAlphaComponent(0.4)
-                ("Colorit" as NSString).draw(in: CGRect(x: 0, y: 545, width: 600, height: 40),
-                                             withAttributes: [.font: UIFont.boldSystemFont(ofSize: 28),
-                                                              .foregroundColor: watermarkColor,
-                                                              .paragraphStyle: paragraphStyle])
+        // Nombre
+        let nameAttrs: [NSAttributedString.Key: Any] = [
+            .font: UIFont.boldSystemFont(ofSize: 62),
+            .foregroundColor: textColor,
+            .paragraphStyle: paragraph
+        ]
+        (color.name as NSString).draw(in: CGRect(x: 0, y: 300, width: size.width, height: 80), withAttributes: nameAttrs)
+
+        // HEX
+        let hexAttrs: [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: 40, weight: .semibold),
+            .foregroundColor: textColor.withAlphaComponent(0.9),
+            .paragraphStyle: paragraph
+        ]
+        (color.hex as NSString).draw(in: CGRect(x: 0, y: 380, width: size.width, height: 50), withAttributes: hexAttrs)
+
+        // Detalle
+        if isPro {
+            let (h, s, b) = rgbToHSB(safeRGB)
+            let (c, m, y, k) = rgbToCMYK(safeRGB)
+            var details = """
+            RGB: \(safeRGB.r), \(safeRGB.g), \(safeRGB.b)
+            HSB: \(Int(h))°, \(Int(s))%, \(Int(b))%
+            CMYK: \(Int(c))%, \(Int(m))%, \(Int(y))%, \(Int(k))%
+            """
+
+            if let v = color.vendor {
+                details += "\nVendor: \(v.brand ?? "—") \(v.code ?? "")"
             }
+
+            let infoAttrs: [NSAttributedString.Key: Any] = [
+                .font: UIFont.systemFont(ofSize: 26, weight: .medium),
+                .foregroundColor: textColor.withAlphaComponent(0.9),
+                .paragraphStyle: paragraph
+            ]
+            (details as NSString).draw(in: CGRect(x: 0, y: 460, width: size.width, height: 300), withAttributes: infoAttrs)
+        } else {
+            // Marca Colorit
+            let markAttrs: [NSAttributedString.Key: Any] = [
+                .font: UIFont.boldSystemFont(ofSize: 30),
+                .foregroundColor: textColor.withAlphaComponent(0.35),
+                .paragraphStyle: paragraph
+            ]
+            ("Made with Colorit.app" as NSString).draw(in: CGRect(x: 0, y: 740, width: size.width, height: 40), withAttributes: markAttrs)
         }
     }
+}
+
+
 
     private func currentValueString() -> String {
         switch selectedTab {
