@@ -412,71 +412,71 @@ private func shadesAndTints(for rgb: RGB) -> [RGB] {
 
 @MainActor
 private func generateShareImage() -> UIImage {
-    // Creamos una vista SwiftUI con el mismo layout visual
-    let shareView = VStack(spacing: 22) {
-        // Color preview con borde y nombre
+    let shareView = VStack(spacing: 18) {
+
+        // MARK: - Color preview
         RoundedRectangle(cornerRadius: 22)
             .fill(Color(rgb.uiColor))
-            .frame(height: 200)
+            .frame(height: 220)
             .overlay(
                 VStack(spacing: 4) {
                     Text(color.name)
-                        .font(.system(size: 26, weight: .bold))
+                        .font(.system(size: 28, weight: .bold))
                         .foregroundStyle(rgb.uiColor.isLight ? .black : .white)
                     Text(color.hex)
                         .font(.subheadline)
-                        .foregroundStyle(rgb.uiColor.isLight ? .black.opacity(0.8) : .white.opacity(0.8))
+                        .foregroundStyle(rgb.uiColor.isLight ? .black.opacity(0.85) : .white.opacity(0.85))
                 }
-                .padding(8)
-                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+                .padding(10)
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
             )
+            .shadow(color: .black.opacity(0.08), radius: 6, y: 2)
 
-        // Harmony
-        VStack(alignment: .leading, spacing: 10) {
+        // MARK: - Color Harmony
+        VStack(alignment: .leading, spacing: 12) {
             Text("Color Harmony").font(.headline)
             HarmonyStrip(base: rgb, mode: harmonyMode) { _ in }
         }
-        .padding(12)
-        .background(.white, in: RoundedRectangle(cornerRadius: 16))
-        .shadow(radius: 2, y: 1)
+        .padding(16)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
 
-        // Shades & tints
-        VStack(alignment: .leading, spacing: 10) {
+        // MARK: - Shades & Tints
+        VStack(alignment: .leading, spacing: 12) {
             Text("Shades & Tints").font(.headline)
             ShadesAndTintsView(base: rgb) { _ in }
         }
-        .padding(12)
-        .background(.white, in: RoundedRectangle(cornerRadius: 16))
-        .shadow(radius: 2, y: 1)
+        .padding(16)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
 
-        // Contrast preview
-        VStack(alignment: .leading, spacing: 10) {
+        // MARK: - Contrast Preview
+        VStack(alignment: .leading, spacing: 12) {
             Text("Contrast Preview").font(.headline)
             ContrastPreviewView(color: rgb)
         }
-        .padding(12)
-        .background(.white, in: RoundedRectangle(cornerRadius: 16))
-        .shadow(radius: 2, y: 1)
+        .padding(16)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
 
+        // MARK: - Footer
         Text("Made with Colorit.app")
             .font(.caption)
             .foregroundColor(.secondary)
-            .padding(.top, 10)
+            .padding(.top, 8)
     }
-    .padding(24)
+    .padding(.horizontal, 20)   // 👈 margen lateral sutil
+    .padding(.vertical, 30)
     .background(Color(.systemGroupedBackground))
 
-    // Renderizamos la vista en una imagen
     let renderer = ImageRenderer(content: shareView)
     renderer.scale = UIScreen.main.scale
-
-    if let uiImage = renderer.uiImage {
-        return uiImage
-    } else {
-        // Fallback
-        return UIImage(systemName: "xmark.circle") ?? UIImage()
-    }
+    return renderer.uiImage ?? UIImage()
 }
+
 
 
 
