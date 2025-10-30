@@ -62,6 +62,7 @@ struct PhotosScreen: View {
     @State private var addedToCollection = false
     @State private var addedPalette: Bool = false // Asegúrate de tener este state en la vista
 
+
 private func savePhotoPalette() {
     // Haptic (idéntico patrón de guardado)
     UIImpactFeedbackGenerator(style: .soft).impactOccurred()
@@ -288,13 +289,47 @@ private func savePhotoPalette() {
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .padding(.horizontal, 24)
-                    Button("Choose Photo") { showSystemPicker = true }
-                        .font(.headline)
-                        .padding(.horizontal, 30)
+                    Button {
+                        showSystemPicker = true
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "photo.on.rectangle.angled")
+                                .font(.system(size: 17, weight: .semibold))
+                            Text("Choose Photo")
+                                .font(.system(size: 17, weight: .semibold))
+                        }
+                        .foregroundColor(Color.accentColor)
+                        .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
-                        .background(Color.accentColor)
-                        .foregroundColor(.white)
-                        .cornerRadius(12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .fill(
+                                    Color(uiColor: UIColor { trait in
+                                        trait.userInterfaceStyle == .dark
+                                        ? UIColor.systemGray5
+                                        : UIColor.systemGray6
+                                    })
+                                )
+                                .shadow(color: Color.black.opacity(0.1), radius: 1, y: 1)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .stroke(
+                                    Color(uiColor: UIColor { trait in
+                                        trait.userInterfaceStyle == .dark
+                                        ? UIColor.white.withAlphaComponent(0.15)
+                                        : UIColor.black.withAlphaComponent(0.1)
+                                    }),
+                                    lineWidth: 0.6
+                                )
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .scaleEffect(showSystemPicker ? 0.96 : 1.0)
+                    .animation(.spring(response: 0.25, dampingFraction: 0.7), value: showSystemPicker)
+                    .padding(.horizontal)
+                    .padding(.top, 10)
+
                 }
                 .frame(maxWidth: .infinity, minHeight: 300)
             }
