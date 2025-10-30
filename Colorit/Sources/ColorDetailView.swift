@@ -394,39 +394,42 @@ struct ColorDetailView: View {
     }
 
     // MARK: - Pro Unlock Overlay (reutilizado de PhotosScreen)
+// MARK: - Pro Unlock Overlay (estilo uniforme con Unlock Picker)
 private struct ProBlurOverlay: View {
     @EnvironmentObject var store: StoreVM
 
     var body: some View {
-            ZStack {
-                // Capa base de blur con degradado vertical
-            Rectangle()
+        ZStack {
+            // 🔲 Fondo con mismo blur, gradiente y opacidad que el Unlock Picker
+            RoundedRectangle(cornerRadius: 20)
                 .fill(.ultraThinMaterial)
-                    .blur(radius: 10)
-                    .opacity(0.95)
+                .blur(radius: 10)
                 .mask(
                     LinearGradient(
                         gradient: Gradient(stops: [
-                                .init(color: .white.opacity(0.0), location: 0.0),
-                                .init(color: .white.opacity(1.0), location: 0.35),
-                                .init(color: .white.opacity(1.0), location: 0.65),
-                                .init(color: .white.opacity(1.0), location: 1.0)
+                            .init(color: .white.opacity(0.0), location: 0.0),
+                            .init(color: .white.opacity(1.0), location: 0.3),
+                            .init(color: .white.opacity(1.0), location: 0.7),
+                            .init(color: .white.opacity(1.0), location: 1.0)
                         ]),
                         startPoint: .top,
                         endPoint: .bottom
                     )
                 )
-                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 20))
+                .opacity(0.99)
+                .zIndex(2)
 
-            // Botón mágico centrado en la parte inferior
+            // 🔒 Botón Unlock encima (mismo estilo que en el picker)
             MagicalUnlockButton(title: "Unlock Pro")
-                .padding(.bottom, 22)
                 .onTapGesture { store.showPaywall = true }
+                .zIndex(3)
         }
         .clipShape(RoundedRectangle(cornerRadius: 18))
         .transition(.opacity)
     }
 }
+
 
     private struct MagicalUnlockButtonSmall: View {
         let title: String
