@@ -312,9 +312,9 @@ struct ColorDetailView: View {
     UIImpactFeedbackGenerator(style: .soft).impactOccurred()
     showToast("Preparing share preview...")
 
-    DispatchQueue.global(qos: .userInitiated).async {
+    Task.detached(priority: .userInitiated) {
         // 1️⃣ Generar imagen
-        let image = generateColorCard(isPro: isProUser)
+        let image = await generateShareImage()
         let tempDir = FileManager.default.temporaryDirectory
         let safeName = color.name.replacingOccurrences(of: " ", with: "_")
         let fileURL = tempDir.appendingPathComponent("Colorit_\(safeName).png")
@@ -400,88 +400,204 @@ struct ColorDetailView: View {
         showToast("Copied \(text)")
     }
 
-    private func generateColorCard(isPro: Bool) -> UIImage {
-    // Validamos color
-    let safeRGB = rgb.r == 0 && rgb.g == 0 && rgb.b == 0 && normalizeHex(color.hex) == "" ? RGB(r: 255, g: 255, b: 255) : rgb
-    let baseColor = safeRGB.uiColor.withAlphaComponent(1)
+    // MARK: - Shades and Tints Helper
+private func shadesAndTints(for rgb: RGB) -> [RGB] {
+    let (h, s, b) = rgbToHSB(rgb)
+    // Variaciones más oscuras y claras del color base
+    let steps: [CGFloat] = [-40, -20, 0, 20, 40]
+    return steps.map { delta in
+        hsbToRGB(hue: h, s: s, b: max(0, min(100, b + delta)))
+    }
+}
 
-    // Renderer seguro
+@MainActor
+private func generateShareImage() -> UIImage {
+    // Creamos una vista SwiftUI con el mismo layout visual
+    let shareView = VStack(spacing: 22) {
+        // Color preview con borde y nombre
+        RoundedRectangle(cornerRadius: 22)
+            .fill(Color(rgb.uiColor))
+            .frame(height: 200)
+            .overlay(
+                VStack(spacing: 4) {
+                    Text(color.name)
+                        .font(.system(size: 26, weight: .bold))
+                        .foregroundStyle(rgb.uiColor.isLight ? .black : .white)
+                    Text(color.hex)
+                        .font(.subheadline)
+                        .foregroundStyle(rgb.uiColor.isLight ? .black.opacity(0.8) : .white.opacity(0.8))
+                }
+                .padding(8)
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+            )
+
+        // Harmony
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Color Harmony").font(.headline)
+            HarmonyStrip(base: rgb, mode: harmonyMode) { _ in }
+        }
+        .padding(12)
+        .background(.white, in: RoundedRectangle(cornerRadius: 16))
+        .shadow(radius: 2, y: 1)
+
+        // Shades & tints
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Shades & Tints").font(.headline)
+            ShadesAndTintsView(base: rgb) { _ in }
+        }
+        .padding(12)
+        .background(.white, in: RoundedRectangle(cornerRadius: 16))
+        .shadow(radius: 2, y: 1)
+
+        // Contrast preview
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Contrast Preview").font(.headline)
+            ContrastPreviewView(color: rgb)
+        }
+        .padding(12)
+        .background(.white, in: RoundedRectangle(cornerRadius: 16))
+        .shadow(radius: 2, y: 1)
+
+        Text("Made with Colorit.app")
+            .font(.caption)
+            .foregroundColor(.secondary)
+            .padding(.top, 10)
+    }
+    .padding(24)
+    .background(Color(.systemGroupedBackground))
+
+    // Renderizamos la vista en una imagen
+    let renderer = ImageRenderer(content: shareView)
+    renderer.scale = UIScreen.main.scale
+
+    if let uiImage = renderer.uiImage {
+        return uiImage
+    } else {
+        // Fallback
+        return UIImage(systemName: "xmark.circle") ?? UIImage()
+    }
+}
+
+
+
+    private func generateColorCard(isPro: Bool) -> UIImage {
+    let safeRGB = rgb
+    let baseColor = safeRGB.uiColor
+
+    // Tamaño vertical tipo retrato (ideal para compartir)
+    let size = CGSize(width: 1080, height: 1350)
     let rendererFormat = UIGraphicsImageRendererFormat()
     rendererFormat.scale = UIScreen.main.scale
     rendererFormat.opaque = true
-    let size = CGSize(width: 800, height: 800)
     let renderer = UIGraphicsImageRenderer(size: size, format: rendererFormat)
 
     return renderer.image { ctx in
-        // --- Fondo sólido
-        baseColor.setFill()
-        ctx.fill(CGRect(origin: .zero, size: size))
+        let cg = ctx.cgContext
+        let bgColor = UIColor.systemBackground
+        bgColor.setFill()
+        cg.fill(CGRect(origin: .zero, size: size))
 
-        // --- Degradado suave inferior para contraste
-        let gradient = CGGradient(
-            colorsSpace: CGColorSpaceCreateDeviceRGB(),
-            colors: [baseColor.cgColor, UIColor.black.withAlphaComponent(0.25).cgColor] as CFArray,
-            locations: [0.0, 1.0]
-        )!
-        ctx.cgContext.drawLinearGradient(
-            gradient,
-            start: CGPoint(x: 0, y: 400),
-            end: CGPoint(x: 0, y: 800),
-            options: []
-        )
+        // MARK: - 1️⃣ Color block principal
+        let colorRect = CGRect(x: 90, y: 120, width: size.width - 180, height: 450)
+        cg.setFillColor(baseColor.cgColor)
+        cg.fill(colorRect)
 
-        // --- Texto
+        // borde blanco
+        cg.setStrokeColor(UIColor.white.cgColor)
+        cg.setLineWidth(20)
+        cg.stroke(colorRect)
+
+        // MARK: - 2️⃣ Nombre y HEX
         let textColor: UIColor = baseColor.isLight ? .black : .white
         let paragraph = NSMutableParagraphStyle()
         paragraph.alignment = .center
 
-        // Nombre
         let nameAttrs: [NSAttributedString.Key: Any] = [
-            .font: UIFont.boldSystemFont(ofSize: 62),
+            .font: UIFont.boldSystemFont(ofSize: 64),
             .foregroundColor: textColor,
             .paragraphStyle: paragraph
         ]
-        (color.name as NSString).draw(in: CGRect(x: 0, y: 300, width: size.width, height: 80), withAttributes: nameAttrs)
+        (color.name as NSString).draw(in: CGRect(x: 0, y: 610, width: size.width, height: 80), withAttributes: nameAttrs)
 
-        // HEX
         let hexAttrs: [NSAttributedString.Key: Any] = [
-            .font: UIFont.systemFont(ofSize: 40, weight: .semibold),
-            .foregroundColor: textColor.withAlphaComponent(0.9),
+            .font: UIFont.monospacedSystemFont(ofSize: 44, weight: .semibold),
+            .foregroundColor: textColor.withAlphaComponent(0.85),
             .paragraphStyle: paragraph
         ]
-        (color.hex as NSString).draw(in: CGRect(x: 0, y: 380, width: size.width, height: 50), withAttributes: hexAttrs)
+        (color.hex as NSString).draw(in: CGRect(x: 0, y: 680, width: size.width, height: 60), withAttributes: hexAttrs)
 
-        // Detalle
-        if isPro {
-            let (h, s, b) = rgbToHSB(safeRGB)
-            let (c, m, y, k) = rgbToCMYK(safeRGB)
-            var details = """
-            RGB: \(safeRGB.r), \(safeRGB.g), \(safeRGB.b)
-            HSB: \(Int(h))°, \(Int(s))%, \(Int(b))%
-            CMYK: \(Int(c))%, \(Int(m))%, \(Int(y))%, \(Int(k))%
-            """
-
-            if let v = color.vendor {
-                details += "\nVendor: \(v.brand ?? "—") \(v.code ?? "")"
-            }
-
-            let infoAttrs: [NSAttributedString.Key: Any] = [
-                .font: UIFont.systemFont(ofSize: 26, weight: .medium),
-                .foregroundColor: textColor.withAlphaComponent(0.9),
-                .paragraphStyle: paragraph
-            ]
-            (details as NSString).draw(in: CGRect(x: 0, y: 460, width: size.width, height: 300), withAttributes: infoAttrs)
-        } else {
-            // Marca Colorit
-            let markAttrs: [NSAttributedString.Key: Any] = [
-                .font: UIFont.boldSystemFont(ofSize: 30),
-                .foregroundColor: textColor.withAlphaComponent(0.35),
-                .paragraphStyle: paragraph
-            ]
-            ("Made with Colorit.app" as NSString).draw(in: CGRect(x: 0, y: 740, width: size.width, height: 40), withAttributes: markAttrs)
+        // MARK: - 3️⃣ Harmony strip
+        let harmonies = [
+            complementaryColor(for: safeRGB),
+            hsbToRGB(hue: rgbToHSB(safeRGB).h + 30, s: rgbToHSB(safeRGB).s, b: rgbToHSB(safeRGB).b),
+            hsbToRGB(hue: rgbToHSB(safeRGB).h - 30, s: rgbToHSB(safeRGB).s, b: rgbToHSB(safeRGB).b)
+        ]
+        var xOffset: CGFloat = 140
+        for h in harmonies {
+            let rect = CGRect(x: xOffset, y: 790, width: 120, height: 120)
+            cg.setFillColor(h.uiColor.cgColor)
+            cg.fill(rect)
+            cg.setStrokeColor(UIColor.white.cgColor)
+            cg.setLineWidth(6)
+            cg.stroke(rect)
+            xOffset += 150
         }
+
+        // MARK: - 4️⃣ Shades & tints
+        let shades = shadesAndTints(for: safeRGB)
+        xOffset = 140
+        for s in shades {
+            let rect = CGRect(x: xOffset, y: 950, width: 120, height: 120)
+            cg.setFillColor(s.uiColor.cgColor)
+            cg.fill(rect)
+            cg.setStrokeColor(UIColor.white.cgColor)
+            cg.setLineWidth(5)
+            cg.stroke(rect)
+            xOffset += 150
+        }
+
+        // MARK: - 5️⃣ Contrast preview
+        let blackRatio = contrastRatio(fg: .black, bg: baseColor)
+        let whiteRatio = contrastRatio(fg: .white, bg: baseColor)
+        let contrastTextAttrs: [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: 32, weight: .medium),
+            .foregroundColor: UIColor.label,
+            .paragraphStyle: paragraph
+        ]
+        ("Contrast to Black: \(String(format: "%.1f", blackRatio)):1" as NSString)
+            .draw(in: CGRect(x: 0, y: 1090, width: size.width, height: 40), withAttributes: contrastTextAttrs)
+        ("Contrast to White: \(String(format: "%.1f", whiteRatio)):1" as NSString)
+            .draw(in: CGRect(x: 0, y: 1130, width: size.width, height: 40), withAttributes: contrastTextAttrs)
+
+        // MARK: - 6️⃣ Info técnica
+        let (h, s, b) = rgbToHSB(safeRGB)
+        let (c, m, y, k) = rgbToCMYK(safeRGB)
+        var info = """
+        RGB: \(safeRGB.r), \(safeRGB.g), \(safeRGB.b)
+        HSB: \(Int(h))°, \(Int(s))%, \(Int(b))%
+        CMYK: \(Int(c))%, \(Int(m))%, \(Int(y))%, \(Int(k))%
+        """
+        if isPro, let v = color.vendor {
+            info += "\nVendor: \(v.brand ?? "—") \(v.code ?? "")"
+        }
+
+        let infoAttrs: [NSAttributedString.Key: Any] = [
+            .font: UIFont.monospacedSystemFont(ofSize: 30, weight: .regular),
+            .foregroundColor: UIColor.secondaryLabel,
+            .paragraphStyle: paragraph
+        ]
+        (info as NSString).draw(in: CGRect(x: 0, y: 1180, width: size.width, height: 150), withAttributes: infoAttrs)
+
+        // MARK: - 7️⃣ Footer
+        let footerAttrs: [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: 26, weight: .semibold),
+            .foregroundColor: UIColor.systemGray,
+            .paragraphStyle: paragraph
+        ]
+        ("Made with Colorit.app" as NSString).draw(in: CGRect(x: 0, y: size.height - 60, width: size.width, height: 40), withAttributes: footerAttrs)
     }
 }
+
 
 
 
