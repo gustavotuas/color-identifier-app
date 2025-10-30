@@ -9,7 +9,9 @@ private func normalizeHex(_ hex: String) -> String {
 }
 
 enum ColorInfoMode: String, CaseIterable { case rgb = "RGB", hex = "HEX", hsb = "HSB", cmyk = "CMYK" }
-enum HarmonyMode: String, CaseIterable { case analogous = "Analogous", complementary = "Complementary", triadic = "Triadic", monochromatic = "Monochromatic" }
+enum HarmonyMode: String, CaseIterable { case analogous = "Analogous", complementary = "Complementary", triadic = "Triadic"
+//, monochromatic = "Monochromatic" 
+}
 
 // MARK: - Main
 struct ColorDetailView: View {
@@ -138,29 +140,6 @@ struct ColorDetailView: View {
                         }
                         .padding(.horizontal)
 
-                        // MARK: - Vendor Info (container)
-                        if let v = color.vendor {
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text("Vendor").font(.headline)
-                                if let brand = v.brand, !brand.isEmpty { InfoRow(label: "Brand", value: brand) }
-                                if let code = v.code, !code.isEmpty { InfoRow(label: "Code", value: code) }
-                                if let locator = v.locator, !locator.isEmpty, locator.uppercased() != "N/A" {
-                                    InfoRow(label: "Locator", value: locator)
-                                    if let url = URL(string: locator), UIApplication.shared.canOpenURL(url) {
-                                        Button("Open Vendor Page") { UIApplication.shared.open(url) }
-                                            .buttonStyle(.borderedProminent)
-                                            .tint(.accentColor)
-                                            .padding(.top, 6)
-                                    }
-                                }
-                                if let line = v.line, !line.isEmpty { InfoRow(label: "Line", value: line) }
-                            }
-                            .padding(12)
-                            .background(scheme == .dark ? Color(.secondarySystemBackground) : .white)
-                            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                            .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
-                            .padding(.horizontal)
-                        }
 
                         // MARK: - Harmony (container)
                         VStack(alignment: .leading, spacing: 12) {
@@ -192,7 +171,72 @@ struct ColorDetailView: View {
                         .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
                         .padding(.horizontal)
 
-                        Spacer(minLength: 40)
+
+                        // MARK: - Shades & Tints Section
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                Text("Shades & Tints").font(.headline)
+                                Spacer()
+                            }
+
+                            ShadesAndTintsView(base: rgb) { tapped in
+                            if let found = findNamedColor(hex: tapped.hex) {
+                                selectedHarmonyColor = found
+                                showHarmonySheet = true
+                            } else {
+                                showToast("Color not found in library")
+                            }
+                        }
+
+                        }
+                        .padding(12)
+                        .background(scheme == .dark ? Color(.secondarySystemBackground) : .white)
+                        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                        .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
+                        .padding(.horizontal)
+
+
+                        // MARK: - Contrast Preview Section
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                Text("Contrast Preview").font(.headline)
+                                Spacer()
+                            }
+
+                            ContrastPreviewView(color: rgb)
+                        }
+                        .padding(12)
+                        .background(scheme == .dark ? Color(.secondarySystemBackground) : .white)
+                        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                        .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
+                        .padding(.horizontal)
+
+
+                        // MARK: - Vendor Info (container)
+                        if let v = color.vendor {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("Vendor").font(.headline)
+                                if let brand = v.brand, !brand.isEmpty { InfoRow(label: "Brand", value: brand) }
+                                if let code = v.code, !code.isEmpty { InfoRow(label: "Code", value: code) }
+                                if let locator = v.locator, !locator.isEmpty, locator.uppercased() != "N/A" {
+                                    InfoRow(label: "Locator", value: locator)
+                                    if let url = URL(string: locator), UIApplication.shared.canOpenURL(url) {
+                                        Button("Open Vendor Page") { UIApplication.shared.open(url) }
+                                            .buttonStyle(.borderedProminent)
+                                            .tint(.accentColor)
+                                            .padding(.top, 6)
+                                    }
+                                }
+                                if let line = v.line, !line.isEmpty { InfoRow(label: "Line", value: line) }
+                            }
+                            .padding(12)
+                            .background(scheme == .dark ? Color(.secondarySystemBackground) : .white)
+                            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                            .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
+                            .padding(.horizontal)
+                        }
+
+                        Spacer(minLength: 20)
                     }
                     .padding(.bottom, 60)
                 }
@@ -409,11 +453,92 @@ private struct HarmonyStrip: View {
             return [base,
                     hsbToRGB(hue: h + 120, s: s, b: b),
                     hsbToRGB(hue: h - 120, s: s, b: b)]
-        case .monochromatic:
-            return monochromaticColors(for: base)
+        // case .monochromatic:
+        //     return monochromaticColors(for: base)
         }
     }
 }
+
+// MARK: - Shades & Tints
+// MARK: - Shades & Tints
+private struct ShadesAndTintsView: View {
+    let base: RGB
+    let onSelect: (RGB) -> Void
+
+    var body: some View {
+        HStack(spacing: 6) {
+            ForEach(shadesAndTints(for: base), id: \.hex) { c in
+                Button {
+                    onSelect(c)
+                    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+                } label: {
+                    VStack(spacing: 4) {
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color(c.uiColor))
+                            .frame(width: 55, height: 55)
+                            .shadow(color: .black.opacity(0.06), radius: 2, y: 1)
+                        Text("#\(normalizeHex(c.hex))")
+                            .font(.caption2.monospaced())
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
+    private func shadesAndTints(for rgb: RGB) -> [RGB] {
+        let (h, s, b) = rgbToHSB(rgb)
+        let steps: [CGFloat] = [-40, -20, 0, 20, 40]
+        return steps.map { delta in
+            hsbToRGB(hue: h, s: s, b: max(0, min(100, b + delta)))
+        }
+    }
+}
+
+
+// MARK: - Contrast Preview
+private struct ContrastPreviewView: View {
+    let color: RGB
+
+    var body: some View {
+        let bg = Color(color.uiColor)
+        let contrastToBlack = contrastRatio(fg: .black, bg: color.uiColor)
+        let contrastToWhite = contrastRatio(fg: .white, bg: color.uiColor)
+
+        HStack(spacing: 12) {
+            contrastCard(text: "Text sample", textColor: .black, contrast: contrastToBlack)
+            contrastCard(text: "Text sample", textColor: .white, contrast: contrastToWhite)
+        }
+    }
+
+    private func contrastCard(text: String, textColor: Color, contrast: Double) -> some View {
+        VStack(spacing: 6) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(color.uiColor))
+                    .frame(width: 120, height: 70)
+                    .shadow(color: .black.opacity(0.1), radius: 3, y: 1)
+
+                Text(text)
+                    .font(.callout.bold())
+                    .foregroundColor(textColor)
+            }
+
+            Text(contrastDescription(for: contrast))
+                .font(.caption2)
+                .foregroundColor(contrast >= 4.5 ? .green : .orange)
+        }
+    }
+
+    private func contrastDescription(for ratio: Double) -> String {
+        if ratio >= 7 { return "Excellent (AAA)" }
+        else if ratio >= 4.5 { return "Good (AA)" }
+        else { return "Low Contrast" }
+    }
+}
+
+
 
 // MARK: - Value / Info rows
 private struct ValueRow: View {
@@ -532,6 +657,24 @@ private func adaptiveCardBackground(_ scheme: ColorScheme) -> some View {
         Color(.systemBackground)
     }
 }
+
+// MARK: - Contrast ratio calculation
+private func contrastRatio(fg: UIColor, bg: UIColor) -> Double {
+    func luminance(_ c: UIColor) -> Double {
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        c.getRed(&r, green: &g, blue: &b, alpha: &a)
+        func adjust(_ v: CGFloat) -> Double {
+            let v = Double(v)
+            return v <= 0.03928 ? v / 12.92 : pow((v + 0.055) / 1.055, 2.4)
+        }
+        return 0.2126 * adjust(r) + 0.7152 * adjust(g) + 0.0722 * adjust(b)
+    }
+
+    let L1 = luminance(fg)
+    let L2 = luminance(bg)
+    return (max(L1, L2) + 0.05) / (min(L1, L2) + 0.05)
+}
+
 
 // MARK: - UIColor helper
 extension UIColor {
