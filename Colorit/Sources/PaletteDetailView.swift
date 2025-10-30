@@ -5,115 +5,135 @@ struct PaletteDetailView: View {
     @EnvironmentObject var favs: FavoritesStore
     @EnvironmentObject var catalog: Catalog
     @EnvironmentObject var catalogs: CatalogStore
+    @EnvironmentObject var store: StoreVM
 
     @State var palette: FavoritePalette
     @State private var isEditing = false
     @State private var showAddColorSheet = false
     @State private var showDeleteConfirm = false
     @State private var selectedColor: NamedColor?
+    @State private var toastMessage: String? = nil
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 18) {
+            ZStack {
+                Color(.systemBackground)
+                    .ignoresSafeArea()
 
-                    // MARK: - Paleta nombre
-                    if isEditing {
-                        TextField("Palette name", text: $palette.name.bound)
-                            .font(.system(size: 26, weight: .bold))
-                            .textFieldStyle(.roundedBorder)
-                            .padding(.horizontal)
-                    } else {
-                        Text(palette.name ?? "")
-                            .font(.system(size: 26, weight: .bold))
-                            .padding(.horizontal)
-                    }
+                ScrollView {
+                    VStack(spacing: 20) {
 
-                    // MARK: - Franja de colores
-                    HStack(spacing: 0) {
-                        ForEach(palette.colors, id: \.hex) { c in
-                            Rectangle()
-                                .fill(Color(c.uiColor))
+                        // MARK: - Palette name
+                        if isEditing {
+                            TextField("Palette name", text: $palette.name.bound)
+                                .font(.system(size: 26, weight: .bold))
+                                .textFieldStyle(.roundedBorder)
+                                .padding(.horizontal)
+                                .padding(.top, 10)
+                        } else {
+                            Text(palette.name ?? "")
+                                .font(.system(size: 26, weight: .bold))
+                                .padding(.horizontal)
+                                .padding(.top, 10)
                         }
-                    }
-                    .frame(height: 60)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .padding(.horizontal)
-                    .shadow(color: .black.opacity(0.08), radius: 2, x: 0, y: 1)
 
-                    Divider().padding(.horizontal)
+                        // MARK: - Color Strip (Live style)
+                        HStack(spacing: 0) {
+                            ForEach(palette.colors, id: \.hex) { c in
+                                Rectangle()
+                                    .fill(Color(c.uiColor))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 0)
+                                            .stroke(Color.primary.opacity(0.1), lineWidth: 0.6)
+                                    )
+                            }
+                        }
+                        .frame(height: 70)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .shadow(color: .black.opacity(0.1), radius: 3, y: 2)
+                        .padding(.horizontal)
 
-                    // MARK: - Add color button
-                    if isEditing {
-                        HStack(spacing: 8) {
+                        // MARK: - Add color button (modern style)
+                        if isEditing {
                             Button {
                                 showAddColorSheet = true
                                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             } label: {
-                                Label("Add Color", systemImage: "plus.circle.fill")
-                                    .font(.headline)
-                            }
-                            Spacer()
-                        }
-                        .padding(.horizontal)
-                        .padding(.top, 4)
-                    }
-
-                    // MARK: - Lista de colores
-                    VStack(spacing: 12) {
-                        ForEach(palette.colors, id: \.hex) { color in
-                            let named = makeNamedColor(from: color)
-                            HStack(spacing: 14) {
-                                if isEditing {
-                                    Button {
-                                        removeColor(color)
-                                    } label: {
-                                        Image(systemName: "minus.circle.fill")
-                                            .foregroundColor(.red)
-                                            .font(.system(size: 22))
-                                    }
+                                HStack(spacing: 6) {
+                                    Image(systemName: "plus.circle.fill")
+                                        .font(.system(size: 17, weight: .semibold))
+                                    Text("Add Color")
+                                        .font(.system(size: 17, weight: .semibold))
                                 }
-
-                                Button {
-                                    selectedColor = named
-                                    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-                                } label: {
-                                    HStack(spacing: 14) {
-                                        RoundedRectangle(cornerRadius: 10)
-                                            .fill(Color(color.uiColor))
-                                            .frame(width: 70, height: 70)
-                                            .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
-
-                                        VStack(alignment: .leading, spacing: 3) {
-                                            Text(named.name)
-                                                .font(.headline)
-                                                .foregroundColor(.primary)
-
-                                            Text(color.hex.uppercased())
-                                                .font(.caption)
-                                                .foregroundColor(.secondary)
-
-                                            if let vendor = named.vendor?.brand {
-                                                Text("\(vendor)")
-                                                    .font(.caption2)
-                                                    .foregroundColor(.secondary)
-                                            }
-                                        }
-                                        Spacer()
-                                    }
-                                }
-                                .buttonStyle(.plain)
+                                .foregroundColor(Color.accentColor)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                        .fill(
+                                            Color(uiColor: UIColor { trait in
+                                                trait.userInterfaceStyle == .dark
+                                                ? UIColor.systemGray5
+                                                : UIColor.systemGray6
+                                            })
+                                        )
+                                        .shadow(color: Color.black.opacity(0.1), radius: 1, y: 1)
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                        .stroke(
+                                            Color(uiColor: UIColor { trait in
+                                                trait.userInterfaceStyle == .dark
+                                                ? UIColor.white.withAlphaComponent(0.15)
+                                                : UIColor.black.withAlphaComponent(0.1)
+                                            }),
+                                            lineWidth: 0.6
+                                        )
+                                )
                             }
+                            .buttonStyle(.plain)
                             .padding(.horizontal)
                         }
-                    }
-                    .padding(.top, 8)
 
-                    Spacer(minLength: 40)
+                        Divider().padding(.horizontal)
+
+                        // MARK: - Color List (Live style + delete in edit mode)
+                        VStack(alignment: .leading, spacing: 10) {
+                            ForEach(palette.colors, id: \.hex) { rgb in
+                                let named = makeNamedColor(from: rgb)
+
+                                HStack(spacing: 12) {
+                                    if isEditing {
+                                        Button {
+                                            removeColor(rgb)
+                                        } label: {
+                                            Image(systemName: "minus.circle.fill")
+                                                .foregroundColor(.red)
+                                                .font(.system(size: 22))
+                                        }
+                                        .transition(.opacity.combined(with: .slide))
+                                    }
+
+                                    PaletteColorRow(
+                                        toast: $toastMessage,
+                                        named: named,
+                                        rgb: rgb
+                                    )
+                                    .environmentObject(favs)
+                                    .environmentObject(catalog)
+                                    .environmentObject(catalogs)
+                                }
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .shadow(color: .black.opacity(0.05), radius: 2, y: 1)
+                                .padding(.horizontal)
+                                .animation(.easeInOut(duration: 0.25), value: palette.colors)
+                            }
+                        }
+                        .padding(.top, 4)
+                        .padding(.bottom, 30)
+                    }
                 }
-                .padding(.bottom)
             }
-            .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -132,11 +152,12 @@ struct PaletteDetailView: View {
                             withAnimation { isEditing = false }
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         } label: {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.blue)
-                                .font(.system(size: 22))
-                            Text("Done")
-                                .font(.headline)
+                            HStack(spacing: 6) {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundColor(.blue)
+                                Text("Done")
+                                    .font(.headline)
+                            }
                         }
                     } else {
                         Button(role: .destructive) {
@@ -165,13 +186,7 @@ struct PaletteDetailView: View {
                 .environmentObject(favs)
                 .presentationDetents([.medium, .large])
             }
-            .sheet(item: $selectedColor) { color in
-                ColorDetailView(color: color)
-                    .environmentObject(favs)
-                    .environmentObject(catalog)
-                    .environmentObject(catalogs)
-                    .presentationDetents([.large])
-            }
+            .toast(message: $toastMessage)
         }
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
@@ -225,6 +240,92 @@ struct PaletteDetailView: View {
     }
 }
 
+// MARK: - Row Style (Like LiveColorRow)
+private struct PaletteColorRow: View {
+    @EnvironmentObject var favs: FavoritesStore
+    @EnvironmentObject var catalog: Catalog
+    @EnvironmentObject var catalogs: CatalogStore
+    @Binding var toast: String?
+
+    let named: NamedColor
+    let rgb: RGB
+    @State private var likedPulse = false
+
+    var body: some View {
+        HStack(spacing: 12) {
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color(uiColor: rgb.uiColor))
+                .frame(width: 50, height: 50)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(named.name)
+                    .font(.headline)
+                    .lineLimit(1)
+                HStack(spacing: 6) {
+                    Text(named.hex)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    if let brand = named.vendor?.brand, let code = named.vendor?.code {
+                        Text("• \(brand) \(code)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+
+            Spacer()
+
+            Button {
+                handleFavorite()
+                UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+            } label: {
+                ZStack {
+                    Circle()
+                        .strokeBorder(isFavorite ? Color.clear : Color.gray.opacity(0.4), lineWidth: 1.4)
+                        .background(
+                            Circle()
+                                .fill(isFavorite ? Color.green.opacity(0.9) : Color.clear)
+                        )
+                        .frame(width: 16, height: 16)
+                    Image(systemName: isFavorite ? "checkmark" : "plus")
+                        .font(.system(size: 7, weight: .bold))
+                        .foregroundColor(isFavorite ? .black : .gray)
+                }
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.vertical, 6)
+        .contentShape(Rectangle())
+        .onTapGesture(count: 2) {
+            handleFavorite()
+            UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+        }
+    }
+
+    private var isFavorite: Bool {
+        favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(named.hex) }
+    }
+
+    private func handleFavorite() {
+        let key = normalizeHex(named.hex)
+
+        if favs.colors.contains(where: { normalizeHex($0.color.hex) == key }) {
+            favs.colors.removeAll { normalizeHex($0.color.hex) == key }
+            toast = "Removed from Collections"
+        } else {
+            favs.add(color: hexToRGB(named.hex))
+            toast = "Added to Collections \(named.name)"
+        }
+
+        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+        withAnimation(.spring(response: 0.25, dampingFraction: 0.6)) {
+            likedPulse.toggle()
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { likedPulse = false }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) { toast = nil }
+    }
+}
+
 // MARK: - Add Colors Sheet
 struct AddColorsToPaletteSheet: View {
     @EnvironmentObject var favs: FavoritesStore
@@ -275,7 +376,6 @@ struct AddColorsToPaletteSheet: View {
                                     toggle: { toggleSelection(fav.color.hex) }
                                 )
                             }
-
                         }
                         .padding(.horizontal)
                     }
@@ -349,6 +449,12 @@ struct AddColorsToPaletteSheet: View {
     }
 }
 
+@inline(__always)
+private func normalizeHex(_ hex: String) -> String {
+    var s = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+    if s.hasPrefix("#") { s.removeFirst() }
+    return s
+}
 
 extension Optional where Wrapped == String {
     var bound: String {
