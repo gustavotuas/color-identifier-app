@@ -365,7 +365,6 @@ struct ColorDetailView: View {
 
                     🏷️ Vendor: \(v.brand ?? "—")
                     Code: \(v.code ?? "—")
-                    Line: \(v.line ?? "—")
                     """
                 }
             } else {
@@ -568,21 +567,37 @@ private func generateShareImage() -> UIImage {
             .clipShape(RoundedRectangle(cornerRadius: 20))
             .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
         } else {
-            VStack(alignment: .center, spacing: 14) {
-                Text("Unlock Pro to view Harmony & Tints")
-                    .font(.headline)
-                    .foregroundColor(.secondary)
-                MagicalUnlockButton(title: "Unlock Pro")
-                    .padding(.top, 4)
+            // 🔒 Versión no Pro con blur
+            ZStack {
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(.ultraThinMaterial)
+                    .blur(radius: 10)
+                    .mask(
+                        LinearGradient(
+                            gradient: Gradient(stops: [
+                                .init(color: .white.opacity(0.0), location: 0.0),
+                                .init(color: .white.opacity(0.0), location: 0.3),
+                                .init(color: .white.opacity(0.3), location: 0.7),
+                                .init(color: .white.opacity(0.5), location: 1.0)
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .opacity(0.99)
+
+                VStack(spacing: 14) {
+                    Text("Unlock Pro to view Harmony")
+                        .font(.headline)
+                        .foregroundColor(.secondary)
+                    MagicalUnlockButton(title: "Unlock Pro")
+                        .padding(.top, 4)
+                }
+                .padding(30)
             }
-            .frame(maxWidth: .infinity)
-            .padding(30)
-            .background(Color.white.opacity(0.9))
-            .clipShape(RoundedRectangle(cornerRadius: 20))
             .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
         }
-
-
 
         // MARK: - Shades & Tints
         if store.isPro {
@@ -595,17 +610,35 @@ private func generateShareImage() -> UIImage {
             .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
             .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
         } else {
-            VStack(alignment: .center, spacing: 14) {
-                Text("Unlock Pro to view Shades & Tints")
-                    .font(.headline)
-                    .foregroundColor(.secondary)
-                MagicalUnlockButton(title: "Unlock Pro")
-                    .padding(.top, 4)
+            // 🔒 Versión no Pro con blur
+            ZStack {
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(.ultraThinMaterial)
+                    .blur(radius: 10)
+                    .mask(
+                        LinearGradient(
+                            gradient: Gradient(stops: [
+                                .init(color: .white.opacity(0.0), location: 0.0),
+                                .init(color: .white.opacity(0.0), location: 0.3),
+                                .init(color: .white.opacity(0.3), location: 0.7),
+                                .init(color: .white.opacity(0.5), location: 1.0)
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .opacity(0.99)
+
+                VStack(spacing: 14) {
+                    Text("Unlock Pro to view Shades & Tints")
+                        .font(.headline)
+                        .foregroundColor(.secondary)
+                    MagicalUnlockButton(title: "Unlock Pro")
+                        .padding(.top, 4)
+                }
+                .padding(30)
             }
-            .frame(maxWidth: .infinity)
-            .padding(30)
-            .background(Color.white.opacity(0.9))
-            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
             .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
         }
 
