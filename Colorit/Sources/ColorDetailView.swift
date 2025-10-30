@@ -189,6 +189,7 @@ struct ColorDetailView: View {
 
 
                         // MARK: - Shades & Tints Section
+                        // MARK: - Shades & Tints Section
                         VStack(alignment: .leading, spacing: 12) {
                             HStack {
                                 Text("Shades & Tints").font(.headline)
@@ -196,20 +197,30 @@ struct ColorDetailView: View {
                             }
 
                             ShadesAndTintsView(base: rgb) { tapped in
-                            if let found = findNamedColor(hex: tapped.hex) {
-                                selectedHarmonyColor = found
-                                showHarmonySheet = true
-                            } else {
-                                showToast("Color not found in library")
+                                if store.isPro {
+                                    if let found = findNamedColor(hex: tapped.hex) {
+                                        selectedHarmonyColor = found
+                                        showHarmonySheet = true
+                                    } else {
+                                        showToast("Color not found in library")
+                                    }
+                                } else {
+                                    store.showPaywall = true
+                                }
                             }
-                        }
-
                         }
                         .padding(12)
                         .background(scheme == .dark ? Color(.secondarySystemBackground) : .white)
                         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                         .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
                         .padding(.horizontal)
+                        .overlay {
+                            if !store.isPro {
+                                ProBlurOverlay()
+                                    .padding(.horizontal, 0)
+                            }
+                        }
+
 
 
                         // MARK: - Contrast Preview Section
@@ -531,14 +542,29 @@ private func generateShareImage() -> UIImage {
 
 
         // MARK: - Shades & Tints
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Shades & Tints").font(.headline)
-            ShadesAndTintsView(base: rgb) { _ in }
+        if store.isPro {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Shades & Tints").font(.headline)
+                ShadesAndTintsView(base: rgb) { _ in }
+            }
+            .padding(16)
+            .background(Color.white)
+            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
+        } else {
+            VStack(alignment: .center, spacing: 14) {
+                Text("Unlock Pro to view Shades & Tints")
+                    .font(.headline)
+                    .foregroundColor(.secondary)
+                MagicalUnlockButtonSmall(title: "Unlock Pro")
+                    .padding(.top, 4)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(30)
+            .background(Color.white.opacity(0.9))
+            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
         }
-        .padding(16)
-        .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
 
         // MARK: - Contrast Preview
         VStack(alignment: .leading, spacing: 12) {
