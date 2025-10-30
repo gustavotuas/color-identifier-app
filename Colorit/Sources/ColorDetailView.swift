@@ -394,38 +394,39 @@ struct ColorDetailView: View {
     }
 
     // MARK: - Pro Unlock Overlay (reutilizado de PhotosScreen)
-    private struct ProBlurOverlay: View {
-        @EnvironmentObject var store: StoreVM
+private struct ProBlurOverlay: View {
+    @EnvironmentObject var store: StoreVM
 
-        var body: some View {
+    var body: some View {
             ZStack {
                 // Capa base de blur con degradado vertical
-                Rectangle()
-                    .fill(.ultraThinMaterial)
+            Rectangle()
+                .fill(.ultraThinMaterial)
                     .blur(radius: 10)
                     .opacity(0.95)
-                    .mask(
-                        LinearGradient(
-                            gradient: Gradient(stops: [
+                .mask(
+                    LinearGradient(
+                        gradient: Gradient(stops: [
                                 .init(color: .white.opacity(0.0), location: 0.0),
                                 .init(color: .white.opacity(1.0), location: 0.35),
                                 .init(color: .white.opacity(1.0), location: 0.65),
                                 .init(color: .white.opacity(1.0), location: 1.0)
-                            ]),
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
+                        ]),
+                        startPoint: .top,
+                        endPoint: .bottom
                     )
-                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
 
-                // Botón mágico de desbloqueo
-                MagicalUnlockButtonSmall(title: "Unlock Pro")
-                    .onTapGesture { store.showPaywall = true }
-            }
-            .clipShape(RoundedRectangle(cornerRadius: 18))
-            .transition(.opacity)
+            // Botón mágico centrado en la parte inferior
+            MagicalUnlockButton(title: "Unlock Pro")
+                .padding(.bottom, 22)
+                .onTapGesture { store.showPaywall = true }
         }
+        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .transition(.opacity)
     }
+}
 
     private struct MagicalUnlockButtonSmall: View {
         let title: String
@@ -453,6 +454,45 @@ struct ColorDetailView: View {
                 .animation(.spring(response: 0.35, dampingFraction: 0.7), value: title)
         }
     }
+
+    // ======================================================
+// MARK: - Magical Unlock Button (universal)
+// ======================================================
+
+private struct MagicalUnlockButton: View {
+    var title: String = "Unlock Pro"
+
+    var body: some View {
+        VStack(spacing: 10) {
+            Image(systemName: "lock.fill")
+                .font(.system(size: 22, weight: .semibold))
+                .foregroundColor(.white.opacity(0.95))
+                .shadow(color: .white.opacity(0.4), radius: 3, y: 1)
+
+            Text(title)
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundColor(.white)
+                .padding(.horizontal, 26)
+                .padding(.vertical, 10)
+                .background(
+                    LinearGradient(
+                        colors: [
+                            Color(hex: "#3C8CE7"), // azul brillante
+                            Color(hex: "#6F3CE7"), // violeta intenso
+                            Color(hex: "#C63DE8"), // púrpura neón
+                            Color(hex: "#FF61B6")  // fucsia vibrante
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .clipShape(Capsule())
+                .shadow(color: Color.purple.opacity(0.35), radius: 6, y: 3)
+        }
+        .padding(.vertical, 12)
+    }
+}
+
 
 
 
@@ -529,7 +569,7 @@ private func generateShareImage() -> UIImage {
                 Text("Unlock Pro to view Harmony & Tints")
                     .font(.headline)
                     .foregroundColor(.secondary)
-                MagicalUnlockButtonSmall(title: "Unlock Pro")
+                MagicalUnlockButton(title: "Unlock Pro")
                     .padding(.top, 4)
             }
             .frame(maxWidth: .infinity)
@@ -556,7 +596,7 @@ private func generateShareImage() -> UIImage {
                 Text("Unlock Pro to view Shades & Tints")
                     .font(.headline)
                     .foregroundColor(.secondary)
-                MagicalUnlockButtonSmall(title: "Unlock Pro")
+                MagicalUnlockButton(title: "Unlock Pro")
                     .padding(.top, 4)
             }
             .frame(maxWidth: .infinity)
