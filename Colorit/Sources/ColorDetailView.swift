@@ -40,7 +40,7 @@ struct ColorDetailView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(.systemBackground).ignoresSafeArea()
+                Color(.systemGroupedBackground).ignoresSafeArea()
 
                 ScrollView {
                     VStack(spacing: 22) {
@@ -383,7 +383,7 @@ private struct HarmonyStrip: View {
                     VStack(spacing: 6) {
                         RoundedRectangle(cornerRadius: 12)
                             .fill(Color(c.uiColor))
-                            .frame(width: 64, height: 64)
+                            .frame(width: 55, height: 55)
                             .shadow(color: .black.opacity(0.08), radius: 3, y: 2)
                         Text("#\(normalizeHex(c.hex))")
                             .font(.caption2.monospaced())
