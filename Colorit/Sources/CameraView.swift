@@ -439,24 +439,53 @@ struct CameraScreen: View {
 
         // 🧩 Overlay para usuarios no Pro
         // 🧩 Overlay de preview (barra de tiempo)
+        // 🧩 Overlay de preview (barra de tiempo + texto)
         if !store.isPro && trialTimerActive {
-            VStack(spacing: 0) {
-                // 🔵 Barra progresiva arriba
+            VStack(spacing: 6) {
+                // 🔹 Texto informativo
+                Text("Free Preview – Unlock PRO for full access")
+                    .font(.caption.bold())
+                    .foregroundColor(.white)
+                    .shadow(color: .black.opacity(0.5), radius: 3, y: 1)
+                    .transition(.opacity)
+                    .padding(.top, 6)
+
+                // 🔵 Barra progresiva arriba (con borde blanco y gradiente vibrante)
                 GeometryReader { geo in
-                    Rectangle()
-                        .fill(
-                            LinearGradient(colors: [.purple, .pink],
-                                        startPoint: .leading,
-                                        endPoint: .trailing)
-                        )
-                        .frame(width: geo.size.width * trialProgress, height: 4)
-                        .cornerRadius(2)
+                    ZStack(alignment: .leading) {
+                        Capsule()
+                            .fill(Color.white.opacity(0.15))
+                            .frame(height: 14)
+
+                        Capsule()
+                            .fill(
+                                LinearGradient(
+                                    colors: [
+                                        Color(hex: "#3C8CE7"), // azul brillante
+                                        Color(hex: "#6F3CE7"), // violeta intenso
+                                        Color(hex: "#C63DE8"), // púrpura neón
+                                        Color(hex: "#FF61B6")  // fucsia vibrante
+                                    ],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .frame(width: geo.size.width * trialProgress, height: 14)
+                            .overlay(
+                                Capsule()
+                                    .stroke(Color.white.opacity(0.9), lineWidth: 1.2) // 🔹 Borde blanco
+                            )
+                            .shadow(color: .black.opacity(0.25), radius: 3, y: 1)
+                    }
                 }
-                .frame(height: 4)
+                .frame(height: 14)
+                .padding(.horizontal, 20)
+
                 Spacer()
             }
             .transition(.opacity)
         }
+
                 
         // 🧩 Overlay final (bloqueo completo)
         if !store.isPro && !trialTimerActive && !engine.isRunning {
