@@ -323,6 +323,10 @@ struct CameraScreen: View {
     @State private var showVendorSheet = false
     @State private var trialProgress: CGFloat = 0
     @State private var trialTimerActive = false
+    @State private var showOverlay = false
+    @State private var trialUsed = false
+
+
 
 
     // MARK: - Body
@@ -421,21 +425,25 @@ struct CameraScreen: View {
             .frame(width: 22, height: 22)
             .allowsHitTesting(false)
 
-        // 🎨 Island inferior
-        VStack(spacing: 0) {
-            Spacer(minLength: 0)
-            ColorIsland(
-                raw: engine.currentRGB,
-                color: engine.currentRGB,
-                catalog: catalog,
-                selection: selection,
-                catalogs: catalogs,
-                onCopy: {},
-                onFavorite: handleFavorite
-            )
-            .environment(\.copyPulse, copiedPulse)
-            .environment(\.likePulse, likedPulse)
+        // 🎨 Island inferior (solo visible si no está bloqueado)
+        if store.isPro || trialTimerActive {
+            VStack(spacing: 0) {
+                Spacer(minLength: 0)
+                ColorIsland(
+                    raw: engine.currentRGB,
+                    color: engine.currentRGB,
+                    catalog: catalog,
+                    selection: selection,
+                    catalogs: catalogs,
+                    onCopy: {},
+                    onFavorite: handleFavorite
+                )
+                .environment(\.copyPulse, copiedPulse)
+                .environment(\.likePulse, likedPulse)
+                .environmentObject(store)
+            }
         }
+
 
         // 🧩 Overlay para usuarios no Pro
         // 🧩 Overlay de preview (barra de tiempo)
@@ -488,7 +496,7 @@ struct CameraScreen: View {
 
                 
         // 🧩 Overlay final (bloqueo completo)
-        if !store.isPro && !trialTimerActive && !engine.isRunning {
+        if !store.isPro && showOverlay {
             ZStack {
                 Color.black.opacity(0.6).ignoresSafeArea()
                 VStack(spacing: 14) {
@@ -703,27 +711,29 @@ private var toolbarItems: some ToolbarContent {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
             engine.start()
 
-            // 🎬 Solo preview temporal si no es Pro
-            if !store.isPro {
+            // 🎬 Solo preview temporal si no es Pro y no lo ha usado en esta sesión
+            if !store.isPro && !trialUsed {
+                trialUsed = true // ✅ se marca solo durante esta sesión
                 trialProgress = 0
                 trialTimerActive = true
                 let duration: Double = 8.0 // segundos de preview
                 
-                // Animar la barra de progreso
                 withAnimation(.linear(duration: duration)) {
                     trialProgress = 1.0
                 }
 
-                // Al terminar el preview
                 DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
-                    engine.stop()
                     trialTimerActive = false
+                    showOverlay = true
                     toastMessage = "Preview ended – Unlock full camera"
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) {
                         toastMessage = nil
                         store.showPaywall = true
                     }
                 }
+            } else if !store.isPro && trialUsed {
+                // 👇 si ya tuvo el trial en esta sesión, mostrar overlay directo
+                showOverlay = true
             }
         }
     }
