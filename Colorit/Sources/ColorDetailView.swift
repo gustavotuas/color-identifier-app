@@ -713,11 +713,29 @@ private struct ShadesAndTintsView: View {
 
     private func shadesAndTints(for rgb: RGB) -> [RGB] {
         let (h, s, b) = rgbToHSB(rgb)
-        let steps: [CGFloat] = [-40, -20, 0, 20, 40]
-        return steps.map { delta in
-            hsbToRGB(hue: h, s: s, b: max(0, min(100, b + delta)))
+
+        // Distribuye los pasos según el rango real de brillo disponible
+        let steps: [CGFloat] = [-45, -25, 0, 20, 40]
+        var results: [RGB] = []
+
+        for delta in steps {
+            let newBrightness = max(0, min(100, b + delta))
+            let newColor = hsbToRGB(hue: h, s: s, b: newBrightness)
+            results.append(newColor)
         }
+
+        // ✅ Elimina duplicados basándose en HEX normalizado
+        let unique = results.reduce(into: [String: RGB]()) { dict, c in
+            let key = normalizeHex(c.hex)
+            if dict[key] == nil {
+                dict[key] = c
+            }
+        }
+
+        // Devuelve los valores únicos, ordenados de oscuro → claro
+        return unique.values.sorted { rgbToHSB($0).b < rgbToHSB($1).b }
     }
+
 }
 
 
