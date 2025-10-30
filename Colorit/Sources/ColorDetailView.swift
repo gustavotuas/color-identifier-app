@@ -402,7 +402,7 @@ private struct ProBlurOverlay: View {
             // 🔲 Fondo con mismo blur, gradiente y opacidad que el Unlock Picker
             RoundedRectangle(cornerRadius: 20)
                 .fill(.ultraThinMaterial)
-                .blur(radius: 10)
+                .blur(radius: 20)
                 .mask(
                     LinearGradient(
                         gradient: Gradient(stops: [
@@ -416,7 +416,7 @@ private struct ProBlurOverlay: View {
                     )
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 20))
-                .opacity(0.99)
+                .opacity(1.0)
                 .zIndex(2)
 
             // 🔒 Botón Unlock encima (mismo estilo que en el picker)
@@ -705,6 +705,8 @@ private func generateShareImage() -> UIImage {
 
 // MARK: - Harmony Strip
 private struct HarmonyStrip: View {
+    @EnvironmentObject var store: StoreVM   // 👈 añadimos esto para saber si es Pro
+
     let base: RGB
     let mode: HarmonyMode
     let onTap: (RGB) -> Void
@@ -721,9 +723,13 @@ private struct HarmonyStrip: View {
                             .fill(Color(c.uiColor))
                             .frame(width: 55, height: 55)
                             .shadow(color: .black.opacity(0.08), radius: 3, y: 2)
-                        Text("#\(normalizeHex(c.hex))")
-                            .font(.caption2.monospaced())
-                            .foregroundColor(.secondary)
+
+                        // 👇 Solo mostrar el HEX si es Pro
+                        if store.isPro {
+                            Text("#\(normalizeHex(c.hex))")
+                                .font(.caption2.monospaced())
+                                .foregroundColor(.secondary)
+                        }
                     }
                 }
                 .buttonStyle(.plain)
@@ -735,25 +741,31 @@ private struct HarmonyStrip: View {
         switch mode {
         case .analogous:
             let (h, s, b) = rgbToHSB(base)
-            return [hsbToRGB(hue: h - 30, s: s, b: b),
-                    base,
-                    hsbToRGB(hue: h + 30, s: s, b: b)]
+            return [
+                hsbToRGB(hue: h - 30, s: s, b: b),
+                base,
+                hsbToRGB(hue: h + 30, s: s, b: b)
+            ]
         case .complementary:
             return [base, complementaryColor(for: base)]
         case .triadic:
             let (h, s, b) = rgbToHSB(base)
-            return [base,
-                    hsbToRGB(hue: h + 120, s: s, b: b),
-                    hsbToRGB(hue: h - 120, s: s, b: b)]
-        // case .monochromatic:
-        //     return monochromaticColors(for: base)
+            return [
+                base,
+                hsbToRGB(hue: h + 120, s: s, b: b),
+                hsbToRGB(hue: h - 120, s: s, b: b)
+            ]
         }
     }
 }
 
+
+// MARK: - Shades & Tints
 // MARK: - Shades & Tints
 // MARK: - Shades & Tints
 private struct ShadesAndTintsView: View {
+    @EnvironmentObject var store: StoreVM   // 👈 añadimos esto
+
     let base: RGB
     let onSelect: (RGB) -> Void
 
@@ -769,9 +781,13 @@ private struct ShadesAndTintsView: View {
                             .fill(Color(c.uiColor))
                             .frame(width: 55, height: 55)
                             .shadow(color: .black.opacity(0.06), radius: 2, y: 1)
-                        Text("#\(normalizeHex(c.hex))")
-                            .font(.caption2.monospaced())
-                            .foregroundColor(.secondary)
+
+                        // 👇 Solo mostrar el HEX si es usuario Pro
+                        if store.isPro {
+                            Text("#\(normalizeHex(c.hex))")
+                                .font(.caption2.monospaced())
+                                .foregroundColor(.secondary)
+                        }
                     }
                 }
                 .buttonStyle(.plain)
@@ -803,8 +819,8 @@ private struct ShadesAndTintsView: View {
         // Devuelve los valores únicos, ordenados de oscuro → claro
         return unique.values.sorted { rgbToHSB($0).b < rgbToHSB($1).b }
     }
-
 }
+
 
 
 // MARK: - Contrast Preview
