@@ -402,19 +402,19 @@ struct CameraScreen: View {
             .ignoresSafeArea(edges: .horizontal)
 
         // ☀️ Luz / exposición
-        HStack {
-            Image(systemName: engine.brightness > 0.45 ? "sun.max.fill" : "cloud.fill")
-                .font(.system(size: 22, weight: .semibold))
-                .foregroundStyle(engine.brightness > 0.45 ? .yellow : .gray)
-                .shadow(color: .black.opacity(0.25), radius: 4, y: 2)
-                .padding(.leading, 12)
-                .padding(.top, 12)
-                .transition(.opacity.combined(with: .scale))
-                .animation(.easeInOut(duration: 0.25), value: engine.brightness > 0.45)
-            Spacer()
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .ignoresSafeArea(edges: .top)
+        // HStack {
+        //     Image(systemName: engine.brightness > 0.45 ? "sun.max.fill" : "cloud.fill")
+        //         .font(.system(size: 22, weight: .semibold))
+        //         .foregroundStyle(engine.brightness > 0.45 ? .yellow : .gray)
+        //         .shadow(color: .black.opacity(0.25), radius: 4, y: 2)
+        //         .padding(.leading, 12)
+        //         .padding(.top, 12)
+        //         .transition(.opacity.combined(with: .scale))
+        //         .animation(.easeInOut(duration: 0.25), value: engine.brightness > 0.45)
+        //     Spacer()
+        // }
+        // .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        // .ignoresSafeArea(edges: .top)
 
         // 🎯 Crosshair central
         CrosshairCenter(color: Color(uiColor: engine.currentRGB.uiColor))
@@ -886,6 +886,8 @@ struct ColorIsland: View {
     var onFavorite: () -> Void
 
     @Environment(\.likePulse) private var likePulse
+    @EnvironmentObject var store: StoreVM
+
 
     // Arma el pool de colores según el filtro activo
     private var filteredPool: [NamedColor] {
@@ -969,17 +971,19 @@ struct ColorIsland: View {
 
                 Spacer()
 
-                Button(action: onFavorite) {
-                    Label("Save", systemImage: "square.and.arrow.down")
-                        .labelStyle(.iconOnly)
-                        .font(.title3.weight(.semibold))
-                        .foregroundStyle(.white)
-                        .symbolEffect(.bounce, value: likePulse)
-                        .shadow(color: .black.opacity(0.25), radius: 2, y: 1)
+                // 🔒 Solo mostrar botón Save si el usuario es PRO
+                if store.isPro {
+                    Button(action: onFavorite) {
+                        Label("Save", systemImage: "square.and.arrow.down")
+                            .labelStyle(.iconOnly)
+                            .font(.title3.weight(.semibold))
+                            .foregroundStyle(.white)
+                            .symbolEffect(.bounce, value: likePulse)
+                            .shadow(color: .black.opacity(0.25), radius: 2, y: 1)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Save color to collections")
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Save color to collections")
-
             }
         }
         .padding(14)
