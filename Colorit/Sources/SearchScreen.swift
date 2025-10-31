@@ -90,7 +90,7 @@ struct SearchScreen: View {
     @State private var layout: LayoutMode = .grid3
     @State private var ascending = true
     @State private var ascendingBrightness = true     // Orden por brillo
-    @State private var selection: CatalogSelection = .all
+    @State private var selection: CatalogSelection = .genericOnly
     @State private var showVendorSheet = false
     @State private var visibleCount = 100
     private let batchSize = 100
@@ -307,7 +307,7 @@ private var iconColor: Color {
             Spacer()
             Button {
                 withAnimation(.easeInOut) {
-                    selection = .all
+                    selection = .genericOnly
                     VendorSelectionStorage.save(selection)
                     // ✅ Toast al limpiar filtro
                     toastMessage = "Paint filter cleared"
@@ -459,6 +459,8 @@ private var iconColor: Color {
     private func initialize() {
         if let saved = VendorSelectionStorage.load() {
             selection = saved
+        } else {
+            selection = .genericOnly
         }
         preloadForSelection()
 
@@ -481,11 +483,7 @@ private var iconColor: Color {
         rebuildEngineAndRefilter()
         // ✅ Toast al setear filtro
         withAnimation {
-            if selection == .all {
-                toastMessage = "Paint filter cleared"
-            } else {
                 toastMessage = "Paint filter set: \(selection.filterSubtitle)"
-            }
         }
     }
 
@@ -515,9 +513,6 @@ private var iconColor: Color {
 
     private func preloadForSelection() {
         switch selection {
-        case .all:
-            catalogs.load(.generic)
-            vendorIDs.forEach { catalogs.load($0) }
         case .genericOnly:
             catalogs.load(.generic)
         case .vendor(let id):
@@ -530,10 +525,6 @@ private var iconColor: Color {
             catalog.names.map { n in NamedColor(name: n.name, hex: n.hex, vendor: nil, rgb: nil) }
         }
         switch sel {
-        case .all:
-            let generic = genericColors()
-            let vendors = catalogs.colors(for: Set(vendorIDs))
-            return mergeUnique([generic, vendors])
         case .genericOnly:
             return genericColors()
         case .vendor(let id):

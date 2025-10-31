@@ -53,7 +53,7 @@ struct PhotosScreen: View {
     @State private var image: UIImage?
     @State private var palette: [RGB] = []
     @State private var matches: [MatchedSwatch] = []
-    @State private var selection: CatalogSelection = .all
+    @State private var selection: CatalogSelection = .genericOnly
     @State private var showVendorSheet = false
     @State private var showSystemPicker = false
     @State private var showPaletteSheet = false
@@ -219,7 +219,7 @@ private func savePhotoPalette() {
             Spacer()
             Button {
                 withAnimation(.easeInOut) {
-                    selection = .all
+                    selection = .genericOnly
                     VendorSelectionStorage.save(selection)
                     rebuildMatches()
                 }
@@ -488,9 +488,6 @@ Button {
 
     private func preloadForSelection() {
         switch selection {
-        case .all:
-            catalogs.load(.generic)
-            vendorIDs.forEach { catalogs.load($0) }
         case .genericOnly:
             catalogs.load(.generic)
         case .vendor(let id):
@@ -502,10 +499,6 @@ Button {
         guard !palette.isEmpty else { matches = []; return }
         let pool: [NamedColor]
         switch selection {
-        case .all:
-            let generic = catalogs.loaded[.generic] ?? catalog.names
-            let vendors = catalogs.colors(for: Set(vendorIDs))
-            pool = generic + vendors
         case .genericOnly:
             pool = catalogs.loaded[.generic] ?? catalog.names
         case .vendor(let id):

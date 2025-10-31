@@ -319,7 +319,7 @@ struct CameraScreen: View {
     @State private var flash = false
     @State private var toastMessage: String? = nil
     @State private var matches: MatchesPayload? = nil
-    @State private var selection: CatalogSelection = VendorSelectionStorage.load() ?? .all
+    @State private var selection: CatalogSelection = VendorSelectionStorage.load() ?? .genericOnly
     @State private var showVendorSheet = false
     @State private var trialProgress: CGFloat = 0
     @State private var trialTimerActive = false
@@ -375,7 +375,7 @@ struct CameraScreen: View {
                     Spacer()
                     Button {
                         withAnimation(.easeInOut) {
-                            selection = .all
+                            selection = .genericOnly
                             VendorSelectionStorage.save(selection)
                             toastMessage = "Paint filter cleared"
                         }
@@ -584,11 +584,7 @@ struct CameraScreen: View {
         .presentationDetents([.medium, .large])
         .onDisappear {
             withAnimation {
-                if selection == .all {
-                    toastMessage = "Paint filter cleared"
-                } else {
                     toastMessage = "Paint filter set: \(selection.filterSubtitle)"
-                }
             }
             VendorSelectionStorage.save(selection)
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) { toastMessage = nil }
@@ -652,8 +648,6 @@ private var toolbarItems: some ToolbarContent {
     // 1️⃣ Construir pool de colores según el filtro activo
     let pool: [NamedColor]
     switch selection {
-    case .all:
-        pool = catalog.names + catalogs.colors(for: Set(CatalogID.allCases.filter { $0 != .generic }))
     case .vendor(let id):
         pool = catalogs.colors(for: [id])
     case .genericOnly:
@@ -705,7 +699,7 @@ private var toolbarItems: some ToolbarContent {
 
 
     private func handleAppear() {
-    selection = VendorSelectionStorage.load() ?? .all
+    selection = VendorSelectionStorage.load() ?? .genericOnly
 
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
         engine.stop()
@@ -744,11 +738,7 @@ private var toolbarItems: some ToolbarContent {
 
     private func handleSelectionChange(_ newValue: CatalogSelection) {
         withAnimation {
-            if newValue == .all {
-                toastMessage = "Paint filter cleared"
-            } else {
                 toastMessage = "Paint filter set: \(newValue.filterSubtitle)"
-            }
         }
         VendorSelectionStorage.save(newValue)
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
@@ -903,8 +893,6 @@ struct ColorIsland: View {
     // Arma el pool de colores según el filtro activo
     private var filteredPool: [NamedColor] {
         switch selection {
-        case .all:
-            return catalog.names + catalogs.colors(for: Set(CatalogID.allCases.filter { $0 != .generic }))
         case .vendor(let id):
             return catalogs.colors(for: [id]) // ✅ sólo colores del proveedor
         case .genericOnly:

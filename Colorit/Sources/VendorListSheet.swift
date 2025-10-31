@@ -34,19 +34,8 @@ struct VendorListSheet: View {
     var body: some View {
         NavigationStack {
             List {
-                // MARK: - Generic & All
+                // MARK: - Generic (único default)
                 Section {
-                    Button {
-                        selection = .all
-                        VendorSelectionStorage.save(selection)
-                        dismiss()
-                    } label: {
-                        HStack {
-                            Image(systemName: selection == .all ? "checkmark.circle.fill" : "circle")
-                            Text("All Colors")
-                        }
-                    }
-
                     Button {
                         selection = .genericOnly
                         VendorSelectionStorage.save(selection)
@@ -54,7 +43,7 @@ struct VendorListSheet: View {
                     } label: {
                         HStack {
                             Image(systemName: selection == .genericOnly ? "checkmark.circle.fill" : "circle")
-                            Text("Generic")
+                            Text("Generic Colors")
                         }
                     }
                 }
@@ -65,12 +54,10 @@ struct VendorListSheet: View {
                         ForEach(items) { row in
                             Button {
                                 if isPro {
-                                    // ✅ PRO puede seleccionar normalmente
                                     selection = .vendor(row.id)
                                     VendorSelectionStorage.save(selection)
                                     dismiss()
                                 } else {
-                                    // 🚫 No PRO: abrir paywall sin cambiar selección
                                     withAnimation(.spring()) {
                                         store.showPaywall = true
                                     }
@@ -85,7 +72,6 @@ struct VendorListSheet: View {
                                             .font(.caption)
                                             .foregroundColor(.secondary)
                                     }
-                                    // 🔒 Si no es PRO, mostramos el candado
                                     if !isPro {
                                         Image(systemName: "lock.fill")
                                             .foregroundColor(.gray)

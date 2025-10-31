@@ -13,7 +13,7 @@ struct LivePaletteDetailView: View {
     @State private var addedPalette = false
     @State private var ascending = true
     @State private var visibleColors: [RGB] = []
-    @State var selection: CatalogSelection = VendorSelectionStorage.load() ?? .all
+    @State var selection: CatalogSelection = VendorSelectionStorage.load() ?? .genericOnly
 
 
     var body: some View {
@@ -184,8 +184,6 @@ struct LivePaletteDetailView: View {
     private func nearestNamedColor(for rgb: RGB) -> NamedColor {
         let pool: [NamedColor]
         switch selection {
-        case .all:
-            pool = catalog.names + catalogs.colors(for: Set(CatalogID.allCases.filter { $0 != .generic }))
         case .vendor(let id):
             pool = catalogs.colors(for: [id])
         case .genericOnly:
@@ -253,7 +251,7 @@ private struct LiveColorRow: View {
     let named: NamedColor
     let rgb: RGB
     @State private var likedPulse = false
-    @State var selection: CatalogSelection = VendorSelectionStorage.load() ?? .all
+    @State var selection: CatalogSelection = VendorSelectionStorage.load() ?? .genericOnly
 
     var body: some View {
         HStack(spacing: 12) {
