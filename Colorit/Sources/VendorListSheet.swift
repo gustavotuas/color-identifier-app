@@ -13,6 +13,8 @@ struct VendorListSheet: View {
     @Binding var selection: CatalogSelection
     let candidates: [CatalogID]
     let catalogs: CatalogStore
+    let isPro: Bool
+    @EnvironmentObject var store: StoreVM
 
     private var rows: [VendorRowModel] {
         candidates
@@ -32,6 +34,7 @@ struct VendorListSheet: View {
     var body: some View {
         NavigationStack {
             List {
+                // MARK: - Generic & All
                 Section {
                     Button {
                         selection = .all
@@ -40,7 +43,7 @@ struct VendorListSheet: View {
                     } label: {
                         HStack {
                             Image(systemName: selection == .all ? "checkmark.circle.fill" : "circle")
-                            Text("All Colors")    // 👈 antes decía All Vendors
+                            Text("All Colors")
                         }
                     }
 
@@ -56,20 +59,36 @@ struct VendorListSheet: View {
                     }
                 }
 
+                // MARK: - Vendor Groups
                 ForEach(grouped, id: \.key) { letter, items in
                     Section(letter) {
                         ForEach(items) { row in
                             Button {
-                                selection = .vendor(row.id)
-                                VendorSelectionStorage.save(selection)
-                                dismiss()
+                                if isPro {
+                                    // ✅ PRO puede seleccionar normalmente
+                                    selection = .vendor(row.id)
+                                    VendorSelectionStorage.save(selection)
+                                    dismiss()
+                                } else {
+                                    // 🚫 No PRO: abrir paywall sin cambiar selección
+                                    withAnimation(.spring()) {
+                                        store.showPaywall = true
+                                    }
+                                }
                             } label: {
                                 HStack {
                                     Image(systemName: (selection == .vendor(row.id)) ? "checkmark.circle.fill" : "circle")
                                     Text(row.name).lineLimit(1)
                                     Spacer()
                                     if let c = row.count {
-                                        Text("\(c)").font(.caption).foregroundColor(.secondary)
+                                        Text("\(c)")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
+                                    // 🔒 Si no es PRO, mostramos el candado
+                                    if !isPro {
+                                        Image(systemName: "lock.fill")
+                                            .foregroundColor(.gray)
                                     }
                                 }
                             }
@@ -79,7 +98,7 @@ struct VendorListSheet: View {
             }
             .listStyle(.insetGrouped)
             .navigationTitle("Paints")
-            .navigationBarTitleDisplayMode(.inline) // compacto
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 }

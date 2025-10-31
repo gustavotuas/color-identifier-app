@@ -578,7 +578,8 @@ struct CameraScreen: View {
         VendorListSheet(
             selection: $selection,
             candidates: CatalogID.allCases.filter { $0 != .generic },
-            catalogs: catalogs
+            catalogs: catalogs,
+            isPro: store.isPro
         )
         .presentationDetents([.medium, .large])
         .onDisappear {

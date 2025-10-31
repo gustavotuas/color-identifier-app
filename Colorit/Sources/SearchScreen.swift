@@ -436,21 +436,24 @@ private var iconColor: Color {
     }
 
     // MARK: - Vendor Sheet
+    // ✅ Correcto
     private var vendorSheet: some View {
         VendorListSheet(
             selection: $selection,
             candidates: vendorIDs,
-            catalogs: catalogs
+            catalogs: catalogs,
+            isPro: store.isPro
         )
+        .environmentObject(store)
         .presentationDetents([.medium, .large])
         .onDisappear {
             preloadForSelection()
-            // Espera un pequeño delay para asegurar que el vendor se haya cargado
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
                 rebuildEngineAndRefilter()
             }
         }
     }
+
 
     // MARK: - Helpers
     private func initialize() {

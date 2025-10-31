@@ -148,7 +148,8 @@ private func savePhotoPalette() {
             .sheet(isPresented: $showVendorSheet) {
                 VendorListSheet(selection: $selection,
                                 candidates: vendorIDs,
-                                catalogs: catalogs)
+                                catalogs: catalogs,
+                                isPro: store.isPro)
                     .presentationDetents([.medium, .large])
                     .onDisappear {
                         preloadForSelection()
