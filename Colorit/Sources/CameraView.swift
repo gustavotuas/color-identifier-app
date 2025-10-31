@@ -370,14 +370,14 @@ struct CameraScreen: View {
         Group {
             if selection.isFiltered {
                 HStack(spacing: 8) {
-                    Image(systemName: "line.3.horizontal.decrease.circle")
+                    Image(systemName: "paintpalette.fill")
                     Text(selection.filterSubtitle).lineLimit(1)
                     Spacer()
                     Button {
                         withAnimation(.easeInOut) {
                             selection = .all
                             VendorSelectionStorage.save(selection)
-                            toastMessage = "Vendor filter cleared"
+                            toastMessage = "Paint filter cleared"
                         }
                     } label: {
                         Label("Clear", systemImage: "xmark.circle.fill")
@@ -584,9 +584,9 @@ struct CameraScreen: View {
         .onDisappear {
             withAnimation {
                 if selection == .all {
-                    toastMessage = "Vendor filter cleared"
+                    toastMessage = "Paint filter cleared"
                 } else {
-                    toastMessage = "Vendor filter set: \(selection.filterSubtitle)"
+                    toastMessage = "Paint filter set: \(selection.filterSubtitle)"
                 }
             }
             VendorSelectionStorage.save(selection)
@@ -600,9 +600,9 @@ private var toolbarItems: some ToolbarContent {
         // Leading
         ToolbarItem(placement: .navigationBarLeading) {
             Button { showVendorSheet = true } label: {
-                Image(systemName: "slider.horizontal.3")
+                Image(systemName: "paintpalette.fill")
             }
-            .accessibilityLabel("Select vendor")
+            .accessibilityLabel("Select Paint")
         }
 
         // Trailing
@@ -744,9 +744,9 @@ private var toolbarItems: some ToolbarContent {
     private func handleSelectionChange(_ newValue: CatalogSelection) {
         withAnimation {
             if newValue == .all {
-                toastMessage = "Vendor filter cleared"
+                toastMessage = "Paint filter cleared"
             } else {
-                toastMessage = "Vendor filter set: \(newValue.filterSubtitle)"
+                toastMessage = "Paint filter set: \(newValue.filterSubtitle)"
             }
         }
         VendorSelectionStorage.save(newValue)

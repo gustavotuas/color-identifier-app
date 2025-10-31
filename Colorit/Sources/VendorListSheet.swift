@@ -78,7 +78,7 @@ struct VendorListSheet: View {
                 }
             }
             .listStyle(.insetGrouped)
-            .navigationTitle("Vendors")
+            .navigationTitle("Paints")
             .navigationBarTitleDisplayMode(.inline) // compacto
         }
     }

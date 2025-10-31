@@ -125,11 +125,11 @@ struct SearchScreen: View {
             showVendorSheet = true
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
         } label: {
-            Image(systemName: "slider.horizontal.3")
+            Image(systemName: "paintpalette.fill")
                 .imageScale(.large)
                 .foregroundColor(iconColor) // 👈 color adaptativo
         }
-        .accessibilityLabel("Select vendor")
+        .accessibilityLabel("Select Paint")
 
         Spacer()
 
@@ -302,7 +302,7 @@ private var iconColor: Color {
     @ViewBuilder
     private var filterBanner: some View {
         HStack(spacing: 8) {
-            Image(systemName: "line.3.horizontal.decrease.circle")
+            Image(systemName: "paintpalette.fill")
             Text(selection.filterSubtitle).lineLimit(1)
             Spacer()
             Button {
@@ -310,7 +310,7 @@ private var iconColor: Color {
                     selection = .all
                     VendorSelectionStorage.save(selection)
                     // ✅ Toast al limpiar filtro
-                    toastMessage = "Vendor filter cleared"
+                    toastMessage = "Paint filter cleared"
                 }
             } label: {
                 Label("Clear", systemImage: "xmark.circle.fill")
@@ -374,9 +374,9 @@ private var iconColor: Color {
     private var toolbarContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarLeading) {
             Button { showVendorSheet = true } label: {
-                Image(systemName: "slider.horizontal.3")
+                Image(systemName: "paintpalette.fill")
             }
-            .accessibilityLabel("Select vendor")
+            .accessibilityLabel("Select Paint")
         }
 
         ToolbarItemGroup(placement: .navigationBarTrailing) {
@@ -479,9 +479,9 @@ private var iconColor: Color {
         // ✅ Toast al setear filtro
         withAnimation {
             if selection == .all {
-                toastMessage = "Vendor filter cleared"
+                toastMessage = "Paint filter cleared"
             } else {
-                toastMessage = "Vendor filter set: \(selection.filterSubtitle)"
+                toastMessage = "Paint filter set: \(selection.filterSubtitle)"
             }
         }
     }

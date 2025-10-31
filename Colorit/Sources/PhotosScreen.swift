@@ -118,7 +118,7 @@ private func savePhotoPalette() {
                 // ⚙️ Botón izquierdo (Filtros)
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button { showVendorSheet = true } label: {
-                        Image(systemName: "slider.horizontal.3")
+                        Image(systemName: "paintpalette.fill")
                     }
                 }
 
@@ -212,7 +212,7 @@ private func savePhotoPalette() {
     // MARK: - Filter Header
     private var filterHeader: some View {
         HStack(spacing: 8) {
-            Image(systemName: "line.3.horizontal.decrease.circle")
+            Image(systemName: "paintpalette.fill")
             Text(selection.filterSubtitle)
                 .lineLimit(1)
             Spacer()
