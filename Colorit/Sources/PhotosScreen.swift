@@ -175,11 +175,17 @@ private func savePhotoPalette() {
 
 
             .fullScreenCover(isPresented: $showSystemPicker) {
+                // PhotosScreen.swift (dentro del .fullScreenCover del picker)
                 SystemPhotoPicker(isPresented: $showSystemPicker, image: $image) { uiimg in
-                    let raw = KMeans.palette(from: uiimg, k: 15)
-                    let filtered = removeSimilarColors(from: raw.compactMap { hexToRGB($0.hex) }, threshold: 0.02)
-                    palette = sortPalette(filtered)
-                    rebuildMatches()
+                    DispatchQueue.global(qos: .userInitiated).async {
+                        let raw = KMeans.palette(from: uiimg, k: 15) // ya hace downscale:contentReference[oaicite:13]{index=13}
+                        let filtered = removeSimilarColors(from: raw, threshold: 22.0)
+                        let sorted = sortPalette(filtered) // ya tienes este helper:contentReference[oaicite:14]{index=14}
+                        DispatchQueue.main.async {
+                            self.palette = sorted
+                            rebuildMatches()
+                        }
+                    }
                 }
                 .ignoresSafeArea()
             }
@@ -534,7 +540,8 @@ Button {
 
 
 
-    private func removeSimilarColors(from colors: [RGB], threshold: Double) -> [RGB] {
+    // PhotosScreen.swift
+    private func removeSimilarColors(from colors: [RGB], threshold: Double = 22.0) -> [RGB] {
         var unique: [RGB] = []
         for color in colors {
             if !unique.contains(where: { $0.distance(to: color) < threshold }) {

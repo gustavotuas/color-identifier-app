@@ -607,19 +607,30 @@ private var iconColor: Color {
         }
     }
 
-    private func performAsyncFilter(_ query: String) {
+    // SearchScreen.swift
+    private func performAsyncFilter(_ text: String) {
+        // Cancela cualquier búsqueda pendiente anterior
         pendingSearchWorkItem?.cancel()
-        let work = DispatchWorkItem { [query, ascending] in
+
+        // Crea una nueva tarea diferida (debounce)
+        let currentAscending = ascending
+        let work = DispatchWorkItem {
             guard let engine = searchEngine else { return }
-            engine.search(query: query, ascending: ascending) { result in
-                self.filteredColors = result
-                self.sortFilteredInPlace()
-                self.visibleCount = self.batchSize
+
+            engine.search(query: text, ascending: currentAscending) { results in
+                filteredColors = results
+                visibleCount = min(batchSize, results.count)
             }
         }
+
+        // Guarda la referencia para poder cancelarla si el usuario sigue escribiendo
         pendingSearchWorkItem = work
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: work)
+
+        // Ejecuta la búsqueda tras 120 ms si no se ha cancelado
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12, execute: work)
     }
+
+
 
     private func sortFilteredInPlace() {
     // Orden alfabético por nombre (A–Z o Z–A)

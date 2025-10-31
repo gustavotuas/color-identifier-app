@@ -257,7 +257,7 @@ private struct PhotoColorRow: View {
         let key = normalizeHex(named.hex)
 
         if favs.colors.contains(where: { normalizeHex($0.color.hex) == key }) {
-            favs.colors.removeAll { normalizeHex($0.color.hex) == key }
+            favs.removeColor(hex: named.hex)
             toast = "Removed from Collections"
         } else {
             favs.add(color: hexToRGB(named.hex))

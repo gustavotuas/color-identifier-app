@@ -38,7 +38,7 @@ struct LikeFavoriteSmallButton: View {
     private func toggleFavorite() {
         let rgb = hexToRGB(hex)
         if isFavorite {
-            favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
+            favs.removeColor(hex: rgb.hex)
             isFavorite = false
         } else {
             let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }

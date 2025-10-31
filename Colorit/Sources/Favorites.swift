@@ -66,6 +66,16 @@ final class FavoritesStore: ObservableObject {
 
     init() { load() }
 
+    // Favorites.swift (dentro de FavoritesStore)
+    func removeColor(hex: String) {
+        let key = normalizeHex(hex)
+        colors.removeAll { normalizeHex($0.color.hex) == key }
+        persist()
+        totalFavorites = colors.count
+        hasNewFavorites = !colors.isEmpty
+    }
+
+
     func add(color: RGB) {
         if !colors.contains(where: { $0.color.hex == color.hex }) {
             colors.insert(FavoriteColor(color: color, date: Date()), at: 0)
@@ -329,6 +339,7 @@ struct FavoritesScreen: View {
             }
         }
     }
+    
 }
 
 // MARK: - Filter Enum

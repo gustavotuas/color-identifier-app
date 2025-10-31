@@ -168,7 +168,9 @@ struct PaywallView: View {
         }
         .interactiveDismissDisabled(!canDismiss)
         .task {
-            await store.load()
+            if store.products.isEmpty {
+                await store.load()
+            }
             // 👇 Selecciona por defecto el plan Yearly
             if let yearly = store.products.first(where: { $0.id == store.yearly }) {
                 store.selectedID = yearly.id
