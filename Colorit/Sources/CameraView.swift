@@ -505,7 +505,7 @@ struct CameraScreen: View {
                         .foregroundColor(.white.opacity(0.9))
                         .padding(.bottom, 4)
 
-                    Text("Unlock Full Camera Access")
+                    Text("Unlock Full Live Camera Access")
                         .font(.title3.bold())
                         .foregroundColor(.white)
 
@@ -725,11 +725,11 @@ private var toolbarItems: some ToolbarContent {
                 DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
                     trialTimerActive = false
                     showOverlay = true
-                    toastMessage = "Preview ended – Unlock full camera"
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) {
-                        toastMessage = nil
-                        store.showPaywall = true
-                    }
+                    // toastMessage = "Preview ended – Unlock full camera"
+                    // DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) {
+                    //     toastMessage = nil
+                    //     store.showPaywall = true
+                    // }
                 }
             } else if !store.isPro && trialUsed {
                 // 👇 si ya tuvo el trial en esta sesión, mostrar overlay directo
@@ -792,10 +792,10 @@ private var toolbarItems: some ToolbarContent {
         matches = MatchesPayload(colors: colors, sourceImage: img)
 
         // Mostrar toast
-        toastMessage = "Palette generated from live camera"
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
-            toastMessage = nil
-        }
+        // toastMessage = "Palette generated from live camera"
+        // DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
+        //     toastMessage = nil
+        // }
     }
 
 

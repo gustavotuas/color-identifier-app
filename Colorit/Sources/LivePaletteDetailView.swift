@@ -68,8 +68,8 @@ struct LivePaletteDetailView: View {
                                     .fill(
                                         Color(uiColor: UIColor { trait in
                                             trait.userInterfaceStyle == .dark
-                                            ? UIColor.systemGray5 // más claro en dark
-                                            : UIColor.systemGray6 // más neutro en light
+                                            ? UIColor.systemGray5
+                                            : UIColor.systemGray6
                                         })
                                     )
                                     .shadow(color: Color.black.opacity(0.1), radius: 1, y: 1)
@@ -92,9 +92,6 @@ struct LivePaletteDetailView: View {
                         .padding(.horizontal)
                         .padding(.top, 10)
 
-
-
-
                         Divider().padding(.horizontal)
 
                         // MARK: - List style like SearchScreen
@@ -103,7 +100,6 @@ struct LivePaletteDetailView: View {
                                 let named = nearestNamedColor(for: rgb)
                                 LiveColorRow(toast: $toastMessage, named: named, rgb: rgb)
                                     .environmentObject(favs)
-                                    //.background(.ultraThinMaterial)
                                     .clipShape(RoundedRectangle(cornerRadius: 12))
                                     .shadow(color: .black.opacity(0.05), radius: 2, y: 1)
                                     .padding(.horizontal)
@@ -112,6 +108,28 @@ struct LivePaletteDetailView: View {
                         .padding(.top, 4)
                         .padding(.bottom, 30)
                     }
+                }
+
+                // MARK: - Blur + Magical Unlock Button (solo si no es Pro)
+                if !store.isPro {
+                    ZStack {
+                        Rectangle()
+                            .fill(.ultraThinMaterial)
+                            //.background(Color.black.opacity(0.01))
+                            .ignoresSafeArea()
+                            .transition(.opacity)
+                            .zIndex(10)
+                            .animation(.easeInOut(duration: 0.25), value: store.showPaywall)
+
+                        MagicalUnlockButton {
+                            // Acción: abrir el paywall
+                            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                                store.showPaywall = true
+                            }
+                        }
+                        .zIndex(11)
+                    }
+                    .allowsHitTesting(true)
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
@@ -142,15 +160,11 @@ struct LivePaletteDetailView: View {
         if store.isPro {
             let unique = Array(Set(payload.colors.map { $0.hex })).compactMap { hexToRGB($0) }
 
-            // 🕒 Formatear fecha actual (ejemplo: "Oct 29, 2025 • 03:42 AM")
             let formatter = DateFormatter()
             formatter.dateFormat = "MMM d, yyyy • hh:mm a"
             let dateString = formatter.string(from: Date())
 
-            // 🔹 Nombre de la paleta con timestamp
             let paletteName = "Live Palette – \(dateString)"
-
-            // Guardar en favoritos con nombre y colores únicos
             favs.addPalette(name: paletteName, colors: unique)
 
             withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
@@ -189,7 +203,47 @@ struct LivePaletteDetailView: View {
 }
 
 
-// MARK: - LiveColorRow (Final - con ícono original y lógica completa)
+// MARK: - Magical Unlock Button
+private struct MagicalUnlockButton: View {
+    var onTap: () -> Void
+
+    var body: some View {
+        VStack(spacing: 10) {
+            Image(systemName: "lock.fill")
+                .font(.system(size: 40, weight: .semibold))
+                .foregroundColor(.white.opacity(0.95))
+                .shadow(color: .white.opacity(0.4), radius: 3, y: 1)
+
+            Button(action: onTap) {
+                Text("Unlock Full Palette & Color Matches")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 26)
+                    .padding(.vertical, 10)
+                    .background(
+                        LinearGradient(
+                            colors: [
+                                Color(hex: "#3C8CE7"),
+                                Color(hex: "#6F3CE7"),
+                                Color(hex: "#C63DE8"),
+                                Color(hex: "#FF61B6")
+                            ],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .clipShape(Capsule())
+                    .shadow(color: Color.purple.opacity(0.35), radius: 6, y: 3)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.vertical, 12)
+    }
+}
+
+
+
+// MARK: - LiveColorRow
 private struct LiveColorRow: View {
     @EnvironmentObject var favs: FavoritesStore
     @EnvironmentObject var catalog: Catalog
@@ -225,7 +279,6 @@ private struct LiveColorRow: View {
 
             Spacer()
 
-            // 🔹 Botón "plus" con estado visual correcto
             Button {
                 handleFavorite()
                 UIImpactFeedbackGenerator(style: .soft).impactOccurred()
@@ -253,43 +306,28 @@ private struct LiveColorRow: View {
         }
     }
 
-    // MARK: - Estado actual
     private var isFavorite: Bool {
         favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(named.hex) }
     }
 
-    // MARK: - Lógica corregida para sincronizar el estado visual
     private func handleFavorite() {
         let key = normalizeHex(named.hex)
-
-        // Verificar si ya está en favoritos
         if favs.colors.contains(where: { normalizeHex($0.color.hex) == key }) {
             favs.colors.removeAll { normalizeHex($0.color.hex) == key }
             toast = "Removed from Collections"
         } else {
-            // Guardar el color del catálogo (named.hex)
             favs.add(color: hexToRGB(named.hex))
             toast = "Added to Collections \(named.name)"
         }
 
-        // Feedback visual y haptics
         UIImpactFeedbackGenerator(style: .soft).impactOccurred()
         withAnimation(.spring(response: 0.25, dampingFraction: 0.6)) {
             likedPulse.toggle()
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-            likedPulse = false
-        }
-
-        // Ocultar toast después
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
-            toast = nil
-        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { likedPulse = false }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) { toast = nil }
     }
-
 }
-
-
 
 
 // MARK: - Shared Helper
