@@ -505,7 +505,7 @@ struct CameraScreen: View {
                         .foregroundColor(.white.opacity(0.9))
                         .padding(.bottom, 4)
 
-                    Text("Unlock Full Live Camera Access")
+                    Text("Unlock Full Live Camera")
                         .font(.title3.bold())
                         .foregroundColor(.white)
 
