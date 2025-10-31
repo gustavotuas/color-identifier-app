@@ -219,6 +219,10 @@ private var iconColor: Color {
             .onAppear {
                 setupSearchBar(for: colorScheme)
                 initialize()
+                // 🔹 Espera a que los catálogos terminen de cargar y fuerza refresco
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    rebuildEngineAndRefilter()
+                }
             }
             .onChange(of: colorScheme) { setupSearchBar(for: $0) }
             .onChange(of: selection) { _ in selectionChanged() }
@@ -454,14 +458,19 @@ private var iconColor: Color {
             selection = saved
         }
         preloadForSelection()
-        let all = makeColors(for: selection)
-        filteredColors = all.sorted { ascending ? $0.name < $1.name : $0.name > $1.name }
-        if searchEngine == nil {
-            searchEngine = ColorSearchEngine(allColors: all)
-        } else {
-            searchEngine?.replaceAll(all)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            let all = makeColors(for: selection)
+            filteredColors = all.sorted { ascending ? $0.name < $1.name : $0.name > $1.name }
+
+            if searchEngine == nil {
+                searchEngine = ColorSearchEngine(allColors: all)
+            } else {
+                searchEngine?.replaceAll(all)
+            }
         }
     }
+
 
     private func selectionChanged() {
         VendorSelectionStorage.save(selection)
