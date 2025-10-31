@@ -209,6 +209,22 @@ struct FavoritesScreen: View {
                     }
                     .padding(.horizontal)
 
+                    // 🧩 Favorite Palettes
+                    if !filteredPalettes.isEmpty {
+                        Text("Palettes")
+                            .font(.headline)
+                            .padding(.horizontal)
+
+                        VStack(spacing: 20) {
+                            ForEach(filteredPalettes) { pal in
+                                FavoritePaletteTile(palette: pal)
+                                    .environmentObject(favs)
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+
+
                     // 🎨 Favorite Colors
                     if !filteredColors.isEmpty {
                         Text("Colors")
@@ -221,21 +237,6 @@ struct FavoritesScreen: View {
                                     .environmentObject(favs)
                                     .environmentObject(catalog)
                                     .environmentObject(catalogs)
-                            }
-                        }
-                        .padding(.horizontal)
-                    }
-
-                    // 🧩 Favorite Palettes
-                    if !filteredPalettes.isEmpty {
-                        Text("Palettes")
-                            .font(.headline)
-                            .padding(.horizontal)
-
-                        VStack(spacing: 20) {
-                            ForEach(filteredPalettes) { pal in
-                                FavoritePaletteTile(palette: pal)
-                                    .environmentObject(favs)
                             }
                         }
                         .padding(.horizontal)
@@ -345,8 +346,8 @@ struct FavoritesScreen: View {
 // MARK: - Filter Enum
 enum FavoritesFilter: String, CaseIterable {
     case all = "All"
-    case colors = "Colors"
     case palettes = "Palettes"
+    case colors = "Colors"
 }
 
 
