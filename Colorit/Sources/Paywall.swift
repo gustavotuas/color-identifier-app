@@ -14,19 +14,8 @@ struct PaywallView: View {
     @Environment(\.colorScheme) private var scheme
     @State private var showClose = false
     @State private var canDismiss = false
-    @State private var currentReview = 0
     @State private var pulse = false
     @State private var restoreMessage: AlertMessage? = nil
-
-    // MARK: - Reseñas (mejoradas)
-    private let reviews: [(stars: Int, text: String, author: String)] = [
-        (5, "Incredible color accuracy and easy to use.", "— Professional Painter"),
-        (5, "Beautifully designed and super intuitive.", "— Interior Decorator"),
-        (5, "An essential tool in my design studio.", "— Design Professional"),
-        (5, "I use it daily for palette inspiration!", "— Visual Artist"),
-        (5, "The perfect companion for creative professionals.", "— Art Director"),
-        (5, "Makes color matching effortless and fun.", "— Photographer")
-    ]
 
     var body: some View {
         ZStack {
@@ -66,67 +55,6 @@ struct PaywallView: View {
                                 .padding(.top, 4)
                         }
                         .padding(.top, 12)
-
-                        // REVIEWS
-                        TabView(selection: $currentReview) {
-                            ForEach(0..<reviews.count, id: \.self) { i in
-                                let r = reviews[i]
-                                VStack(spacing: 10) {
-                                    HStack(spacing: 2) {
-                                        ForEach(0..<r.stars, id: \.self) { _ in
-                                            Image(systemName: "star.fill")
-                                                .foregroundColor(.yellow)
-                                                .font(.subheadline)
-                                                .shadow(color: .yellow.opacity(0.4), radius: 2)
-                                        }
-                                    }
-
-                                    Text("“\(r.text)”")
-                                        .font(.subheadline)
-                                        .multilineTextAlignment(.center)
-                                        .foregroundColor(.primary)
-                                        .padding(.horizontal, 20)
-                                        .transition(.opacity.combined(with: .slide))
-
-                                    Text(r.author)
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                }
-                                .padding(.vertical, 20)
-                                .frame(width: UIScreen.main.bounds.width - 70)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .fill(.ultraThinMaterial)
-                                        .shadow(color: .black.opacity(0.1), radius: 6, y: 3)
-                                )
-                                .tag(i)
-                            }
-                        }
-                        .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-                        .frame(height: 140)
-                        .overlay(
-                            HStack(spacing: 6) {
-                                ForEach(0..<reviews.count, id: \.self) { i in
-                                    Circle()
-                                        .fill(i == currentReview
-                                              ? Color(hex: "#6F3CE7")
-                                              : Color.gray.opacity(0.3))
-                                        .frame(width: i == currentReview ? 10 : 6,
-                                               height: i == currentReview ? 10 : 6)
-                                        .animation(.spring(response: 0.4,
-                                                           dampingFraction: 0.8),
-                                                   value: currentReview)
-                                }
-                            }
-                            .padding(.top, 160)
-                        )
-                        .onAppear {
-                            Timer.scheduledTimer(withTimeInterval: 3.8, repeats: true) { _ in
-                                withAnimation(.easeInOut(duration: 0.5)) {
-                                    currentReview = (currentReview + 1) % reviews.count
-                                }
-                            }
-                        }
 
                         // PLANS
                         VStack(spacing: 12) {
