@@ -547,9 +547,6 @@ struct CameraScreen: View {
         )
         .presentationDetents([.medium, .large])
         .onDisappear {
-            withAnimation {
-                    toastMessage = "Paint filter set: \(selection.filterSubtitle)"
-            }
             VendorSelectionStorage.save(selection)
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) { toastMessage = nil }
         }
@@ -761,9 +758,6 @@ private var toolbarItems: some ToolbarContent {
 
 
     private func handleSelectionChange(_ newValue: CatalogSelection) {
-        withAnimation {
-                toastMessage = "Paint filter set: \(newValue.filterSubtitle)"
-        }
         VendorSelectionStorage.save(newValue)
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
             toastMessage = nil

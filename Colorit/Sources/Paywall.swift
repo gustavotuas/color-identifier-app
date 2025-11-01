@@ -1,13 +1,87 @@
 import SwiftUI
 import StoreKit
 
+// ============================================================================
 // MARK: - Helper para alertas
+// ============================================================================
 struct AlertMessage: Identifiable {
     let id = UUID()
     let text: String
 }
 
-// MARK: - PaywallView
+// ============================================================================
+// MARK: - Flash Sale Countdown (reinicia cada medianoche)
+// ============================================================================
+struct FlashSaleCountdownView: View {
+    @State private var timeRemaining: TimeInterval = 0
+    @State private var timer: Timer?
+
+    private func endOfToday(from now: Date) -> Date {
+        let cal = Calendar.current
+        return cal.date(bySettingHour: 23, minute: 59, second: 59, of: now) ?? now
+    }
+
+    private func recalcRemaining() {
+        let now = Date()
+        let eod = endOfToday(from: now)
+        timeRemaining = max(0, eod.timeIntervalSince(now))
+    }
+
+    private var hours: Int   { Int(timeRemaining) / 3600 }
+    private var minutes: Int { (Int(timeRemaining) % 3600) / 60 }
+    private var seconds: Int { Int(timeRemaining) % 60 }
+
+    private func block(_ value: Int, _ label: String) -> some View {
+        VStack(spacing: 2) {
+            Text(String(format: "%02d", value))
+                .font(.headline.bold())
+                .foregroundColor(.white)
+            Text(label)
+                .font(.caption2)
+                .foregroundColor(.white.opacity(0.9))
+        }
+        .frame(minWidth: 48)
+    }
+
+    var body: some View {
+        VStack(spacing: 6) {
+            Text("⚡ Flash Sale — 80% OFF ends in")
+                .font(.caption.bold())
+                .foregroundColor(.white.opacity(0.98))
+
+            HStack(spacing: 22) {
+                block(hours, "hrs")
+                block(minutes, "min")
+                block(seconds, "sec")
+            }
+            .font(.system(size: 14, weight: .semibold, design: .monospaced))
+        }
+        .padding(.vertical, 10)
+        .padding(.horizontal, 18)
+        .background(
+            LinearGradient(colors: [Color(hex: "#6F3CE7"), Color(hex: "#FF61B6")],
+                           startPoint: .topLeading, endPoint: .bottomTrailing)
+        )
+        .cornerRadius(16)
+        .shadow(color: .black.opacity(0.25), radius: 6, y: 3)
+        .onAppear {
+            recalcRemaining()
+            timer?.invalidate()
+            timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+                if timeRemaining > 0 {
+                    timeRemaining -= 1
+                } else {
+                    recalcRemaining()
+                }
+            }
+        }
+        .onDisappear { timer?.invalidate() }
+    }
+}
+
+// ============================================================================
+// MARK: - PaywallView principal
+// ============================================================================
 struct PaywallView: View {
     @EnvironmentObject var store: StoreVM
     @Environment(\.dismiss) private var dismiss
@@ -104,6 +178,22 @@ struct PaywallView: View {
                                        subtitle: "Compare and visualise matches between live and captured samples.", color: .cyan)
                             FeatureRow(icon: "lock.open.fill", title: "Unlimited Access",
                                        subtitle: "No restrictions — enjoy every tool, palette and feature forever.", color: .gray)
+
+                            // 👇 Links moved here, visible only when scrolls down
+                            VStack(spacing: 10) {
+                                HStack(spacing: 18) {
+                                    Link("Terms of Use",
+                                         destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
+                                    Link("Privacy Policy",
+                                         destination: URL(string: "https://www.coloritapp.com/privacy")!)
+                                }
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                                .padding(.top, 12)
+                                .padding(.bottom, 24)
+                                .frame(maxWidth: .infinity)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .center)
                         }
                         .padding(.horizontal)
                         .padding(.bottom, 12)
@@ -111,7 +201,7 @@ struct PaywallView: View {
                     .padding(.bottom, 20)
                 }
 
-                // CTA + FOOTER
+                // CTA + FOOTER (solo botón y restore)
                 VStack(spacing: 10) {
                     let selected = store.products.first(where: { $0.id == store.selectedID })
                     let buttonLabel = (selected?.id == store.weekly) ? "Continue" : "Try for Free"
@@ -120,7 +210,6 @@ struct PaywallView: View {
                         Task { await store.buySelected() }
                     }
 
-                    // RESTORE BUTTON WITH ALERT
                     Button {
                         Task {
                             await store.restorePurchases()
@@ -148,17 +237,6 @@ struct PaywallView: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .padding(.top, 2)
-
-                    HStack(spacing: 18) {
-                        Link("Terms of Use",
-                             destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
-                        Link("Privacy Policy",
-                             destination: URL(string: "https://www.coloritapp.com/privacy")!)
-                    }
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-                    .padding(.top, 4)
-                    .padding(.bottom, 8)
                 }
                 .padding(.horizontal)
                 .padding(.bottom, 25)
@@ -184,7 +262,9 @@ struct PaywallView: View {
     }
 }
 
+// ============================================================================
 // MARK: - AnimatedTryFreeButton
+// ============================================================================
 struct AnimatedTryFreeButton: View {
     var label: String
     var action: () -> Void
@@ -232,7 +312,9 @@ struct AnimatedTryFreeButton: View {
     }
 }
 
-// MARK: - SelectablePlanCard
+// ============================================================================
+// MARK: - SelectablePlanCard (badge azul + flash sale)
+// ============================================================================
 struct SelectablePlanCard: View {
     @EnvironmentObject var store: StoreVM
     @Environment(\.colorScheme) private var scheme
@@ -248,7 +330,7 @@ struct SelectablePlanCard: View {
                         .font(.headline)
                         .foregroundColor(.primary)
                     if store.hasTrial(product) {
-                        Text("Try for Free")
+                        Text("3-Day Free Trial")
                             .font(.subheadline.bold())
                             .foregroundColor(.green)
                     }
@@ -256,15 +338,19 @@ struct SelectablePlanCard: View {
 
                 Spacer()
 
+                // 💙 Best Value badge (blue gradient)
                 if product.id == store.yearly {
                     Text("Best Value")
                         .font(.caption2.bold())
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Color.blue)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(
+                            LinearGradient(colors: [Color(hex: "#3C8CE7"), Color(hex: "#5AA9FF")],
+                                           startPoint: .topLeading, endPoint: .bottomTrailing)
+                        )
                         .foregroundColor(.white)
                         .cornerRadius(6)
-                        .scaleEffect(pulse ? 1.15 : 1.0)
+                        .scaleEffect(pulse ? 1.1 : 1.0)
                         .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: pulse)
                 }
 
@@ -276,37 +362,71 @@ struct SelectablePlanCard: View {
                 }
             }
 
-            Text(product.displayPrice)
-                .font(.title3.bold())
-                .foregroundColor(.primary)
+            if product.id == store.yearly,
+               let yearly = store.products.first(where: { $0.id == store.yearly }) {
+                let discount = 80
+                let regularPrice = inflatedPrice(for: yearly, percentage: discount)
+                let finalPrice = yearly.displayPrice
+
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(spacing: 8) {
+                        Text(regularPrice)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .strikethrough()
+                        Text(finalPrice)
+                            .font(.title3.bold())
+                            .foregroundColor(.primary)
+                    }
+
+                    FlashSaleCountdownView()
+                        .padding(.top, 6)
+                }
+            } else {
+                Text(product.displayPrice)
+                    .font(.title3.bold())
+                    .foregroundColor(.primary)
+            }
         }
         .padding()
         .frame(maxWidth: .infinity)
-        .background(
-            scheme == .dark ? Color(.secondarySystemBackground) : Color.white
-        )
+        .background(scheme == .dark ? Color(.secondarySystemBackground) : Color.white)
         .overlay(
             RoundedRectangle(cornerRadius: 16)
                 .stroke(isSelected ? Color(hex: "#6F3CE7") : Color.gray.opacity(0.25),
                         lineWidth: isSelected ? 3 : 1)
         )
         .cornerRadius(16)
-        .shadow(
-            color: scheme == .dark ? .white.opacity(0.04) : .black.opacity(0.08),
-            radius: 4, x: 0, y: 1
-        )
+        .shadow(color: scheme == .dark ? .white.opacity(0.04) : .black.opacity(0.08),
+                radius: 4, x: 0, y: 1)
     }
 
     private func displayTitle(for product: Product) -> String {
         switch product.id {
-        case store.yearly: return "1 Year"
-        case store.weekly: return "1 Week"
+        case store.yearly: return "1 Year Plan"
+        case store.weekly: return "1 Week Plan"
         default: return product.displayName
         }
     }
+
+    private func inflatedPrice(for product: Product, percentage: Int) -> String {
+        let base = product.price as Decimal
+        // Convierte descuento en factor inverso (ej. 80% off → factor = 1 / 0.2 = 5)
+        let discount = Double(percentage) / 100
+        let factor = Decimal(1 / (1 - discount))
+        let inflated = base * factor
+
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = product.priceFormatStyle.locale
+        return formatter.string(from: inflated as NSDecimalNumber) ?? product.displayPrice
+    }
+
 }
 
+// ============================================================================
 // MARK: - FeatureRow
+// ============================================================================
 struct FeatureRow: View {
     let icon: String
     let title: String
@@ -333,13 +453,9 @@ struct FeatureRow: View {
         }
         .padding(14)
         .frame(maxWidth: .infinity)
-        .background(
-            scheme == .dark ? Color(.secondarySystemBackground) : Color.white
-        )
+        .background(scheme == .dark ? Color(.secondarySystemBackground) : Color.white)
         .cornerRadius(16)
-        .shadow(
-            color: scheme == .dark ? .white.opacity(0.03) : .black.opacity(0.08),
-            radius: 4, x: 0, y: 2
-        )
+        .shadow(color: scheme == .dark ? .white.opacity(0.03) : .black.opacity(0.08),
+                radius: 4, x: 0, y: 2)
     }
 }

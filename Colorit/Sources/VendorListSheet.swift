@@ -34,7 +34,7 @@ struct VendorListSheet: View {
     var body: some View {
         NavigationStack {
             List {
-                // MARK: - Generic (único default)
+                // MARK: - General (único default)
                 Section {
                     Button {
                         selection = .genericOnly
@@ -43,7 +43,7 @@ struct VendorListSheet: View {
                     } label: {
                         HStack {
                             Image(systemName: selection == .genericOnly ? "checkmark.circle.fill" : "circle")
-                            Text("Generic")
+                            Text("General")
                         }
                     }
                 }

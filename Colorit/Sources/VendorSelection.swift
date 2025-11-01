@@ -6,7 +6,7 @@ public enum CatalogSelection: Hashable, Equatable {
 
     public var title: String {
         switch self {
-        case .genericOnly: return "Generic"
+        case .genericOnly: return "General"
         case .vendor(let id): return id.displayName
         }
     }
@@ -18,9 +18,9 @@ public enum CatalogSelection: Hashable, Equatable {
     public var filterSubtitle: String {
         switch self {
         case .genericOnly:
-            return "Generic palette"
+            return "General palette"
         case .vendor(let id):
-            return "Filtered by \(id.displayName)"
+            return "\(id.displayName)"
         }
     }
 }

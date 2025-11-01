@@ -63,7 +63,7 @@ public enum CatalogID: String, CaseIterable, Hashable {
 
     public var displayName: String {
         switch self {
-        case .generic:          return "Generic"
+        case .generic:          return "General"
         case .sherwinWilliams:  return "Sherwin-Williams"
         case .behr: return "Behr"
         case .benjamin: return "Benjamin Moore"

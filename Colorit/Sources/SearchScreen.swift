@@ -518,10 +518,6 @@ private var vendorFilterBar: some View {
         VendorSelectionStorage.save(selection)
         preloadForSelection()
         rebuildEngineAndRefilter()
-        // ✅ Toast al setear filtro
-        withAnimation {
-                toastMessage = "Paint filter set: \(selection.filterSubtitle)"
-        }
     }
 
     // MARK: - Ordenar por brillo (Luminance)
