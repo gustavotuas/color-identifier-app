@@ -7,6 +7,8 @@ struct SettingScreen: View {
     @EnvironmentObject var store: StoreVM
     @EnvironmentObject var theme: ThemeManager
     @EnvironmentObject var languageManager: LanguageManager
+    @State private var animate = false
+
 
     // 🔹 Lee la versión automáticamente desde Info.plist
     private var appVersion: String {
@@ -63,35 +65,66 @@ struct SettingScreen: View {
 
     var body: some View {
         List {
-            // MARK: - Get Pro (solo si NO es Pro)
-            if !store.isPro {
-                Section {
-                    Button {
-                        Haptic.tap()
-                        store.showPaywall = true
-                    } label: {
-                        HStack(spacing: 15) {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color.yellow.opacity(0.15))
-                                    .frame(width: 36, height: 36)
-                                Image(systemName: "crown.fill")
-                                    .foregroundColor(.yellow)
-                                    .font(.system(size: 18))
-                            }
-                            Text("Get Pro")
-                                .foregroundColor(.primary)
-                                .fontWeight(.semibold)
-                            Spacer()
-                            Image(systemName: "chevron.right")
-                                .foregroundColor(.gray)
-                                .font(.system(size: 13))
-                        }
-                        .padding(.vertical, 6)
-                    }
-                    .buttonStyle(.plain)
+// MARK: - Unlock Pro (solo si NO es Pro)
+if !store.isPro {
+    Section {
+        Button {
+            Haptic.tap()
+            store.showPaywall = true
+        } label: {
+            HStack(spacing: 15) {
+                ZStack {
+                    LinearGradient(
+                        colors: [
+                            Color(hex: "#3C8CE7"),
+                            Color(hex: "#6F3CE7"),
+                            Color(hex: "#C63DE8"),
+                            Color(hex: "#FF61B6")
+                        ],
+                        startPoint: animate ? .topLeading : .bottomTrailing,
+                        endPoint: animate ? .bottomTrailing : .topLeading
+                    )
+                    .frame(width: 38, height: 38)
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .shadow(color: .purple.opacity(0.35), radius: 6, y: 3)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.white.opacity(0.3), lineWidth: 0.8)
+                    )
+
+                    Image(systemName: "lock.open.fill")
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundColor(.white)
+                        .shadow(color: .white.opacity(0.5), radius: 2, y: 1)
                 }
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("Unlock Pro")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundColor(.primary)
+                    Text("Access all premium features")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .foregroundColor(.secondary)
+                    .font(.system(size: 13, weight: .semibold))
             }
+            .padding(.vertical, 6)
+        }
+        .buttonStyle(.plain)
+        .onAppear {
+            withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
+                animate = true
+            }
+        }
+    }
+}
+
+
 
             // MARK: - Appearance
             Section(header: Text("Appearance")) {
