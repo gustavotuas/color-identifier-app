@@ -235,7 +235,7 @@ private var iconColor: Color {
 
 
 
-  // MARK: - Vendor Filter Bar
+  // MARK: - Vendor Filter Bar (estilo Favorites)
 private var vendorFilterBar: some View {
     ScrollView(.horizontal, showsIndicators: false) {
         HStack(spacing: 8) {
@@ -245,13 +245,13 @@ private var vendorFilterBar: some View {
 
                 Button {
                     if isLocked {
-                        // 🔒 Mostrar paywall si no es PRO
+                        // Mostrar paywall si no es PRO
                         withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
                             store.showPaywall = true
                         }
                         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                     } else {
-                        // ✅ Cambiar vendor
+                        // Cambiar vendor
                         withAnimation(.easeInOut(duration: 0.25)) {
                             if id == .generic {
                                 selection = .genericOnly
@@ -267,30 +267,26 @@ private var vendorFilterBar: some View {
                     HStack(spacing: 6) {
                         Text(id.displayName)
                             .font(.subheadline.bold())
+
                         if isLocked {
                             Image(systemName: "lock.fill")
                                 .font(.system(size: 10, weight: .semibold))
                         }
                     }
                     .padding(.vertical, 6)
-                    .padding(.horizontal, 14)
+                    .padding(.horizontal, 16)
                     .background(
                         Capsule()
-                            .fill(isSelected ? Color.accentColor.opacity(0.2) : Color.clear)
+                            .fill(isSelected ? Color.secondary.opacity(0.2) : Color.clear)
                             .overlay(
                                 Capsule()
-                                    .stroke(
-                                        isSelected
-                                        ? Color.accentColor.opacity(0.4)
-                                        : Color.secondary.opacity(0.3),
-                                        lineWidth: 1
-                                    )
+                                    .stroke(Color.secondary.opacity(0.3), lineWidth: 1)
                             )
                     )
                     .foregroundColor(
                         isLocked
                         ? .gray.opacity(0.7)
-                        : (isSelected ? Color.accentColor : .primary)
+                        : (isSelected ? .primary : .secondary)
                     )
                 }
             }
@@ -299,6 +295,7 @@ private var vendorFilterBar: some View {
         .padding(.vertical, 6)
     }
 }
+
 
 
 
