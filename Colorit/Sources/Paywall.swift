@@ -20,12 +20,12 @@ struct PaywallView: View {
 
     // MARK: - Reseñas (mejoradas)
     private let reviews: [(stars: Int, text: String, author: String)] = [
-        (5, "Incredible colour accuracy and easy to use.", "— Professional Painter"),
+        (5, "Incredible color accuracy and easy to use.", "— Professional Painter"),
         (5, "Beautifully designed and super intuitive.", "— Interior Decorator"),
         (5, "An essential tool in my design studio.", "— Design Professional"),
         (5, "I use it daily for palette inspiration!", "— Visual Artist"),
         (5, "The perfect companion for creative professionals.", "— Art Director"),
-        (5, "Makes colour matching effortless and fun.", "— Photographer")
+        (5, "Makes color matching effortless and fun.", "— Photographer")
     ]
 
     var body: some View {
@@ -156,23 +156,23 @@ struct PaywallView: View {
                                 .foregroundColor(.primary)
                                 .padding(.leading, 4)
 
-                            FeatureRow(icon: "camera.viewfinder", title: "Live Colour ID",
-                                       subtitle: "Identify colours instantly through your camera in real-time.", color: .green)
-                            FeatureRow(icon: "photo.on.rectangle.angled", title: "Photo Colour Picker",
+                            FeatureRow(icon: "camera.viewfinder", title: "Live Color ID",
+                                       subtitle: "Identify colors instantly through your camera in real-time.", color: .green)
+                            FeatureRow(icon: "photo.on.rectangle.angled", title: "Photo Color Picker",
                                        subtitle: "Extract professional palettes from any photo with AI precision.", color: .orange)
                             FeatureRow(icon: "paintpalette.fill", title: "Professional Paint Catalogues",
                                        subtitle: "Explore curated palettes from multiple paint collections.", color: .pink)
                             FeatureRow(icon: "heart.text.square.fill", title: "Unlimited Collections & Palettes",
                                        subtitle: "Create and organise unlimited palettes for your work or inspiration.", color: .red)
                             FeatureRow(icon: "magnifyingglass", title: "Advanced Search",
-                                       subtitle: "Find colours by HEX, RGB, or name instantly and intuitively.", color: .blue)
-                            FeatureRow(icon: "circle.hexagongrid.fill", title: "Harmony & Similar Colours",
+                                       subtitle: "Find colors by HEX, RGB, or name instantly and intuitively.", color: .blue)
+                            FeatureRow(icon: "circle.hexagongrid.fill", title: "Harmony & Similar Colors",
                                        subtitle: "Generate harmonic schemes and discover matching tones easily.", color: .indigo)
                             FeatureRow(icon: "square.grid.2x2", title: "Multiple Layout Views",
                                        subtitle: "Switch between grid and list layouts to explore palettes visually.", color: .purple)
                             FeatureRow(icon: "wand.and.stars", title: "Smart Filters & Sorting",
                                        subtitle: "Filter by hue, brightness, or harmony with precision.", color: .teal)
-                            FeatureRow(icon: "photo.stack.fill", title: "Colour Matches for Photo & Live ID",
+                            FeatureRow(icon: "photo.stack.fill", title: "Color Matches for Photo & Live ID",
                                        subtitle: "Compare and visualise matches between live and captured samples.", color: .cyan)
                             FeatureRow(icon: "lock.open.fill", title: "Unlimited Access",
                                        subtitle: "No restrictions — enjoy every tool, palette and feature forever.", color: .gray)

@@ -161,7 +161,7 @@ struct ColorDetailView: View {
                             }
                             .pickerStyle(.segmented)
 
-                            HarmonyStrip(base: rgb, mode: harmonyMode) { tapped in
+                            HarmonyStrip(base: rgb, mode: harmonyMode, isPro: store.isPro) { tapped in
                                 if store.isPro {
                                     if let found = findNamedColor(hex: tapped.hex) {
                                         selectedHarmonyColor = found
@@ -196,7 +196,7 @@ struct ColorDetailView: View {
                                 Spacer()
                             }
 
-                            ShadesAndTintsView(base: rgb) { tapped in
+                            ShadesAndTintsView(base: rgb, isPro: store.isPro) { tapped in
                                 if store.isPro {
                                     if let found = findNamedColor(hex: tapped.hex) {
                                         selectedHarmonyColor = found
@@ -333,8 +333,8 @@ struct ColorDetailView: View {
         UIImpactFeedbackGenerator(style: .soft).impactOccurred()
         showToast("Preparing share preview...")
 
-        Task.detached(priority: .userInitiated) {
-            // 1️⃣ Generar imagen
+        Task {
+            // 1️⃣ Generar imagen en main actor
             let image = await generateShareImage()
             let tempDir = FileManager.default.temporaryDirectory
             let safeName = color.name.replacingOccurrences(of: " ", with: "_")
@@ -371,26 +371,24 @@ struct ColorDetailView: View {
                 message += "\n\n📱 Made with Colorit – www.colorit.app"
             }
 
-            // 3️⃣ Volver al main thread para mostrar el share sheet
-            DispatchQueue.main.async {
-                showToast("Opening share sheet...")
+            // 3️⃣ Mostrar el share sheet
+            showToast("Opening share sheet...")
 
-                let activityVC = UIActivityViewController(activityItems: [message, fileURL], applicationActivities: nil)
-                activityVC.excludedActivityTypes = [.assignToContact, .addToReadingList]
+            let activityVC = UIActivityViewController(activityItems: [message, fileURL], applicationActivities: nil)
+            activityVC.excludedActivityTypes = [.assignToContact, .addToReadingList]
 
-                // ✅ Presentación compatible con SwiftUI
-                if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                let rootVC = scene.windows.first?.rootViewController {
-                    var top = rootVC
-                    while let presented = top.presentedViewController { top = presented }
-                    top.present(activityVC, animated: true)
-                } else {
-                    print("⚠️ Could not find a valid rootViewController to present share sheet.")
-                    showToast("Failed to open share sheet.")
-                }
+            if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+            let rootVC = scene.windows.first?.rootViewController {
+                var top = rootVC
+                while let presented = top.presentedViewController { top = presented }
+                top.present(activityVC, animated: true)
+            } else {
+                print("⚠️ Could not find a valid rootViewController to present share sheet.")
+                showToast("Failed to open share sheet.")
             }
         }
     }
+
 
     // MARK: - Pro Unlock Overlay (reutilizado de PhotosScreen)
 // MARK: - Pro Unlock Overlay (estilo uniforme con Unlock Picker)
@@ -560,7 +558,7 @@ private func generateShareImage() -> UIImage {
         if store.isPro {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Color Harmony").font(.headline)
-                HarmonyStrip(base: rgb, mode: harmonyMode) { _ in }
+                HarmonyStrip(base: rgb, mode: harmonyMode, isPro: store.isPro) { _ in }
             }
             .padding(16)
             .background(Color.white)
@@ -603,7 +601,7 @@ private func generateShareImage() -> UIImage {
         if store.isPro {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Shades & Tints").font(.headline)
-                ShadesAndTintsView(base: rgb) { _ in }
+                ShadesAndTintsView(base: rgb, isPro: store.isPro) { _ in }
             }
             .padding(16)
             .background(Color.white)
@@ -703,12 +701,10 @@ private func generateShareImage() -> UIImage {
     }
 }
 
-// MARK: - Harmony Strip
 private struct HarmonyStrip: View {
-    @EnvironmentObject var store: StoreVM   // 👈 añadimos esto para saber si es Pro
-
     let base: RGB
     let mode: HarmonyMode
+    let isPro: Bool
     let onTap: (RGB) -> Void
 
     var body: some View {
@@ -725,7 +721,7 @@ private struct HarmonyStrip: View {
                             .shadow(color: .black.opacity(0.08), radius: 3, y: 2)
 
                         // 👇 Solo mostrar el HEX si es Pro
-                        if store.isPro {
+                        if isPro {
                             Text("#\(normalizeHex(c.hex))")
                                 .font(.caption2.monospaced())
                                 .foregroundColor(.secondary)
@@ -737,6 +733,7 @@ private struct HarmonyStrip: View {
         }
     }
 
+    // 🧠 Reponemos esta función (faltaba)
     private func colors(for mode: HarmonyMode) -> [RGB] {
         switch mode {
         case .analogous:
@@ -760,13 +757,14 @@ private struct HarmonyStrip: View {
 }
 
 
+
+
 // MARK: - Shades & Tints
 // MARK: - Shades & Tints
 // MARK: - Shades & Tints
 private struct ShadesAndTintsView: View {
-    @EnvironmentObject var store: StoreVM   // 👈 añadimos esto
-
     let base: RGB
+    let isPro: Bool
     let onSelect: (RGB) -> Void
 
     var body: some View {
@@ -783,7 +781,7 @@ private struct ShadesAndTintsView: View {
                             .shadow(color: .black.opacity(0.06), radius: 2, y: 1)
 
                         // 👇 Solo mostrar el HEX si es usuario Pro
-                        if store.isPro {
+                        if isPro {
                             Text("#\(normalizeHex(c.hex))")
                                 .font(.caption2.monospaced())
                                 .foregroundColor(.secondary)
@@ -797,26 +795,18 @@ private struct ShadesAndTintsView: View {
 
     private func shadesAndTints(for rgb: RGB) -> [RGB] {
         let (h, s, b) = rgbToHSB(rgb)
-
-        // Distribuye los pasos según el rango real de brillo disponible
         let steps: [CGFloat] = [-45, -25, 0, 20, 40]
-        var results: [RGB] = []
-
-        for delta in steps {
-            let newBrightness = max(0, min(100, b + delta))
-            let newColor = hsbToRGB(hue: h, s: s, b: newBrightness)
-            results.append(newColor)
+        var results: [RGB] = steps.map { delta in
+            hsbToRGB(hue: h, s: s, b: max(0, min(100, b + delta)))
         }
 
-        // ✅ Elimina duplicados basándose en HEX normalizado
+        // Elimina duplicados
         let unique = results.reduce(into: [String: RGB]()) { dict, c in
             let key = normalizeHex(c.hex)
-            if dict[key] == nil {
-                dict[key] = c
-            }
+            if dict[key] == nil { dict[key] = c }
         }
 
-        // Devuelve los valores únicos, ordenados de oscuro → claro
+        // Ordena de oscuro → claro
         return unique.values.sorted { rgbToHSB($0).b < rgbToHSB($1).b }
     }
 }
