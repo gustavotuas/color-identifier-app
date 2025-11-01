@@ -43,7 +43,7 @@ struct VendorListSheet: View {
                     } label: {
                         HStack {
                             Image(systemName: selection == .genericOnly ? "checkmark.circle.fill" : "circle")
-                            Text("Generic Colors")
+                            Text("Generic")
                         }
                     }
                 }

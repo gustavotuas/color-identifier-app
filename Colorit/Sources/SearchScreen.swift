@@ -189,9 +189,9 @@ private var iconColor: Color {
 
 
     // MARK: - Body
-    var body: some View {
-        NavigationStack {
-            VStack(spacing: 10) {
+   var body: some View {
+    NavigationStack {
+        VStack(spacing: 10) {
                 // 👇 Solo se muestra mientras se escribe algo en el search
                 if isSearching {
                     searchOptionsBar
@@ -199,37 +199,110 @@ private var iconColor: Color {
                         .animation(.spring(response: 0.4, dampingFraction: 0.7), value: isSearching)
                 }
 
-                mainContent
-            }
-            .navigationTitle("Colors")
-            .toolbar { toolbarContent }
-            .sheet(isPresented: $showVendorSheet) { vendorSheet }
-            .searchable(
-                text: $query,
+            mainContent
+        }
+        .navigationTitle("Colors")
+        .toolbar { toolbarContent }
+        .sheet(isPresented: $showVendorSheet) { vendorSheet }
+        .searchable(
+            text: $query,
                 isPresented: $isSearching, // 👈 Detecta cuándo el search está activo
-                placement: .navigationBarDrawer(displayMode: .always),
-                prompt: "Search by name, hex, brand or code"
-            )
-            .onChange(of: query) { text in
-                performAsyncFilter(text)
-            }
-            .onSubmit(of: .search) {
-                isSearching = true
-            }
-            .onAppear {
-                setupSearchBar(for: colorScheme)
-                initialize()
+            placement: .navigationBarDrawer(displayMode: .always),
+            prompt: "Search by name, hex, brand or code"
+        )
+        .onChange(of: query) { text in
+            performAsyncFilter(text)
+        }
+        .onSubmit(of: .search) {
+            isSearching = true
+        }
+        .onAppear {
+            setupSearchBar(for: colorScheme)
+            initialize()
                 // 🔹 Espera a que los catálogos terminen de cargar y fuerza refresco
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    rebuildEngineAndRefilter()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                rebuildEngineAndRefilter()
+            }
+        }
+        .onChange(of: colorScheme) { setupSearchBar(for: $0) }
+        .onChange(of: selection) { _ in selectionChanged() }
+        .onReceive(catalogs.$loaded) { _ in rebuildEngineAndRefilter() }
+    }
+    .toast(message: $toastMessage)
+}
+
+
+
+
+
+  // MARK: - Vendor Filter Bar
+private var vendorFilterBar: some View {
+    ScrollView(.horizontal, showsIndicators: false) {
+        HStack(spacing: 8) {
+            ForEach(CatalogID.allCases, id: \.self) { id in
+                let isSelected = selection == .vendor(id) || (selection == .genericOnly && id == .generic)
+                let isLocked = !store.isPro && id != .generic
+
+                Button {
+                    if isLocked {
+                        // 🔒 Mostrar paywall si no es PRO
+                        withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                            store.showPaywall = true
+                        }
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                    } else {
+                        // ✅ Cambiar vendor
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            if id == .generic {
+                                selection = .genericOnly
+                            } else {
+                                selection = .vendor(id)
+                            }
+                            VendorSelectionStorage.save(selection)
+                            rebuildEngineAndRefilter()
+                        }
+                        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+                    }
+                } label: {
+                    HStack(spacing: 6) {
+                        Text(id.displayName)
+                            .font(.subheadline.bold())
+                        if isLocked {
+                            Image(systemName: "lock.fill")
+                                .font(.system(size: 10, weight: .semibold))
+                        }
+                    }
+                    .padding(.vertical, 6)
+                    .padding(.horizontal, 14)
+                    .background(
+                        Capsule()
+                            .fill(isSelected ? Color.accentColor.opacity(0.2) : Color.clear)
+                            .overlay(
+                                Capsule()
+                                    .stroke(
+                                        isSelected
+                                        ? Color.accentColor.opacity(0.4)
+                                        : Color.secondary.opacity(0.3),
+                                        lineWidth: 1
+                                    )
+                            )
+                    )
+                    .foregroundColor(
+                        isLocked
+                        ? .gray.opacity(0.7)
+                        : (isSelected ? Color.accentColor : .primary)
+                    )
                 }
             }
-            .onChange(of: colorScheme) { setupSearchBar(for: $0) }
-            .onChange(of: selection) { _ in selectionChanged() }
-            .onReceive(catalogs.$loaded) { _ in rebuildEngineAndRefilter() }
         }
-        .toast(message: $toastMessage)
+        .padding(.horizontal)
+        .padding(.vertical, 6)
     }
+}
+
+
+
+
 
     @ViewBuilder
     private var mainContent: some View {
@@ -250,11 +323,12 @@ private var iconColor: Color {
     // MARK: - List layout + banner scrollable
     private var listLayoutWithBanner: some View {
         List {
-            if selection.isFiltered {
-                Section {
-                    filterBanner
+            // 🔹 Title
+            Section {
+                VStack(alignment: .leading, spacing: 6) {
+                  vendorFilterBar
                 }
-                .listRowInsets(EdgeInsets()) // quita padding lateral
+                .listRowInsets(EdgeInsets())
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
             }
@@ -275,11 +349,7 @@ private var iconColor: Color {
         GeometryReader { geo in
             ScrollView {
                 VStack(spacing: 10) {
-                    if selection.isFiltered {
-                        filterBanner
-                            .frame(width: geo.size.width) // ocupa TODO el ancho visible
-                            .padding(.top, 6)
-                    }
+                    vendorFilterBar
 
                     LazyVGrid(columns: gridColumns, spacing: 16) {
                         ForEach(filteredColors.prefix(visibleCount)) { color in
@@ -298,37 +368,7 @@ private var iconColor: Color {
         }
     }
 
-    // MARK: - Filter Banner
-    @ViewBuilder
-    private var filterBanner: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "paintpalette.fill")
-            Text(selection.filterSubtitle).lineLimit(1)
-            Spacer()
-            Button {
-                withAnimation(.easeInOut) {
-                    selection = .genericOnly
-                    VendorSelectionStorage.save(selection)
-                    // ✅ Toast al limpiar filtro
-                    toastMessage = "Paint filter cleared"
-                }
-            } label: {
-                Label("Clear", systemImage: "xmark.circle.fill")
-                    .labelStyle(.titleAndIcon)
-            }
-            .buttonStyle(.bordered)
-            .tint(.blue)
-            .font(.caption.bold())
-        }
-        .font(.footnote)
-        .padding(10)
-        .background(Color.blue.opacity(0.12))
-        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.blue.opacity(0.5)))
-        .foregroundColor(.blue)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-        .padding(.horizontal)
-        .transition(.move(edge: .top).combined(with: .opacity))
-    }
+
 
     // MARK: - Layout View (no se usa ahora, pero lo respetamos)
     @ViewBuilder
