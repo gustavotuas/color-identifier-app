@@ -21,9 +21,9 @@ struct HomeScreen: View {
                     .font(.largeTitle)
                     .bold()
 
-                GroupBox(NSLocalizedString("quick_actions", comment: "")) {
+                GroupBox("Quick Actions") {
                     HStack {
-                        NavigationLink(NSLocalizedString("open_camera", comment: "")) {
+                        NavigationLink("Open Camera") {
                             CameraScreen()
                         }
                         Spacer()
@@ -31,7 +31,7 @@ struct HomeScreen: View {
                 }
 
                 if !store.isPro {
-                    Button(NSLocalizedString("unlock_pro", comment: "")) {
+                    Button("Unlock Pro") {
                         store.showPaywall = true
                     }
                     .buttonStyle(.borderedProminent)
@@ -59,7 +59,7 @@ struct MainTabs: View {
                 SearchScreen()
             }
             .tabItem {
-                Label(NSLocalizedString("search", comment: ""), systemImage: "magnifyingglass")
+                Label("Search", systemImage: "magnifyingglass")
             }
             .tag(0)
 
@@ -70,7 +70,7 @@ struct MainTabs: View {
                     .onAppear { favs.hasNewFavorites = false } // 👈 limpia el badge al entrar
             }
             .tabItem {
-                Label(NSLocalizedString("Collections", comment: ""), systemImage: "rectangle.stack.fill")
+                Label("Collections", systemImage: "rectangle.stack.fill")
             }
             .badge(favs.hasNewFavorites ? "●" : nil) // 👈 muestra el puntito de novedades
             .tag(1)
@@ -80,7 +80,7 @@ struct MainTabs: View {
                 CameraScreen()
             }
             .tabItem {
-                Label(NSLocalizedString("camera", comment: ""), systemImage: "camera")
+                Label("Camera", systemImage: "camera")
             }
             .tag(2)
 
@@ -89,7 +89,7 @@ struct MainTabs: View {
                 PhotosScreen()
             }
             .tabItem {
-                Label(NSLocalizedString("photo", comment: ""), systemImage: "photo")
+                Label("Photo", systemImage: "photo")
             }
             .tag(3)
 
@@ -98,7 +98,7 @@ struct MainTabs: View {
                 SettingScreen()
             }
             .tabItem {
-                Label(NSLocalizedString("settings", comment: ""), systemImage: "gearshape")
+                Label("Settings", systemImage: "gearshape")
             }
             .tag(4)
         }

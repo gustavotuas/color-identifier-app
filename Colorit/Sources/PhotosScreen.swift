@@ -113,7 +113,7 @@ private func savePhotoPalette() {
                 }
                 .padding(.top, 10)
             }
-            .navigationTitle("photos".localized)
+            .navigationTitle("Photos")
             .toolbar {
                 // ⚙️ Botón izquierdo (Filtros)
                 ToolbarItem(placement: .navigationBarLeading) {

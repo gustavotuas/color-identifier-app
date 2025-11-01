@@ -130,7 +130,7 @@ final class StoreVM: ObservableObject {
 
     func regularPriceText(_ p: Product) -> String {
         if p.id == yearly {
-            return NSLocalizedString("regular_price_yearly", comment: "")
+            return "Regular $119.99/year"
         }
         return ""
     }
