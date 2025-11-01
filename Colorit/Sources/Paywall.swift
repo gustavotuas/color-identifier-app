@@ -1,38 +1,50 @@
 import SwiftUI
 import StoreKit
 
+// MARK: - Helper para alertas
+struct AlertMessage: Identifiable {
+    let id = UUID()
+    let text: String
+}
+
 // MARK: - PaywallView
 struct PaywallView: View {
     @EnvironmentObject var store: StoreVM
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var scheme
     @State private var showClose = false
     @State private var canDismiss = false
     @State private var currentReview = 0
     @State private var pulse = false
+    @State private var restoreMessage: AlertMessage? = nil
 
-    // ✅ Reviews embebidas en memoria
-    private let reviews: [(stars: String, text: String)] = [
-        ("⭐️⭐️⭐️⭐️⭐️", "The upgrade was worth it just for the paint colours."),
-        ("⭐️⭐️⭐️⭐️⭐️", "This app completely changed how I work with palettes."),
-        ("⭐️⭐️⭐️⭐️⭐️", "Simple, smart and beautiful. Highly recommend it!"),
-        ("⭐️⭐️⭐️⭐️⭐️", "Love how accurate the color matching is. Worth every penny!")
+    // MARK: - Reseñas (mejoradas)
+    private let reviews: [(stars: Int, text: String, author: String)] = [
+        (5, "Incredible colour accuracy and easy to use.", "— Professional Painter"),
+        (5, "Beautifully designed and super intuitive.", "— Interior Decorator"),
+        (5, "An essential tool in my design studio.", "— Design Professional"),
+        (5, "I use it daily for palette inspiration!", "— Visual Artist"),
+        (5, "The perfect companion for creative professionals.", "— Art Director"),
+        (5, "Makes colour matching effortless and fun.", "— Photographer")
     ]
 
     var body: some View {
         ZStack {
-            LinearGradient(colors: [
-                Color(red: 0.95, green: 0.96, blue: 1.0),
-                Color(red: 0.93, green: 0.94, blue: 1.0)
-            ], startPoint: .top, endPoint: .bottom)
+            LinearGradient(
+                colors: scheme == .dark
+                    ? [Color(.systemBackground), Color(.secondarySystemBackground)]
+                    : [Color(red: 0.97, green: 0.98, blue: 1.0),
+                       Color(red: 0.94, green: 0.95, blue: 1.0)],
+                startPoint: .top, endPoint: .bottom
+            )
             .ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // SCROLLABLE CONTENT
                 ScrollView(showsIndicators: false) {
-                    VStack(spacing: 24) {
+                    VStack(spacing: 28) {
 
                         // HEADER
-                        VStack(spacing: 6) {
+                        VStack(spacing: 8) {
                             HStack {
                                 if showClose {
                                     Button {
@@ -40,7 +52,7 @@ struct PaywallView: View {
                                     } label: {
                                         Image(systemName: "xmark.circle.fill")
                                             .font(.system(size: 18, weight: .semibold))
-                                            .foregroundColor(.gray.opacity(0.6))
+                                            .foregroundColor(.secondary)
                                     }
                                     .padding(.leading, 8)
                                 }
@@ -48,48 +60,89 @@ struct PaywallView: View {
                             }
 
                             Text("Unlock Pro Features")
-                                .font(.system(size: 26, weight: .bold))
+                                .font(.system(size: 28, weight: .bold))
                                 .multilineTextAlignment(.center)
-                                .padding(.top, 0)
+                                .foregroundColor(.primary)
+                                .padding(.top, 4)
                         }
                         .padding(.top, 12)
 
-                        // REVIEWS SECTION
+                        // REVIEWS
                         TabView(selection: $currentReview) {
                             ForEach(0..<reviews.count, id: \.self) { i in
-                                VStack(spacing: 6) {
-                                    Text(reviews[i].stars)
-                                        .font(.title3)
-                                    Text(reviews[i].text)
+                                let r = reviews[i]
+                                VStack(spacing: 10) {
+                                    HStack(spacing: 2) {
+                                        ForEach(0..<r.stars, id: \.self) { _ in
+                                            Image(systemName: "star.fill")
+                                                .foregroundColor(.yellow)
+                                                .font(.subheadline)
+                                                .shadow(color: .yellow.opacity(0.4), radius: 2)
+                                        }
+                                    }
+
+                                    Text("“\(r.text)”")
                                         .font(.subheadline)
-                                        .foregroundColor(.gray)
                                         .multilineTextAlignment(.center)
-                                        .padding(.horizontal, 24)
+                                        .foregroundColor(.primary)
+                                        .padding(.horizontal, 20)
+                                        .transition(.opacity.combined(with: .slide))
+
+                                    Text(r.author)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
                                 }
-                                .frame(width: UIScreen.main.bounds.width - 80, height: 80)
-                                .background(Color.white)
-                                .cornerRadius(14)
-                                .shadow(color: .black.opacity(0.05), radius: 3, x: 0, y: 1)
+                                .padding(.vertical, 20)
+                                .frame(width: UIScreen.main.bounds.width - 70)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .fill(.ultraThinMaterial)
+                                        .shadow(color: .black.opacity(0.1), radius: 6, y: 3)
+                                )
+                                .tag(i)
                             }
                         }
-                        .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
-                        .frame(height: 120)
+                        .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                        .frame(height: 140)
+                        .overlay(
+                            HStack(spacing: 6) {
+                                ForEach(0..<reviews.count, id: \.self) { i in
+                                    Circle()
+                                        .fill(i == currentReview
+                                              ? Color(hex: "#6F3CE7")
+                                              : Color.gray.opacity(0.3))
+                                        .frame(width: i == currentReview ? 10 : 6,
+                                               height: i == currentReview ? 10 : 6)
+                                        .animation(.spring(response: 0.4,
+                                                           dampingFraction: 0.8),
+                                                   value: currentReview)
+                                }
+                            }
+                            .padding(.top, 160)
+                        )
+                        .onAppear {
+                            Timer.scheduledTimer(withTimeInterval: 3.8, repeats: true) { _ in
+                                withAnimation(.easeInOut(duration: 0.5)) {
+                                    currentReview = (currentReview + 1) % reviews.count
+                                }
+                            }
+                        }
 
-                        // SELECTABLE PLANS
+                        // PLANS
                         VStack(spacing: 12) {
                             ForEach(store.products.sorted(by: { a, b in
-                                if a.id == store.yearly { return true } // Yearly primero
+                                if a.id == store.yearly { return true }
                                 if b.id == store.yearly { return false }
                                 return a.price < b.price
-                            }), id: \.id) { product in
+                            }), id: \.id) { p in
                                 SelectablePlanCard(
-                                    product: product,
-                                    isSelected: store.selectedID == product.id,
-                                    pulse: pulse && product.id == store.yearly
+                                    product: p,
+                                    isSelected: store.selectedID == p.id,
+                                    pulse: pulse && p.id == store.yearly
                                 )
                                 .onTapGesture {
                                     withAnimation(.spring()) {
-                                        store.selectedID = product.id
+                                        store.selectedID = p.id
                                     }
                                 }
                             }
@@ -98,51 +151,56 @@ struct PaywallView: View {
 
                         // FEATURES
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("Only in Pro:")
+                            Text("Included in Pro")
                                 .font(.headline)
-                            FeatureRow(icon: "camera.viewfinder",
-                                       title: "Live Colour ID",
-                                       subtitle: "Identify colours and matching paint colors in real-time using your camera.",
-                                       color: .green)
-                            FeatureRow(icon: "paintpalette.fill",
-                                       title: "Paint Colours",
-                                       subtitle: "Browse and search professional paint colours from major manufacturers.",
-                                       color: .orange)
+                                .foregroundColor(.primary)
+                                .padding(.leading, 4)
+
+                            FeatureRow(icon: "camera.viewfinder", title: "Live Colour ID",
+                                       subtitle: "Identify colours instantly through your camera in real-time.", color: .green)
+                            FeatureRow(icon: "photo.on.rectangle.angled", title: "Photo Colour Picker",
+                                       subtitle: "Extract professional palettes from any photo with AI precision.", color: .orange)
+                            FeatureRow(icon: "paintpalette.fill", title: "Professional Paint Catalogues",
+                                       subtitle: "Explore curated palettes from multiple paint collections.", color: .pink)
+                            FeatureRow(icon: "heart.text.square.fill", title: "Unlimited Collections & Palettes",
+                                       subtitle: "Create and organise unlimited palettes for your work or inspiration.", color: .red)
+                            FeatureRow(icon: "magnifyingglass", title: "Advanced Search",
+                                       subtitle: "Find colours by HEX, RGB, or name instantly and intuitively.", color: .blue)
+                            FeatureRow(icon: "circle.hexagongrid.fill", title: "Harmony & Similar Colours",
+                                       subtitle: "Generate harmonic schemes and discover matching tones easily.", color: .indigo)
+                            FeatureRow(icon: "square.grid.2x2", title: "Multiple Layout Views",
+                                       subtitle: "Switch between grid and list layouts to explore palettes visually.", color: .purple)
+                            FeatureRow(icon: "wand.and.stars", title: "Smart Filters & Sorting",
+                                       subtitle: "Filter by hue, brightness, or harmony with precision.", color: .teal)
+                            FeatureRow(icon: "photo.stack.fill", title: "Colour Matches for Photo & Live ID",
+                                       subtitle: "Compare and visualise matches between live and captured samples.", color: .cyan)
+                            FeatureRow(icon: "lock.open.fill", title: "Unlimited Access",
+                                       subtitle: "No restrictions — enjoy every tool, palette and feature forever.", color: .gray)
                         }
                         .padding(.horizontal)
-                        .padding(.bottom, 120)
+                        .padding(.bottom, 12)
                     }
-                    .padding(.bottom, 30)
+                    .padding(.bottom, 20)
                 }
 
-                // FIXED CTA BUTTON + RESTORE
+                // CTA + FOOTER
                 VStack(spacing: 10) {
-                    Button {
+                    let selected = store.products.first(where: { $0.id == store.selectedID })
+                    let buttonLabel = (selected?.id == store.weekly) ? "Continue" : "Try for Free"
+
+                    AnimatedTryFreeButton(label: buttonLabel) {
                         Task { await store.buySelected() }
-                    } label: {
-                        let selected = selectedProduct()
-                        Text(selectedButtonLabel(for: selected))
-                            .font(.headline)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(
-                                LinearGradient(colors: [.orange, .yellow],
-                                               startPoint: .leading,
-                                               endPoint: .trailing)
-                            )
-                            .foregroundColor(.white)
-                            .cornerRadius(16)
-                            .shadow(color: .orange.opacity(0.3), radius: 4, x: 0, y: 2)
                     }
 
-                    // ✅ Restore Purchases Button
+                    // RESTORE BUTTON WITH ALERT
                     Button {
                         Task {
                             await store.restorePurchases()
-                            if store.isPro {
-                                store.showPaywall = false
-                                dismiss()
-                            }
+                            restoreMessage = AlertMessage(
+                                text: store.isPro
+                                    ? "Your purchases have been restored ✅"
+                                    : "No previous purchases found."
+                            )
                         }
                     } label: {
                         Text("Restore Purchases")
@@ -150,9 +208,10 @@ struct PaywallView: View {
                             .underline()
                             .foregroundColor(.blue)
                     }
-                    .padding(.top, 2)
+                    .alert(item: $restoreMessage) { message in
+                        Alert(title: Text(message.text))
+                    }
 
-                    // INFO LABELS
                     HStack {
                         Label("Cancel anytime", systemImage: "checkmark.circle")
                         Spacer()
@@ -160,26 +219,34 @@ struct PaywallView: View {
                     }
                     .font(.caption)
                     .foregroundColor(.secondary)
+                    .padding(.top, 2)
+
+                    HStack(spacing: 18) {
+                        Link("Terms of Use",
+                             destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
+                        Link("Privacy Policy",
+                             destination: URL(string: "https://www.coloritapp.com/privacy")!)
+                    }
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                    .padding(.top, 4)
+                    .padding(.bottom, 8)
                 }
                 .padding(.horizontal)
-                .padding(.bottom, 20)
+                .padding(.bottom, 25)
                 .background(.ultraThinMaterial)
             }
         }
         .interactiveDismissDisabled(!canDismiss)
         .task {
-            if store.products.isEmpty {
-                await store.load()
-            }
-            // 👇 Selecciona por defecto el plan Yearly
+            if store.products.isEmpty { await store.load() }
             if let yearly = store.products.first(where: { $0.id == store.yearly }) {
                 store.selectedID = yearly.id
             }
-            // 👇 Activa animación de pulso
             withAnimation(.easeInOut(duration: 1).repeatForever(autoreverses: true)) {
                 pulse = true
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 withAnimation(.easeIn(duration: 0.3)) {
                     showClose = true
                     canDismiss = true
@@ -187,18 +254,52 @@ struct PaywallView: View {
             }
         }
     }
+}
 
-    // MARK: - Helpers
-    private func selectedProduct() -> Product? {
-        store.products.first(where: { $0.id == store.selectedID })
-    }
+// MARK: - AnimatedTryFreeButton
+struct AnimatedTryFreeButton: View {
+    var label: String
+    var action: () -> Void
+    @Environment(\.colorScheme) private var scheme
+    @State private var animateGradient = false
+    @State private var scaleUp = false
 
-    private func selectedButtonLabel(for product: Product?) -> String {
-        guard let p = product else { return "Subscribe" }
-        if store.hasTrial(p) {
-            return "Start 3-day Free Trial, then \(p.displayPrice)"
-        } else {
-            return "Subscribe for \(p.displayPrice)"
+    var body: some View {
+        Button(action: {
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                scaleUp.toggle()
+            }
+            action()
+        }) {
+            Text(label)
+                .font(.headline)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(
+                    LinearGradient(
+                        colors: scheme == .dark
+                            ? [Color(hex: "#3C8CE7"), Color(hex: "#6F3CE7")]
+                            : [Color(hex: "#6F3CE7"), Color(hex: "#FF61B6")],
+                        startPoint: animateGradient ? .topLeading : .bottomTrailing,
+                        endPoint: animateGradient ? .bottomTrailing : .topLeading
+                    )
+                )
+                .cornerRadius(18)
+                .foregroundColor(.white)
+                .scaleEffect(scaleUp ? 1.04 : 1.0)
+                .shadow(color: Color.purple.opacity(0.4), radius: 10, y: 4)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 18)
+                        .stroke(Color.white.opacity(0.25), lineWidth: 1)
+                )
+                .onAppear {
+                    withAnimation(.linear(duration: 3).repeatForever(autoreverses: true)) {
+                        animateGradient.toggle()
+                    }
+                    withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
+                        scaleUp.toggle()
+                    }
+                }
         }
     }
 }
@@ -206,16 +307,27 @@ struct PaywallView: View {
 // MARK: - SelectablePlanCard
 struct SelectablePlanCard: View {
     @EnvironmentObject var store: StoreVM
+    @Environment(\.colorScheme) private var scheme
     let product: Product
     let isSelected: Bool
     let pulse: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text(displayTitle(for: product))
-                    .font(.headline)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(displayTitle(for: product))
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                    if store.hasTrial(product) {
+                        Text("Try for Free")
+                            .font(.subheadline.bold())
+                            .foregroundColor(.green)
+                    }
+                }
+
                 Spacer()
+
                 if product.id == store.yearly {
                     Text("Best Value")
                         .font(.caption2.bold())
@@ -227,46 +339,33 @@ struct SelectablePlanCard: View {
                         .scaleEffect(pulse ? 1.15 : 1.0)
                         .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: pulse)
                 }
+
                 if isSelected {
                     Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.blue)
+                        .foregroundColor(Color(hex: "#6F3CE7"))
                         .scaleEffect(pulse ? 1.1 : 1.0)
                         .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: pulse)
                 }
             }
 
-            if store.hasTrial(product) {
-                Text("3-day free trial")
-                    .font(.subheadline)
-                    .foregroundColor(.green)
-            }
-
             Text(product.displayPrice)
                 .font(.title3.bold())
-
-            if store.hasLaunchDiscount(product) {
-                Text(store.regularPriceText(product))
-                    .font(.caption)
-                    .strikethrough()
-                    .foregroundColor(.gray)
-                Text("81% off today")
-                    .font(.caption)
-                    .foregroundColor(.pink)
-            }
+                .foregroundColor(.primary)
         }
         .padding()
         .frame(maxWidth: .infinity)
         .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white)
-                .shadow(color: .black.opacity(0.04), radius: 3, x: 0, y: 1)
+            scheme == .dark ? Color(.secondarySystemBackground) : Color.white
         )
         .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .stroke(isSelected ? Color.blue : Color.gray.opacity(0.2),
+                .stroke(isSelected ? Color(hex: "#6F3CE7") : Color.gray.opacity(0.25),
                         lineWidth: isSelected ? 3 : 1)
-                .scaleEffect(pulse && isSelected ? 1.05 : 1.0)
-                .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: pulse)
+        )
+        .cornerRadius(16)
+        .shadow(
+            color: scheme == .dark ? .white.opacity(0.04) : .black.opacity(0.08),
+            radius: 4, x: 0, y: 1
         )
     }
 
@@ -285,9 +384,10 @@ struct FeatureRow: View {
     let title: String
     let subtitle: String
     let color: Color
+    @Environment(\.colorScheme) private var scheme
 
     var body: some View {
-        HStack(alignment: .top, spacing: 10) {
+        HStack(alignment: .top, spacing: 12) {
             Image(systemName: icon)
                 .font(.title3)
                 .foregroundColor(color)
@@ -295,14 +395,23 @@ struct FeatureRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.subheadline.bold())
+                    .foregroundColor(.primary)
                 Text(subtitle)
                     .font(.caption)
                     .foregroundColor(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
+            Spacer()
         }
-        .padding(12)
-        .background(Color.white)
-        .cornerRadius(14)
-        .shadow(color: .black.opacity(0.03), radius: 2, x: 0, y: 1)
+        .padding(14)
+        .frame(maxWidth: .infinity)
+        .background(
+            scheme == .dark ? Color(.secondarySystemBackground) : Color.white
+        )
+        .cornerRadius(16)
+        .shadow(
+            color: scheme == .dark ? .white.opacity(0.03) : .black.opacity(0.08),
+            radius: 4, x: 0, y: 2
+        )
     }
 }
