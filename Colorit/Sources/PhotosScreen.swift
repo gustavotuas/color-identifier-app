@@ -332,7 +332,7 @@ private var vendorFilterBar: some View {
                                 .font(.system(size: 17, weight: .semibold))
                         }
                         .foregroundColor(Color.accentColor)
-                        .frame(maxWidth: .infinity)
+                        .frame(maxWidth: 340)
                         .padding(.vertical, 12)
                         .background(
                             RoundedRectangle(cornerRadius: 16, style: .continuous)
