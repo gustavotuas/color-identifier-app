@@ -38,12 +38,16 @@ public struct NamedColor: Codable, Identifiable, Hashable {
 public enum CatalogID: String, CaseIterable, Hashable {
     case generic
     case sherwinWilliams
+    case behr
+    case benjamin
 
     /// File name (WITHOUT ".json")
     public var filename: String {
         switch self {
         case .generic:          return "NamedColors"
         case .sherwinWilliams:  return "catalog_sherwin_williams"   // <- coincide con tu archivo
+        case .behr: return "catalog_sherwin_williams"
+        case .benjamin: return "catalog_sherwin_williams"
         }
     }
 
@@ -52,6 +56,8 @@ public enum CatalogID: String, CaseIterable, Hashable {
         switch self {
         case .generic:          return nil
         case .sherwinWilliams:  return "catalogs"
+        case .behr: return "catalogs"
+        case .benjamin: return "catalogs"
         }
     }
 
@@ -59,6 +65,8 @@ public enum CatalogID: String, CaseIterable, Hashable {
         switch self {
         case .generic:          return "Generic"
         case .sherwinWilliams:  return "Sherwin-Williams"
+        case .behr: return "Behr"
+        case .benjamin: return "Benjamin Moore"
         }
     }
 }

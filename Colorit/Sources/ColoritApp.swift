@@ -16,7 +16,7 @@ struct ColoritApp: App {
     @StateObject private var languageManager = LanguageManager()
     @Environment(\.scenePhase) private var scenePhase
 
-    @StateObject private var catalogs = CatalogStore(preload: [.generic, .sherwinWilliams])
+    @StateObject private var catalogs = CatalogStore(preload: [.generic, .sherwinWilliams, .behr, .benjamin])
 
     var body: some Scene {
         WindowGroup {
