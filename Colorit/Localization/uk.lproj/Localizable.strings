@@ -1,34 +1,200 @@
-"unlock_title" = "Unlock Colorit Pro";
-"unlock_subtitle" = "Experience AI color intelligence & design freedom.";
-"plan_weekly" = "Weekly – $5.99/week";
-"plan_monthly" = "Monthly – $14.99/month";
-"plan_yearly" = "Yearly – $59.99/year";
-"trial_badge" = "Start free for 3 days";
-"discount_badge_today" = "50% OFF today only";
-"discount_badge_limited" = "Save 50% – Limited Time";
-"regular_price_monthly" = "Regular $29.99/month";
-"regular_price_yearly" = "Regular $119.99/year";
-"cta_start_trial_save" = "Start My Free Trial & Save 50%";
-"footer_note" = "Limited-time launch offer. Cancel anytime in Settings. Offer may end soon.";
-"cancel_anytime" = "Cancel anytime";
-"best_value" = "Best Value";
-"selected" = "Selected";
-"offer_ends_in" = "Offer ends in";
-"get_started" = "Get Started";
-"camera" = "Camera";
-"photos" = "Фотографії";
-"browse" = "Browse";
-"discover" = "Discover";
-"home" = "Home";
-"profile" = "Profile";
-"quick_actions" = "Quick Actions";
-"open_camera" = "Open Camera";
-"from_photos" = "From Photos";
-"unlock_pro" = "Unlock Pro";
-"pick_photo" = "Pick a photo";
-"choose_photo" = "Choose Photo";
-"extract_palette" = "Extract Palette";
-"pro_tips" = "Pro Tips";
-"tip_natural_light" = "Capture under natural light";
-"tip_avoid_glare" = "Avoid reflections and glare";
-"tip_contrast" = "Try contrasty backgrounds";
+/* ======================================================
+   MAIN APP STRUCTURE
+   ====================================================== */
+"tab_collections" = "Колекції";
+"tab_search" = "Пошук";
+"tab_camera" = "Камера";
+"tab_photos" = "Фото";
+"tab_settings" = "Налаштування";
+"pro_badge" = "PRO";
+"unlock_pro" = "Відкрити Pro";
+"unlock_pro_subtitle" = "Отримайте доступ до всіх преміум-функцій";
+"unlock_picker" = "Відкрити вибір кольору";
+
+/* ======================================================
+   SEARCH / COLOR DETAIL
+   ====================================================== */
+"color_harmony" = "Гармонія кольорів";
+"mode" = "Режим";
+"harmony" = "Гармонія";
+"copy" = "Копіювати";
+"share" = "Поділитися";
+"add" = "Додати";
+"added" = "Додано";
+"close" = "Закрити";
+"copied_to_clipboard" = "Скопійовано в буфер обміну";
+"share_preparing" = "Підготовка попереднього перегляду...";
+"red" = "Червоний";
+"green" = "Зелений";
+"blue" = "Синій";
+"hex" = "Hex";
+"hue" = "Відтінок";
+"saturation" = "Насиченість";
+"brightness" = "Яскравість";
+"cyan" = "Бірюзовий";
+"magenta" = "Пурпуровий";
+"yellow" = "Жовтий";
+"black" = "Чорний";
+"show_more" = "Показати більше";
+"bucket" = "Відро";
+"color_not_found" = "Колір не знайдено в бібліотеці";
+"shades_tints" = "Тіні та відтінки";
+"contrast_preview" = "Попередній перегляд контрасту";
+"vendor" = "Постачальник";
+"brand" = "Бренд";
+"code" = "Код";
+"locator" = "Локатор";
+"open_vendor_page" = "Відкрити сторінку постачальника";
+"line" = "Лінія";
+"made_with" = "Створено за допомогою Colorit";
+"url" = "www.colorit.app";
+"opening_share_sheet" = "Відкривається меню спільного доступу...";
+"failed_to_open_share_sheet" = "Не вдалося відкрити меню спільного доступу.";
+"unlock_pro_to_view_harmony" = "Відкрийте Pro, щоб переглянути Гармонію";
+"unlock_pro_to_view_shades_tints" = "Відкрийте Pro, щоб переглянути Тіні та Відтінки";
+"text_sample" = "Зразок тексту";
+"excellent_AAA" = "Відмінно (AAA)";
+"good_AA" = "Добре (AA)";
+"low_contrast" = "Низький контраст";
+"select_paint" = "Вибрати фарбу";
+"sort_alphabetically" = "Сортувати за алфавітом";
+"sort_by_brightness" = "Сортувати за яскравістю";
+"toggle_layout" = "Змінити макет";
+"search_by" = "Шукайте за назвою, hex, брендом або кодом";
+"paints" = "Фарби";
+"general_palette" = "Загальна палітра";
+
+/* ======================================================
+   CAMERA SCREEN
+   ====================================================== */
+"no_match_found" = "Збігів не знайдено";
+"added_to_collections" = "Додано до колекцій";
+"removed_from_collections" = "Видалено з колекцій";
+"sort_by_alphabetic" = "Сортувати за алфавітом";
+"free_preview" = "Безкоштовний перегляд – Відкрийте PRO для повного доступу";
+"unlock_live_camera" = "Відкрити повну камеру";
+"generate_palette" = "Створити палітру";
+"precision" = "Точність";
+"save" = "Зберегти";
+"save_color_to_collections" = "Зберегти колір у колекції";
+"color_matches" = "Збіги кольорів";
+
+/* ======================================================
+   LIVE / PHOTO PALETTE DETAILS
+   ====================================================== */
+"add_palette_to_collections" = "Додати палітру до колекцій";
+"palette_saved" = "Палітру збережено";
+"palette_added" = "Палітру додано до колекцій";
+"live_palette" = "Жива палітра";
+"photo_palette" = "Фото палітра";
+"unlock_full_palette_color_matches" = "Відкрити повну палітру та збіги кольорів";
+
+/* ======================================================
+   FAVORITES / COLLECTIONS
+   ====================================================== */
+"colors" = "Кольори";
+"color" = "Колір";
+"palettes" = "Палітри";
+"palette" = "Палітра";
+"all" = "Усе";
+"no_collections_yet" = "Ще немає колекцій";
+"no_collections_subtitle" = "Зберігайте кольори та палітри, щоб переглянути їх тут пізніше.";
+"clear_all_collections" = "Очистити всі колекції?";
+"yes" = "Так";
+"no" = "Ні";
+"create_palette" = "Створити палітру";
+"palette_name_optional" = "Назва палітри (необов’язково)";
+"palette_name" = "Назва палітри";
+"add_color" = "Додати колір";
+"edit" = "Редагувати";
+"cancel" = "Скасувати";
+"done" = "Готово";
+"delete_palette" = "Видалити цю палітру?";
+"collections" = "Колекції";
+"new_palette" = "Нова палітра";
+"untitled_palette" = "Палітра без назви";
+"delete" = "Видалити";
+"all_colors_already_added" = "Усі кольори вже додано.";
+"select_colors_to_add" = "Виберіть кольори для додавання";
+
+/* ======================================================
+   PHOTOS SCREEN
+   ====================================================== */
+"detected_palette" = "Виявлена палітра";
+"choose_photo" = "Вибрати фото";
+"pick_photo" = "Обрати фото";
+"pick_color" = "Обрати колір";
+"change_photo" = "Змінити фото";
+"choose_an_image_to_find_matching_colors" = "Виберіть зображення, щоб знайти схожі кольори";
+"unlock_full_palette" = "Відкрити повну палітру";
+"unnamed_color" = "Колір без назви";
+"color_added_to_collections" = "Колір додано до колекцій";
+
+/* ======================================================
+   SETTINGS SCREEN
+   ====================================================== */
+"appearance" = "Вигляд";
+"theme" = "Тема";
+"language" = "Мова";
+"about" = "Про програму";
+"version" = "Версія:";
+"rate_app" = "Оцінити застосунок";
+"help" = "Допомога";
+"send_feedback" = "Надіслати відгук";
+"app_name" = "Colorit";
+"hrs" = "год";
+"min" = "хв";
+"sec" = "с";
+"system" = "Система";
+"light" = "Світла";
+"dark" = "Темна";
+"general" = "Загальні";
+
+/* ======================================================
+   PAYWALL / PRO FEATURES
+   ====================================================== */
+"flash_sale" = "Знижка до -80% завершується через";
+"best_value" = "Найкраща пропозиція";
+"terms_of_use" = "Умови користування";
+"privacy_policy" = "Політика конфіденційності";
+"try_free" = "Спробувати безкоштовно";
+"continue" = "Продовжити";
+"unlock_pro_features" = "Відкрити функції Pro";
+"included_in_pro" = "Входить до Pro";
+"feature_live_color_id_subtitle" = "Миттєво визначайте кольори за допомогою камери в реальному часі.";
+"feature_photo_color_picker_subtitle" = "Витягайте професійні палітри з будь-якого фото з точністю AI.";
+"feature_paint_catalogues_subtitle" = "Досліджуйте вибрані палітри з різних колекцій фарб.";
+"feature_unlimited_collections_subtitle" = "Створюйте та організовуйте необмежені палітри для роботи чи натхнення.";
+"feature_advanced_search_subtitle" = "Миттєво знаходьте кольори за HEX, RGB або назвою.";
+"feature_harmony_colors_subtitle" = "Створюйте гармонійні схеми та легко знаходьте відповідні тони.";
+"feature_multiple_layouts_subtitle" = "Перемикайтеся між сіткою та списком для зручного перегляду.";
+"feature_smart_filters_subtitle" = "Фільтруйте за відтінком, яскравістю або гармонією з точністю.";
+"feature_color_matches_subtitle" = "Порівнюйте та візуалізуйте збіги між живими та збереженими зразками.";
+"feature_unlimited_access_subtitle" = "Без обмежень — насолоджуйтесь усіма інструментами, палітрами та функціями назавжди.";
+"your_purchases_have_been_restored" = "Ваші покупки відновлено";
+"no_previous_purchases_found" = "Попередніх покупок не знайдено.";
+"restore_purchases" = "Відновити покупки";
+"cancel_anytime" = "Можна скасувати в будь-який час";
+"family_sharing_enabled" = "Сімейний доступ увімкнено";
+"3_day_free_trial" = "3-денна безкоштовна пробна версія";
+"1_year_plan" = "План на 1 рік";
+"1_week_plan" = "План на 1 тиждень";
+"feature_live_color_id_title" = "Розпізнавання кольорів у реальному часі";
+"feature_photo_color_picker_title" = "Вибір кольорів з фото";
+"feature_paint_catalogues_title" = "Професійні каталоги фарб";
+"feature_unlimited_collections_title" = "Необмежені колекції та палітри";
+"feature_advanced_search_title" = "Розширений пошук";
+"feature_harmony_colors_title" = "Гармонійні та подібні кольори";
+"feature_multiple_layouts_title" = "Кілька макетів перегляду";
+"feature_smart_filters_title" = "Розумні фільтри та сортування";
+"feature_color_matches_title" = "Збіги кольорів для фото та живого режиму";
+"feature_unlimited_access_title" = "Необмежений доступ";
+
+/* ======================================================
+   TOASTS / GENERIC MESSAGES
+   ====================================================== */
+"toast_copied" = "Скопійовано";
+"toast_added" = "Додано";
+"toast_removed" = "Видалено";
+"toast_share" = "Поділитися";
+"toast_info" = "Інформація";

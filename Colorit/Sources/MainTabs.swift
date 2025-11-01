@@ -9,42 +9,6 @@ final class Haptic {
     }
 }
 
-// MARK: - Home Screen
-struct HomeScreen: View {
-    @EnvironmentObject var store: StoreVM
-
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-
-                Text("Colorit")
-                    .font(.largeTitle)
-                    .bold()
-
-                GroupBox("Quick Actions") {
-                    HStack {
-                        NavigationLink("Open Camera") {
-                            CameraScreen()
-                        }
-                        Spacer()
-                    }
-                }
-
-                if !store.isPro {
-                    Button("Unlock Pro") {
-                        store.showPaywall = true
-                    }
-                    .buttonStyle(.borderedProminent)
-                }
-
-                Spacer(minLength: 40)
-            }
-            .padding()
-        }
-        .navigationBarHidden(true)
-    }
-}
-
 // MARK: - Pestañas principales
 struct MainTabs: View {
     @EnvironmentObject var favs: FavoritesStore  // 👈 ahora sí tienes acceso al store
@@ -59,7 +23,7 @@ struct MainTabs: View {
                 SearchScreen()
             }
             .tabItem {
-                Label("Search", systemImage: "magnifyingglass")
+                Label("tab_search".localized, systemImage: "magnifyingglass")
             }
             .tag(0)
 
@@ -70,7 +34,7 @@ struct MainTabs: View {
                     .onAppear { favs.hasNewFavorites = false } // 👈 limpia el badge al entrar
             }
             .tabItem {
-                Label("Collections", systemImage: "rectangle.stack.fill")
+                Label("tab_collections".localized, systemImage: "rectangle.stack.fill")
             }
             .badge(favs.hasNewFavorites ? "●" : nil) // 👈 muestra el puntito de novedades
             .tag(1)
@@ -80,7 +44,7 @@ struct MainTabs: View {
                 CameraScreen()
             }
             .tabItem {
-                Label("Camera", systemImage: "camera")
+                Label("tab_camera".localized, systemImage: "camera")
             }
             .tag(2)
 
@@ -89,7 +53,7 @@ struct MainTabs: View {
                 PhotosScreen()
             }
             .tabItem {
-                Label("Photo", systemImage: "photo")
+                Label("tab_photos".localized, systemImage: "photo")
             }
             .tag(3)
 
@@ -98,7 +62,7 @@ struct MainTabs: View {
                 SettingScreen()
             }
             .tabItem {
-                Label("Settings", systemImage: "gearshape")
+                Label("tab_settings".localized, systemImage: "gearshape")
             }
             .tag(4)
         }

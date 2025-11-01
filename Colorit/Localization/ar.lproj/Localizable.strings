@@ -1,34 +1,201 @@
-"unlock_title" = "Unlock Colorit Pro";
-"unlock_subtitle" = "Experience AI color intelligence & design freedom.";
-"plan_weekly" = "Weekly – $5.99/week";
-"plan_monthly" = "Monthly – $14.99/month";
-"plan_yearly" = "Yearly – $59.99/year";
-"trial_badge" = "Start free for 3 days";
-"discount_badge_today" = "50% OFF today only";
-"discount_badge_limited" = "Save 50% – Limited Time";
-"regular_price_monthly" = "Regular $29.99/month";
-"regular_price_yearly" = "Regular $119.99/year";
-"cta_start_trial_save" = "Start My Free Trial & Save 50%";
-"footer_note" = "Limited-time launch offer. Cancel anytime in Settings. Offer may end soon.";
-"cancel_anytime" = "Cancel anytime";
-"best_value" = "Best Value";
-"selected" = "Selected";
-"offer_ends_in" = "Offer ends in";
-"get_started" = "Get Started";
-"camera" = "Camera";
-"photos" = "Photos";
-"browse" = "Browse";
-"discover" = "Discover";
-"home" = "Home";
-"profile" = "Profile";
-"quick_actions" = "Quick Actions";
-"open_camera" = "Open Camera";
-"from_photos" = "From Photos";
-"unlock_pro" = "Unlock Pro";
-"pick_photo" = "Pick a photo";
-"choose_photo" = "Choose Photo";
-"extract_palette" = "Extract Palette";
-"pro_tips" = "Pro Tips";
-"tip_natural_light" = "Capture under natural light";
-"tip_avoid_glare" = "Avoid reflections and glare";
-"tip_contrast" = "Try contrasty backgrounds";
+/* ======================================================
+   MAIN APP STRUCTURE
+   ====================================================== */
+"tab_collections" = "المجموعات";
+"tab_search" = "بحث";
+"tab_camera" = "الكاميرا";
+"tab_photos" = "الصور";
+"tab_settings" = "الإعدادات";
+"pro_badge" = "محترف";
+"unlock_pro" = "افتح النسخة الاحترافية";
+"unlock_pro_subtitle" = "الوصول إلى جميع الميزات المميزة";
+"unlock_picker" = "افتح أداة الاختيار";
+
+/* ======================================================
+   SEARCH / COLOR DETAIL
+   ====================================================== */
+"color_harmony" = "تناغم الألوان";
+"mode" = "الوضع";
+"harmony" = "التناغم";
+"copy" = "نسخ";
+"share" = "مشاركة";
+"add" = "إضافة";
+"added" = "تمت الإضافة";
+"close" = "إغلاق";
+"copied_to_clipboard" = "تم النسخ إلى الحافظة";
+"share_preparing" = "جارٍ تحضير المعاينة للمشاركة...";
+"red" = "أحمر";
+"green" = "أخضر";
+"blue" = "أزرق";
+"hex" = "رمز Hex";
+"hue" = "الدرجة اللونية";
+"saturation" = "التشبع";
+"brightness" = "السطوع";
+"cyan" = "سماوي";
+"magenta" = "أرجواني";
+"yellow" = "أصفر";
+"black" = "أسود";
+"show_more" = "عرض المزيد";
+"bucket" = "دلو";
+"color_not_found" = "اللون غير موجود في المكتبة";
+"shades_tints" = "الدرجات والظلال";
+"contrast_preview" = "معاينة التباين";
+"vendor" = "المورّد";
+"brand" = "العلامة التجارية";
+"code" = "الرمز";
+"locator" = "الموقع";
+"open_vendor_page" = "فتح صفحة المورّد";
+"line" = "الخط";
+"made_with" = "صنع باستخدام Colorit";
+"url" = "www.colorit.app";
+"opening_share_sheet" = "جارٍ فتح قائمة المشاركة...";
+"failed_to_open_share_sheet" = "تعذر فتح قائمة المشاركة.";
+"unlock_pro_to_view_harmony" = "افتح النسخة الاحترافية لعرض التناغم";
+"unlock_pro_to_view_shades_tints" = "افتح النسخة الاحترافية لعرض الظلال والدرجات";
+"text_sample" = "عينة نصية";
+"excellent_AAA" = "ممتاز (AAA)";
+"good_AA" = "جيد (AA)";
+"low_contrast" = "تباين منخفض";
+"select_paint" = "اختر الطلاء";
+"sort_alphabetically" = "فرز أبجديًا";
+"sort_by_brightness" = "فرز حسب السطوع";
+"toggle_layout" = "تبديل التخطيط";
+"search_by" = "ابحث بالاسم أو الرمز أو العلامة أو الكود";
+"paints" = "الدهانات";
+"general_palette" = "لوحة الألوان العامة";
+
+
+/* ======================================================
+   CAMERA SCREEN
+   ====================================================== */
+"no_match_found" = "لا توجد مطابقة";
+"added_to_collections" = "تمت الإضافة إلى المجموعات";
+"removed_from_collections" = "تمت الإزالة من المجموعات";
+"sort_by_alphabetic" = "فرز أبجديًا";
+"free_preview" = "معاينة مجانية – افتح PRO للوصول الكامل";
+"unlock_live_camera" = "افتح الكاميرا الحية الكاملة";
+"generate_palette" = "إنشاء لوحة ألوان";
+"precision" = "الدقة";
+"save" = "حفظ";
+"save_color_to_collections" = "حفظ اللون في المجموعات";
+"color_matches" = "تطابق الألوان";
+
+/* ======================================================
+   LIVE / PHOTO PALETTE DETAILS
+   ====================================================== */
+"add_palette_to_collections" = "إضافة اللوحة إلى المجموعات";
+"palette_saved" = "تم حفظ اللوحة";
+"palette_added" = "تمت إضافة اللوحة إلى المجموعات";
+"live_palette" = "لوحة الألوان الحية";
+"photo_palette" = "لوحة ألوان الصورة";
+"unlock_full_palette_color_matches" = "افتح اللوحة الكاملة وتطابق الألوان";
+
+/* ======================================================
+   FAVORITES / COLLECTIONS
+   ====================================================== */
+"colors" = "ألوان";
+"color" = "لون";
+"palettes" = "لوحات";
+"palette" = "لوحة";
+"all" = "الكل";
+"no_collections_yet" = "لا توجد مجموعات بعد";
+"no_collections_subtitle" = "احفظ الألوان واللوحات لعرضها هنا لاحقًا.";
+"clear_all_collections" = "مسح جميع المجموعات؟";
+"yes" = "نعم";
+"no" = "لا";
+"create_palette" = "إنشاء لوحة";
+"palette_name_optional" = "اسم اللوحة (اختياري)";
+"palette_name" = "اسم اللوحة";
+"add_color" = "إضافة لون";
+"edit" = "تعديل";
+"cancel" = "إلغاء";
+"done" = "تم";
+"delete_palette" = "هل تريد حذف هذه اللوحة؟";
+"collections" = "المجموعات";
+"new_palette" = "لوحة جديدة";
+"untitled_palette" = "لوحة بدون عنوان";
+"delete" = "حذف";
+"all_colors_already_added" = "تمت إضافة جميع الألوان مسبقًا.";
+"select_colors_to_add" = "اختر الألوان لإضافتها";
+
+/* ======================================================
+   PHOTOS SCREEN
+   ====================================================== */
+"detected_palette" = "لوحة الألوان المكتشفة";
+"choose_photo" = "اختر صورة";
+"pick_photo" = "تحديد صورة";
+"pick_color" = "اختر لونًا";
+"change_photo" = "تغيير الصورة";
+"choose_an_image_to_find_matching_colors" = "اختر صورة للعثور على ألوان متطابقة";
+"unlock_full_palette" = "افتح اللوحة الكاملة";
+"unnamed_color" = "لون بدون اسم";
+"color_added_to_collections" = "تمت إضافة اللون إلى المجموعات";
+
+/* ======================================================
+   SETTINGS SCREEN
+   ====================================================== */
+"appearance" = "المظهر";
+"theme" = "الثيم";
+"language" = "اللغة";
+"about" = "حول";
+"version" = "الإصدار:";
+"rate_app" = "قيّم التطبيق";
+"help" = "مساعدة";
+"send_feedback" = "إرسال الملاحظات";
+"app_name" = "Colorit";
+"hrs" = "س";
+"min" = "د";
+"sec" = "ث";
+"system" = "النظام";
+"light" = "فاتح";
+"dark" = "داكن";
+"general" = "عام";
+
+/* ======================================================
+   PAYWALL / PRO FEATURES
+   ====================================================== */
+"flash_sale" = "عرض خاص حتى 80٪ خصم ينتهي خلال";
+"best_value" = "أفضل قيمة";
+"terms_of_use" = "شروط الاستخدام";
+"privacy_policy" = "سياسة الخصوصية";
+"try_free" = "جرّب مجانًا";
+"continue" = "متابعة";
+"unlock_pro_features" = "افتح الميزات الاحترافية";
+"included_in_pro" = "مدرج في النسخة الاحترافية";
+"feature_live_color_id_subtitle" = "تعرف على الألوان فورًا من خلال الكاميرا في الوقت الحقيقي.";
+"feature_photo_color_picker_subtitle" = "استخرج لوحات احترافية من أي صورة بدقة الذكاء الاصطناعي.";
+"feature_paint_catalogues_subtitle" = "استكشف لوحات مختارة من عدة مجموعات دهان.";
+"feature_unlimited_collections_subtitle" = "أنشئ ونظم لوحات غير محدودة لعملك أو إلهامك.";
+"feature_advanced_search_subtitle" = "اعثر على الألوان عبر HEX أو RGB أو الاسم بسرعة وسهولة.";
+"feature_harmony_colors_subtitle" = "أنشئ مخططات متناغمة واكتشف الألوان المتناسقة بسهولة.";
+"feature_multiple_layouts_subtitle" = "بدّل بين عرض الشبكة والقائمة لاستكشاف اللوحات بصريًا.";
+"feature_smart_filters_subtitle" = "قم بالتصفية حسب التدرج أو السطوع أو التناغم بدقة.";
+"feature_color_matches_subtitle" = "قارن وشاهد التطابقات بين الألوان الحية والمصورة.";
+"feature_unlimited_access_subtitle" = "بدون قيود — استمتع بكل الأدوات واللوحات والميزات إلى الأبد.";
+"your_purchases_have_been_restored" = "تم استعادة مشترياتك";
+"no_previous_purchases_found" = "لم يتم العثور على مشتريات سابقة.";
+"restore_purchases" = "استعادة المشتريات";
+"cancel_anytime" = "يمكنك الإلغاء في أي وقت";
+"family_sharing_enabled" = "مشاركة العائلة مفعّلة";
+"3_day_free_trial" = "تجربة مجانية لمدة 3 أيام";
+"1_year_plan" = "خطة سنوية";
+"1_week_plan" = "خطة أسبوعية";
+"feature_live_color_id_title" = "معرّف اللون الحي";
+"feature_photo_color_picker_title" = "أداة اختيار الألوان من الصور";
+"feature_paint_catalogues_title" = "كتالوجات الطلاء الاحترافية";
+"feature_unlimited_collections_title" = "مجموعات ولوحات غير محدودة";
+"feature_advanced_search_title" = "بحث متقدم";
+"feature_harmony_colors_title" = "تناغم وألوان متشابهة";
+"feature_multiple_layouts_title" = "طرق عرض متعددة";
+"feature_smart_filters_title" = "فلاتر وفرز ذكي";
+"feature_color_matches_title" = "تطابق الألوان للصور والبث المباشر";
+"feature_unlimited_access_title" = "وصول غير محدود";
+
+/* ======================================================
+   TOASTS / GENERIC MESSAGES
+   ====================================================== */
+"toast_copied" = "تم النسخ";
+"toast_added" = "تمت الإضافة";
+"toast_removed" = "تمت الإزالة";
+"toast_share" = "مشاركة";
+"toast_info" = "معلومة";

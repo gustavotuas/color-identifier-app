@@ -1,34 +1,200 @@
-"unlock_title" = "Unlock Colorit Pro";
-"unlock_subtitle" = "Experience AI color intelligence & design freedom.";
-"plan_weekly" = "Weekly – $5.99/week";
-"plan_monthly" = "Monthly – $14.99/month";
-"plan_yearly" = "Yearly – $59.99/year";
-"trial_badge" = "Start free for 3 days";
-"discount_badge_today" = "50% OFF today only";
-"discount_badge_limited" = "Save 50% – Limited Time";
-"regular_price_monthly" = "Regular $29.99/month";
-"regular_price_yearly" = "Regular $119.99/year";
-"cta_start_trial_save" = "Start My Free Trial & Save 50%";
-"footer_note" = "Limited-time launch offer. Cancel anytime in Settings. Offer may end soon.";
-"cancel_anytime" = "Cancel anytime";
-"best_value" = "Best Value";
-"selected" = "Selected";
-"offer_ends_in" = "Offer ends in";
-"get_started" = "Get Started";
-"camera" = "Camera";
-"photos" = "Photos";
-"browse" = "Browse";
-"discover" = "Discover";
-"home" = "Home";
-"profile" = "Profile";
-"quick_actions" = "Quick Actions";
-"open_camera" = "Open Camera";
-"from_photos" = "From Photos";
-"unlock_pro" = "Unlock Pro";
-"pick_photo" = "Pick a photo";
-"choose_photo" = "Choose Photo";
-"extract_palette" = "Extract Palette";
-"pro_tips" = "Pro Tips";
-"tip_natural_light" = "Capture under natural light";
-"tip_avoid_glare" = "Avoid reflections and glare";
-"tip_contrast" = "Try contrasty backgrounds";
+/* ======================================================
+   MAIN APP STRUCTURE
+   ====================================================== */
+"tab_collections" = "Samlinger";
+"tab_search" = "Søk";
+"tab_camera" = "Kamera";
+"tab_photos" = "Bilder";
+"tab_settings" = "Innstillinger";
+"pro_badge" = "PRO";
+"unlock_pro" = "Lås opp Pro";
+"unlock_pro_subtitle" = "Få tilgang til alle premiumfunksjoner";
+"unlock_picker" = "Lås opp fargevelger";
+
+/* ======================================================
+   SEARCH / COLOR DETAIL
+   ====================================================== */
+"color_harmony" = "Fargeharmoni";
+"mode" = "Modus";
+"harmony" = "Harmoni";
+"copy" = "Kopier";
+"share" = "Del";
+"add" = "Legg til";
+"added" = "Lagt til";
+"close" = "Lukk";
+"copied_to_clipboard" = "Kopiert til utklippstavle";
+"share_preparing" = "Forbereder delingsforhåndsvisning...";
+"red" = "Rød";
+"green" = "Grønn";
+"blue" = "Blå";
+"hex" = "Hex";
+"hue" = "Nyanse";
+"saturation" = "Metning";
+"brightness" = "Lysstyrke";
+"cyan" = "Cyan";
+"magenta" = "Magenta";
+"yellow" = "Gul";
+"black" = "Svart";
+"show_more" = "Vis mer";
+"bucket" = "Bøtte";
+"color_not_found" = "Farge ikke funnet i biblioteket";
+"shades_tints" = "Skygger og toner";
+"contrast_preview" = "Kontrastforhåndsvisning";
+"vendor" = "Leverandør";
+"brand" = "Merke";
+"code" = "Kode";
+"locator" = "Lokator";
+"open_vendor_page" = "Åpne leverandørens side";
+"line" = "Linje";
+"made_with" = "Laget med Colorit";
+"url" = "www.colorit.app";
+"opening_share_sheet" = "Åpner delingsark...";
+"failed_to_open_share_sheet" = "Kunne ikke åpne delingsark.";
+"unlock_pro_to_view_harmony" = "Lås opp Pro for å se Harmoni";
+"unlock_pro_to_view_shades_tints" = "Lås opp Pro for å se Skygger og Toner";
+"text_sample" = "Tekstprøve";
+"excellent_AAA" = "Utmerket (AAA)";
+"good_AA" = "God (AA)";
+"low_contrast" = "Lav kontrast";
+"select_paint" = "Velg maling";
+"sort_alphabetically" = "Sorter alfabetisk";
+"sort_by_brightness" = "Sorter etter lysstyrke";
+"toggle_layout" = "Bytt visning";
+"search_by" = "Søk etter navn, hex, merke eller kode";
+"paints" = "Malinger";
+"general_palette" = "Generell palett";
+
+/* ======================================================
+   CAMERA SCREEN
+   ====================================================== */
+"no_match_found" = "Ingen treff funnet";
+"added_to_collections" = "Lagt til i samlinger";
+"removed_from_collections" = "Fjernet fra samlinger";
+"sort_by_alphabetic" = "Sorter alfabetisk";
+"free_preview" = "Gratis forhåndsvisning – Lås opp PRO for full tilgang";
+"unlock_live_camera" = "Lås opp full live-kamera";
+"generate_palette" = "Generer palett";
+"precision" = "Presisjon";
+"save" = "Lagre";
+"save_color_to_collections" = "Lagre farge i samlinger";
+"color_matches" = "Fargetreff";
+
+/* ======================================================
+   LIVE / PHOTO PALETTE DETAILS
+   ====================================================== */
+"add_palette_to_collections" = "Legg til palett i samlinger";
+"palette_saved" = "Palett lagret";
+"palette_added" = "Palett lagt til i samlinger";
+"live_palette" = "Live-palett";
+"photo_palette" = "Foto-palett";
+"unlock_full_palette_color_matches" = "Lås opp full palett og fargetreff";
+
+/* ======================================================
+   FAVORITES / COLLECTIONS
+   ====================================================== */
+"colors" = "Farger";
+"color" = "Farge";
+"palettes" = "Paletter";
+"palette" = "Palett";
+"all" = "Alle";
+"no_collections_yet" = "Ingen samlinger ennå";
+"no_collections_subtitle" = "Lagre farger og paletter for å se dem her senere.";
+"clear_all_collections" = "Slett alle samlinger?";
+"yes" = "Ja";
+"no" = "Nei";
+"create_palette" = "Opprett palett";
+"palette_name_optional" = "Palettnavn (valgfritt)";
+"palette_name" = "Palettnavn";
+"add_color" = "Legg til farge";
+"edit" = "Rediger";
+"cancel" = "Avbryt";
+"done" = "Ferdig";
+"delete_palette" = "Slett denne paletten?";
+"collections" = "Samlinger";
+"new_palette" = "Ny palett";
+"untitled_palette" = "Palett uten navn";
+"delete" = "Slett";
+"all_colors_already_added" = "Alle farger er allerede lagt til.";
+"select_colors_to_add" = "Velg farger å legge til";
+
+/* ======================================================
+   PHOTOS SCREEN
+   ====================================================== */
+"detected_palette" = "Oppdaget palett";
+"choose_photo" = "Velg bilde";
+"pick_photo" = "Velg foto";
+"pick_color" = "Velg farge";
+"change_photo" = "Bytt bilde";
+"choose_an_image_to_find_matching_colors" = "Velg et bilde for å finne matchende farger";
+"unlock_full_palette" = "Lås opp full palett";
+"unnamed_color" = "Navnløs farge";
+"color_added_to_collections" = "Farge lagt til i samlinger";
+
+/* ======================================================
+   SETTINGS SCREEN
+   ====================================================== */
+"appearance" = "Utseende";
+"theme" = "Tema";
+"language" = "Språk";
+"about" = "Om";
+"version" = "Versjon:";
+"rate_app" = "Vurder appen";
+"help" = "Hjelp";
+"send_feedback" = "Send tilbakemelding";
+"app_name" = "Colorit";
+"hrs" = "t";
+"min" = "min";
+"sec" = "sek";
+"system" = "System";
+"light" = "Lyst";
+"dark" = "Mørkt";
+"general" = "Generelt";
+
+/* ======================================================
+   PAYWALL / PRO FEATURES
+   ====================================================== */
+"flash_sale" = "Lynsalg opptil −80 % avsluttes om";
+"best_value" = "Best verdi";
+"terms_of_use" = "Bruksvilkår";
+"privacy_policy" = "Personvernregler";
+"try_free" = "Prøv gratis";
+"continue" = "Fortsett";
+"unlock_pro_features" = "Lås opp Pro-funksjoner";
+"included_in_pro" = "Inkludert i Pro";
+"feature_live_color_id_subtitle" = "Identifiser farger umiddelbart gjennom kameraet i sanntid.";
+"feature_photo_color_picker_subtitle" = "Trekk ut profesjonelle paletter fra ethvert bilde med AI-presisjon.";
+"feature_paint_catalogues_subtitle" = "Utforsk kuraterte paletter fra flere malingskolleksjoner.";
+"feature_unlimited_collections_subtitle" = "Lag og organiser ubegrensede paletter for arbeid eller inspirasjon.";
+"feature_advanced_search_subtitle" = "Finn farger raskt og intuitivt etter HEX, RGB eller navn.";
+"feature_harmony_colors_subtitle" = "Generer harmoniske kombinasjoner og oppdag matchende toner.";
+"feature_multiple_layouts_subtitle" = "Bytt mellom rutenett- og listevisning for visuell utforskning.";
+"feature_smart_filters_subtitle" = "Filtrer etter nyanse, lysstyrke eller harmoni med presisjon.";
+"feature_color_matches_subtitle" = "Sammenlign og visualiser treff mellom live- og bildemateriale.";
+"feature_unlimited_access_subtitle" = "Ingen begrensninger — nyt alle verktøy, paletter og funksjoner for alltid.";
+"your_purchases_have_been_restored" = "Kjøpene dine er gjenopprettet";
+"no_previous_purchases_found" = "Ingen tidligere kjøp funnet.";
+"restore_purchases" = "Gjenopprett kjøp";
+"cancel_anytime" = "Kanseller når som helst";
+"family_sharing_enabled" = "Familiedeling aktivert";
+"3_day_free_trial" = "3-dagers gratis prøveperiode";
+"1_year_plan" = "1-års plan";
+"1_week_plan" = "1-ukes plan";
+"feature_live_color_id_title" = "Live farge-ID";
+"feature_photo_color_picker_title" = "Fargevelger for foto";
+"feature_paint_catalogues_title" = "Profesjonelle malingskataloger";
+"feature_unlimited_collections_title" = "Ubegrensede samlinger og paletter";
+"feature_advanced_search_title" = "Avansert søk";
+"feature_harmony_colors_title" = "Harmoni og lignende farger";
+"feature_multiple_layouts_title" = "Flere visningsoppsett";
+"feature_smart_filters_title" = "Smarte filtre og sortering";
+"feature_color_matches_title" = "Fargetreff for foto og live-ID";
+"feature_unlimited_access_title" = "Ubegrenset tilgang";
+
+/* ======================================================
+   TOASTS / GENERIC MESSAGES
+   ====================================================== */
+"toast_copied" = "Kopiert";
+"toast_added" = "Lagt til";
+"toast_removed" = "Fjernet";
+"toast_share" = "Del";
+"toast_info" = "Info";

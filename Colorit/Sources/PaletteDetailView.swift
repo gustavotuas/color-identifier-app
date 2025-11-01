@@ -24,7 +24,7 @@ struct PaletteDetailView: View {
 
                         // MARK: - Palette name
                         if isEditing {
-                            TextField("Palette name", text: $palette.name.bound)
+                            TextField("palette_name".localized, text: $palette.name.bound)
                                 .font(.system(size: 26, weight: .bold))
                                 .textFieldStyle(.roundedBorder)
                                 .padding(.horizontal)
@@ -61,7 +61,7 @@ struct PaletteDetailView: View {
                                 HStack(spacing: 6) {
                                     Image(systemName: "plus.circle.fill")
                                         .font(.system(size: 17, weight: .semibold))
-                                    Text("Add Color")
+                                    Text("add_color".localized)
                                         .font(.system(size: 17, weight: .semibold))
                                 }
                                 .foregroundColor(Color.accentColor)
@@ -123,7 +123,7 @@ struct PaletteDetailView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button(isEditing ? "Cancel" : "Edit") {
+                    Button(isEditing ? "cancel".localized : "edit".localized) {
                         withAnimation { isEditing.toggle() }
                         UIImpactFeedbackGenerator(style: .soft).impactOccurred()
                     }
@@ -136,7 +136,7 @@ struct PaletteDetailView: View {
                             withAnimation { isEditing = false }
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         } label: {
-                            Label("Done", systemImage: "checkmark.circle.fill")
+                            Label("done".localized, systemImage: "checkmark.circle.fill")
                                 .foregroundColor(.blue)
                         }
                     } else {
@@ -146,13 +146,13 @@ struct PaletteDetailView: View {
                     }
                 }
             }
-            .alert("Delete this palette?", isPresented: $showDeleteConfirm) {
-                Button("Delete", role: .destructive) {
+            .alert("delete_palette".localized, isPresented: $showDeleteConfirm) {
+                Button("delete".localized, role: .destructive) {
                     withAnimation { favs.removePalette(palette) }
                     UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                     dismiss()
                 }
-                Button("Cancel", role: .cancel) {}
+                Button("cancel".localized, role: .cancel) {}
             }
             .sheet(isPresented: $showAddColorSheet) {
                 AddColorsToPaletteSheet(palette: $palette, showSheet: $showAddColorSheet)
@@ -243,11 +243,11 @@ struct AddColorsToPaletteSheet: View {
                 if availableColors.isEmpty {
                     VStack(spacing: 12) {
                         Image(systemName: "checkmark.circle").font(.largeTitle).foregroundColor(.green)
-                        Text("All colors already added.").font(.headline).foregroundColor(.secondary)
+                        Text("all_colors_already_added".localized).font(.headline).foregroundColor(.secondary)
                     }
                     .padding(.top, 40)
                 } else {
-                    Text("Select colors to add")
+                    Text("select_colors_to_add".localized)
                         .font(.title3.bold())
                         .padding(.top)
 
@@ -266,7 +266,7 @@ struct AddColorsToPaletteSheet: View {
                     }
 
                     Button(action: addSelectedColors) {
-                        Label("Add \(selectedColors.count) Color\(selectedColors.count == 1 ? "" : "s")",
+                        Label("\("Add".localized) \(selectedColors.count) \(selectedColors.count == 1 ? "color".localized : "colors".localized)",
                               systemImage: "plus.circle.fill")
                             .font(.headline)
                             .frame(maxWidth: .infinity)
@@ -282,7 +282,7 @@ struct AddColorsToPaletteSheet: View {
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { showSheet = false }
+                    Button("cancel".localized) { showSheet = false }
                 }
             }
         }

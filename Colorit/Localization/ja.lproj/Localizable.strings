@@ -1,34 +1,200 @@
-"unlock_title" = "Unlock Colorit Pro";
-"unlock_subtitle" = "Experience AI color intelligence & design freedom.";
-"plan_weekly" = "Weekly – $5.99/week";
-"plan_monthly" = "Monthly – $14.99/month";
-"plan_yearly" = "Yearly – $59.99/year";
-"trial_badge" = "Start free for 3 days";
-"discount_badge_today" = "50% OFF today only";
-"discount_badge_limited" = "Save 50% – Limited Time";
-"regular_price_monthly" = "Regular $29.99/month";
-"regular_price_yearly" = "Regular $119.99/year";
-"cta_start_trial_save" = "Start My Free Trial & Save 50%";
-"footer_note" = "Limited-time launch offer. Cancel anytime in Settings. Offer may end soon.";
-"cancel_anytime" = "Cancel anytime";
-"best_value" = "Best Value";
-"selected" = "Selected";
-"offer_ends_in" = "Offer ends in";
-"get_started" = "Get Started";
-"camera" = "Camera";
-"photos" = "Photos";
-"browse" = "Browse";
-"discover" = "Discover";
-"home" = "Home";
-"profile" = "Profile";
-"quick_actions" = "Quick Actions";
-"open_camera" = "Open Camera";
-"from_photos" = "From Photos";
-"unlock_pro" = "Unlock Pro";
-"pick_photo" = "Pick a photo";
-"choose_photo" = "Choose Photo";
-"extract_palette" = "Extract Palette";
-"pro_tips" = "Pro Tips";
-"tip_natural_light" = "Capture under natural light";
-"tip_avoid_glare" = "Avoid reflections and glare";
-"tip_contrast" = "Try contrasty backgrounds";
+/* ======================================================
+   MAIN APP STRUCTURE
+   ====================================================== */
+"tab_collections" = "コレクション";
+"tab_search" = "検索";
+"tab_camera" = "カメラ";
+"tab_photos" = "写真";
+"tab_settings" = "設定";
+"pro_badge" = "PRO";
+"unlock_pro" = "Proをアンロック";
+"unlock_pro_subtitle" = "すべてのプレミアム機能にアクセス";
+"unlock_picker" = "ピッカーをアンロック";
+
+/* ======================================================
+   SEARCH / COLOR DETAIL
+   ====================================================== */
+"color_harmony" = "カラーハーモニー";
+"mode" = "モード";
+"harmony" = "ハーモニー";
+"copy" = "コピー";
+"share" = "共有";
+"add" = "追加";
+"added" = "追加済み";
+"close" = "閉じる";
+"copied_to_clipboard" = "クリップボードにコピーしました";
+"share_preparing" = "共有プレビューを準備中...";
+"red" = "赤";
+"green" = "緑";
+"blue" = "青";
+"hex" = "Hex";
+"hue" = "色相";
+"saturation" = "彩度";
+"brightness" = "明度";
+"cyan" = "シアン";
+"magenta" = "マゼンタ";
+"yellow" = "黄色";
+"black" = "黒";
+"show_more" = "さらに表示";
+"bucket" = "バケット";
+"color_not_found" = "ライブラリに色が見つかりません";
+"shades_tints" = "シェードとティント";
+"contrast_preview" = "コントラストプレビュー";
+"vendor" = "メーカー";
+"brand" = "ブランド";
+"code" = "コード";
+"locator" = "ロケーター";
+"open_vendor_page" = "メーカーのページを開く";
+"line" = "ライン";
+"made_with" = "Coloritで作成";
+"url" = "www.colorit.app";
+"opening_share_sheet" = "共有シートを開いています...";
+"failed_to_open_share_sheet" = "共有シートを開けませんでした。";
+"unlock_pro_to_view_harmony" = "ハーモニーを表示するにはProをアンロック";
+"unlock_pro_to_view_shades_tints" = "シェードとティントを表示するにはProをアンロック";
+"text_sample" = "テキストサンプル";
+"excellent_AAA" = "優秀 (AAA)";
+"good_AA" = "良好 (AA)";
+"low_contrast" = "コントラストが低い";
+"select_paint" = "ペイントを選択";
+"sort_alphabetically" = "アルファベット順に並べ替え";
+"sort_by_brightness" = "明るさ順に並べ替え";
+"toggle_layout" = "レイアウトを切り替え";
+"search_by" = "名前、Hex、ブランド、またはコードで検索";
+"paints" = "ペイント";
+"general_palette" = "一般パレット";
+
+/* ======================================================
+   CAMERA SCREEN
+   ====================================================== */
+"no_match_found" = "一致するものが見つかりません";
+"added_to_collections" = "コレクションに追加しました";
+"removed_from_collections" = "コレクションから削除しました";
+"sort_by_alphabetic" = "アルファベット順に並べ替え";
+"free_preview" = "無料プレビュー – フルアクセスにはPROをアンロック";
+"unlock_live_camera" = "ライブカメラをフルアンロック";
+"generate_palette" = "パレットを生成";
+"precision" = "精度";
+"save" = "保存";
+"save_color_to_collections" = "色をコレクションに保存";
+"color_matches" = "色の一致";
+
+/* ======================================================
+   LIVE / PHOTO PALETTE DETAILS
+   ====================================================== */
+"add_palette_to_collections" = "パレットをコレクションに追加";
+"palette_saved" = "パレットを保存しました";
+"palette_added" = "パレットをコレクションに追加しました";
+"live_palette" = "ライブパレット";
+"photo_palette" = "フォトパレット";
+"unlock_full_palette_color_matches" = "フルパレットと色の一致をアンロック";
+
+/* ======================================================
+   FAVORITES / COLLECTIONS
+   ====================================================== */
+"colors" = "色";
+"color" = "色";
+"palettes" = "パレット";
+"palette" = "パレット";
+"all" = "すべて";
+"no_collections_yet" = "まだコレクションがありません";
+"no_collections_subtitle" = "色やパレットを保存して、ここで再度確認できます。";
+"clear_all_collections" = "すべてのコレクションを削除しますか？";
+"yes" = "はい";
+"no" = "いいえ";
+"create_palette" = "パレットを作成";
+"palette_name_optional" = "パレット名（任意）";
+"palette_name" = "パレット名";
+"add_color" = "色を追加";
+"edit" = "編集";
+"cancel" = "キャンセル";
+"done" = "完了";
+"delete_palette" = "このパレットを削除しますか？";
+"collections" = "コレクション";
+"new_palette" = "新しいパレット";
+"untitled_palette" = "タイトルなしのパレット";
+"delete" = "削除";
+"all_colors_already_added" = "すべての色はすでに追加されています。";
+"select_colors_to_add" = "追加する色を選択";
+
+/* ======================================================
+   PHOTOS SCREEN
+   ====================================================== */
+"detected_palette" = "検出されたパレット";
+"choose_photo" = "写真を選択";
+"pick_photo" = "写真を選ぶ";
+"pick_color" = "色を選ぶ";
+"change_photo" = "写真を変更";
+"choose_an_image_to_find_matching_colors" = "一致する色を見つけるための画像を選択";
+"unlock_full_palette" = "フルパレットをアンロック";
+"unnamed_color" = "名前のない色";
+"color_added_to_collections" = "色がコレクションに追加されました";
+
+/* ======================================================
+   SETTINGS SCREEN
+   ====================================================== */
+"appearance" = "外観";
+"theme" = "テーマ";
+"language" = "言語";
+"about" = "アプリについて";
+"version" = "バージョン:";
+"rate_app" = "アプリを評価";
+"help" = "ヘルプ";
+"send_feedback" = "フィードバックを送信";
+"app_name" = "Colorit";
+"hrs" = "時";
+"min" = "分";
+"sec" = "秒";
+"system" = "システム";
+"light" = "ライト";
+"dark" = "ダーク";
+"general" = "一般";
+
+/* ======================================================
+   PAYWALL / PRO FEATURES
+   ====================================================== */
+"flash_sale" = "最大80%オフのフラッシュセール、終了まで";
+"best_value" = "最高の価値";
+"terms_of_use" = "利用規約";
+"privacy_policy" = "プライバシーポリシー";
+"try_free" = "無料で試す";
+"continue" = "続ける";
+"unlock_pro_features" = "Pro機能をアンロック";
+"included_in_pro" = "Proに含まれています";
+"feature_live_color_id_subtitle" = "リアルタイムでカメラを通して色を瞬時に識別します。";
+"feature_photo_color_picker_subtitle" = "AI精度でどんな写真からでもプロ仕様のパレットを抽出します。";
+"feature_paint_catalogues_subtitle" = "複数のペイントコレクションから厳選されたパレットを探索。";
+"feature_unlimited_collections_subtitle" = "作業やインスピレーションのために無制限のパレットを作成・整理します。";
+"feature_advanced_search_subtitle" = "HEX、RGB、または名前で直感的に色をすばやく検索。";
+"feature_harmony_colors_subtitle" = "調和の取れた配色を生成し、簡単にマッチするトーンを発見します。";
+"feature_multiple_layouts_subtitle" = "グリッドとリストビューを切り替えてパレットを視覚的に探索。";
+"feature_smart_filters_subtitle" = "色相、明度、または調和で正確にフィルタリング。";
+"feature_color_matches_subtitle" = "ライブとキャプチャサンプル間の一致を比較・表示。";
+"feature_unlimited_access_subtitle" = "制限なし — すべてのツール、パレット、機能を永遠に楽しめます。";
+"your_purchases_have_been_restored" = "購入履歴が復元されました";
+"no_previous_purchases_found" = "以前の購入は見つかりませんでした。";
+"restore_purchases" = "購入を復元";
+"cancel_anytime" = "いつでもキャンセル可能";
+"family_sharing_enabled" = "ファミリー共有が有効";
+"3_day_free_trial" = "3日間の無料トライアル";
+"1_year_plan" = "1年プラン";
+"1_week_plan" = "1週間プラン";
+"feature_live_color_id_title" = "ライブカラー識別";
+"feature_photo_color_picker_title" = "フォトカラーピッカー";
+"feature_paint_catalogues_title" = "プロフェッショナルペイントカタログ";
+"feature_unlimited_collections_title" = "無制限のコレクションとパレット";
+"feature_advanced_search_title" = "高度な検索";
+"feature_harmony_colors_title" = "ハーモニーと類似色";
+"feature_multiple_layouts_title" = "複数レイアウト表示";
+"feature_smart_filters_title" = "スマートフィルターと並べ替え";
+"feature_color_matches_title" = "写真とライブIDの色一致";
+"feature_unlimited_access_title" = "無制限アクセス";
+
+/* ======================================================
+   TOASTS / GENERIC MESSAGES
+   ====================================================== */
+"toast_copied" = "コピーしました";
+"toast_added" = "追加しました";
+"toast_removed" = "削除しました";
+"toast_share" = "共有";
+"toast_info" = "情報";

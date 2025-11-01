@@ -1,34 +1,200 @@
-"unlock_title" = "Unlock Colorit Pro";
-"unlock_subtitle" = "Experience AI color intelligence & design freedom.";
-"plan_weekly" = "Weekly – $5.99/week";
-"plan_monthly" = "Monthly – $14.99/month";
-"plan_yearly" = "Yearly – $59.99/year";
-"trial_badge" = "Start free for 3 days";
-"discount_badge_today" = "50% OFF today only";
-"discount_badge_limited" = "Save 50% – Limited Time";
-"regular_price_monthly" = "Regular $29.99/month";
-"regular_price_yearly" = "Regular $119.99/year";
-"cta_start_trial_save" = "Start My Free Trial & Save 50%";
-"footer_note" = "Limited-time launch offer. Cancel anytime in Settings. Offer may end soon.";
-"cancel_anytime" = "Cancel anytime";
-"best_value" = "Best Value";
-"selected" = "Selected";
-"offer_ends_in" = "Offer ends in";
-"get_started" = "Get Started";
-"camera" = "Camera";
-"photos" = "Photos";
-"browse" = "Browse";
-"discover" = "Discover";
-"home" = "Home";
-"profile" = "Profile";
-"quick_actions" = "Quick Actions";
-"open_camera" = "Open Camera";
-"from_photos" = "From Photos";
-"unlock_pro" = "Unlock Pro";
-"pick_photo" = "Pick a photo";
-"choose_photo" = "Choose Photo";
-"extract_palette" = "Extract Palette";
-"pro_tips" = "Pro Tips";
-"tip_natural_light" = "Capture under natural light";
-"tip_avoid_glare" = "Avoid reflections and glare";
-"tip_contrast" = "Try contrasty backgrounds";
+/* ======================================================
+   MAIN APP STRUCTURE
+   ====================================================== */
+"tab_collections" = "சேமிப்புகள்";
+"tab_search" = "தேடல்";
+"tab_camera" = "கேமரா";
+"tab_photos" = "புகைப்படங்கள்";
+"tab_settings" = "அமைப்புகள்";
+"pro_badge" = "PRO";
+"unlock_pro" = "ப்ரோவை திறக்கவும்";
+"unlock_pro_subtitle" = "அனைத்து சிறப்பம்சங்களையும் அணுகவும்";
+"unlock_picker" = "தேர்வியை திறக்கவும்";
+
+/* ======================================================
+   SEARCH / COLOR DETAIL
+   ====================================================== */
+"color_harmony" = "நிற ஒத்திசைவு";
+"mode" = "முறை";
+"harmony" = "ஒத்திசைவு";
+"copy" = "நகலெடுக்கவும்";
+"share" = "பகிர்";
+"add" = "சேர்";
+"added" = "சேர்க்கப்பட்டது";
+"close" = "மூடு";
+"copied_to_clipboard" = "கிளிப்போர்டில் நகலெடுக்கப்பட்டது";
+"share_preparing" = "பகிர்வுக்கான முன்னோட்டம் தயார் செய்யப்படுகிறது...";
+"red" = "சிகப்பு";
+"green" = "பச்சை";
+"blue" = "நீலம்";
+"hex" = "Hex";
+"hue" = "நிறம்";
+"saturation" = "பொருத்தம்";
+"brightness" = "ஒளிர்ச்சி";
+"cyan" = "சியான்";
+"magenta" = "மேஜெண்டா";
+"yellow" = "மஞ்சள்";
+"black" = "கருப்பு";
+"show_more" = "மேலும் காட்டு";
+"bucket" = "வாளி";
+"color_not_found" = "நிறம் நூலகத்தில் கிடைக்கவில்லை";
+"shades_tints" = "நிழல்கள் மற்றும் வெளிச்சங்கள்";
+"contrast_preview" = "எதிர்மறை முன்னோட்டம்";
+"vendor" = "விற்பனையாளர்";
+"brand" = "பிராண்ட்";
+"code" = "குறியீடு";
+"locator" = "இடம் கண்டுபிடி";
+"open_vendor_page" = "விற்பனையாளர் பக்கத்தை திறக்கவும்";
+"line" = "வரி";
+"made_with" = "Colorit மூலம் உருவாக்கப்பட்டது";
+"url" = "www.colorit.app";
+"opening_share_sheet" = "பகிர்வு தாளைத் திறக்கிறது...";
+"failed_to_open_share_sheet" = "பகிர்வு தாளை திறக்க முடியவில்லை.";
+"unlock_pro_to_view_harmony" = "ஒத்திசைவை காண ப்ரோவைத் திறக்கவும்";
+"unlock_pro_to_view_shades_tints" = "நிழல்கள் மற்றும் வெளிச்சங்களை காண ப்ரோவைத் திறக்கவும்";
+"text_sample" = "உரை மாதிரி";
+"excellent_AAA" = "மிகச் சிறந்தது (AAA)";
+"good_AA" = "நன்று (AA)";
+"low_contrast" = "குறைந்த எதிர்மறை";
+"select_paint" = "நிறத்தைத் தேர்ந்தெடுக்கவும்";
+"sort_alphabetically" = "அகர வரிசைப்படி வரிசைப்படுத்தவும்";
+"sort_by_brightness" = "ஒளிர்ச்சியின்படி வரிசைப்படுத்தவும்";
+"toggle_layout" = "அமைப்பை மாற்றவும்";
+"search_by" = "பெயர், hex, பிராண்ட் அல்லது குறியீட்டின் மூலம் தேடவும்";
+"paints" = "நிறங்கள்";
+"general_palette" = "பொது நிறப்பட்டி";
+
+/* ======================================================
+   CAMERA SCREEN
+   ====================================================== */
+"no_match_found" = "பொருத்தம் எதுவும் இல்லை";
+"added_to_collections" = "சேமிப்புகளில் சேர்க்கப்பட்டது";
+"removed_from_collections" = "சேமிப்பிலிருந்து நீக்கப்பட்டது";
+"sort_by_alphabetic" = "அகர வரிசைப்படி வரிசைப்படுத்து";
+"free_preview" = "இலவச முன்னோட்டம் – முழு அணுகலுக்கு PROவைத் திறக்கவும்";
+"unlock_live_camera" = "முழு நேர கேமராவைத் திறக்கவும்";
+"generate_palette" = "நிறப்பட்டி உருவாக்கவும்";
+"precision" = "துல்லியம்";
+"save" = "சேமி";
+"save_color_to_collections" = "நிறத்தை சேமிப்புகளில் சேமிக்கவும்";
+"color_matches" = "பொருந்தும் நிறங்கள்";
+
+/* ======================================================
+   LIVE / PHOTO PALETTE DETAILS
+   ====================================================== */
+"add_palette_to_collections" = "நிறப்பட்டியை சேமிப்புகளில் சேர்க்கவும்";
+"palette_saved" = "நிறப்பட்டி சேமிக்கப்பட்டது";
+"palette_added" = "நிறப்பட்டி சேமிப்புகளில் சேர்க்கப்பட்டது";
+"live_palette" = "நேரடி நிறப்பட்டி";
+"photo_palette" = "புகைப்பட நிறப்பட்டி";
+"unlock_full_palette_color_matches" = "முழு நிறப்பட்டி மற்றும் பொருந்தும் நிறங்களைத் திறக்கவும்";
+
+/* ======================================================
+   FAVORITES / COLLECTIONS
+   ====================================================== */
+"colors" = "நிறங்கள்";
+"color" = "நிறம்";
+"palettes" = "நிறப்பட்டிகள்";
+"palette" = "நிறப்பட்டி";
+"all" = "அனைத்தும்";
+"no_collections_yet" = "இன்னும் சேமிப்புகள் இல்லை";
+"no_collections_subtitle" = "நிறங்கள் மற்றும் நிறப்பட்டிகளை சேமித்து பின்னர் இங்கே பார்க்கவும்.";
+"clear_all_collections" = "அனைத்து சேமிப்புகளையும் நீக்கவா?";
+"yes" = "ஆம்";
+"no" = "இல்லை";
+"create_palette" = "நிறப்பட்டி உருவாக்கவும்";
+"palette_name_optional" = "நிறப்பட்டி பெயர் (விருப்பம்)";
+"palette_name" = "நிறப்பட்டி பெயர்";
+"add_color" = "நிறம் சேர்க்கவும்";
+"edit" = "திருத்து";
+"cancel" = "ரத்து செய்";
+"done" = "முடிந்தது";
+"delete_palette" = "இந்த நிறப்பட்டியை நீக்கவா?";
+"collections" = "சேமிப்புகள்";
+"new_palette" = "புதிய நிறப்பட்டி";
+"untitled_palette" = "பெயரிடாத நிறப்பட்டி";
+"delete" = "அழி";
+"all_colors_already_added" = "அனைத்து நிறங்களும் ஏற்கனவே சேர்க்கப்பட்டுள்ளன.";
+"select_colors_to_add" = "சேர்க்க நிறங்களைத் தேர்ந்தெடுக்கவும்";
+
+/* ======================================================
+   PHOTOS SCREEN
+   ====================================================== */
+"detected_palette" = "கண்டறியப்பட்ட நிறப்பட்டி";
+"choose_photo" = "புகைப்படத்தைத் தேர்ந்தெடுக்கவும்";
+"pick_photo" = "புகைப்படம் தேர்வு செய்";
+"pick_color" = "நிறத்தைத் தேர்ந்தெடுக்கவும்";
+"change_photo" = "புகைப்படத்தை மாற்று";
+"choose_an_image_to_find_matching_colors" = "பொருந்தும் நிறங்களைத் தேட ஒரு படத்தைத் தேர்ந்தெடுக்கவும்";
+"unlock_full_palette" = "முழு நிறப்பட்டியைத் திறக்கவும்";
+"unnamed_color" = "பெயரிடாத நிறம்";
+"color_added_to_collections" = "நிறம் சேமிப்புகளில் சேர்க்கப்பட்டது";
+
+/* ======================================================
+   SETTINGS SCREEN
+   ====================================================== */
+"appearance" = "தோற்றம்";
+"theme" = "தீம்";
+"language" = "மொழி";
+"about" = "பற்றி";
+"version" = "பதிப்பு:";
+"rate_app" = "பயன்பாட்டை மதிப்பிடு";
+"help" = "உதவி";
+"send_feedback" = "கருத்து அனுப்பு";
+"app_name" = "Colorit";
+"hrs" = "மணிநேரம்";
+"min" = "நிமிடம்";
+"sec" = "விநாடி";
+"system" = "அமைப்பு";
+"light" = "ஒளி";
+"dark" = "இருள்";
+"general" = "பொது";
+
+/* ======================================================
+   PAYWALL / PRO FEATURES
+   ====================================================== */
+"flash_sale" = "பிளாஷ் சலுகை -80% வரை முடிவடைகிறது";
+"best_value" = "சிறந்த மதிப்பு";
+"terms_of_use" = "பயன்பாட்டு விதிமுறைகள்";
+"privacy_policy" = "தனியுரிமைக் கொள்கை";
+"try_free" = "இலவசமாக முயற்சிக்கவும்";
+"continue" = "தொடரவும்";
+"unlock_pro_features" = "ப்ரோ அம்சங்களைத் திறக்கவும்";
+"included_in_pro" = "ப்ரோவில் சேர்க்கப்பட்டுள்ளது";
+"feature_live_color_id_subtitle" = "உங்கள் கேமரா வழியாக நேரடியாக நிறங்களை அடையாளம் காண்க.";
+"feature_photo_color_picker_subtitle" = "எந்தப் புகைப்படத்திலிருந்தும் தொழில்முறை நிறப்பட்டிகளை AI துல்லியத்துடன் பெறவும்.";
+"feature_paint_catalogues_subtitle" = "பல்வேறு நிறத் தொகுப்புகளிலிருந்து தேர்ந்தெடுக்கப்பட்ட நிறப்பட்டிகளை ஆராயவும்.";
+"feature_unlimited_collections_subtitle" = "உங்கள் வேலை அல்லது ஊக்கத்திற்காக அளவில்லா நிறப்பட்டிகளை உருவாக்கி ஒழுங்குபடுத்தவும்.";
+"feature_advanced_search_subtitle" = "HEX, RGB அல்லது பெயரால் நிறங்களை விரைவாக தேடவும்.";
+"feature_harmony_colors_subtitle" = "ஒத்திசைவான நிற அமைப்புகளை உருவாக்கி பொருந்தும் நிறங்களை எளிதாகக் கண்டறியவும்.";
+"feature_multiple_layouts_subtitle" = "விசுவல் ஆய்வுக்காக கிரிட் மற்றும் பட்டியல் காட்சிகளுக்கு மாறவும்.";
+"feature_smart_filters_subtitle" = "நிறம், ஒளிர்ச்சி அல்லது ஒத்திசைவு அடிப்படையில் வடிகட்டவும்.";
+"feature_color_matches_subtitle" = "நேரடி மற்றும் சேமிக்கப்பட்ட மாதிரிகளுக்கிடையிலான பொருத்தங்களை ஒப்பிடவும் மற்றும் காண்பிக்கவும்.";
+"feature_unlimited_access_subtitle" = "எந்த வரம்புகளும் இல்லை — அனைத்து கருவிகள், நிறப்பட்டிகள் மற்றும் அம்சங்களை என்றென்றும் அனுபவிக்கவும்.";
+"your_purchases_have_been_restored" = "உங்கள் கொள்முதல்கள் மீட்டெடுக்கப்பட்டன";
+"no_previous_purchases_found" = "முந்தைய கொள்முதல்கள் எதுவும் இல்லை.";
+"restore_purchases" = "கொள்முதல்களை மீட்டெடு";
+"cancel_anytime" = "எப்போது வேண்டுமானாலும் ரத்து செய்யவும்";
+"family_sharing_enabled" = "குடும்பப் பகிர்வு இயலுமைப்படுத்தப்பட்டது";
+"3_day_free_trial" = "3 நாள் இலவச சோதனை";
+"1_year_plan" = "1 ஆண்டு திட்டம்";
+"1_week_plan" = "1 வார திட்டம்";
+"feature_live_color_id_title" = "நேரடி நிற அடையாளம்";
+"feature_photo_color_picker_title" = "புகைப்பட நிறத் தேர்வி";
+"feature_paint_catalogues_title" = "தொழில்முறை நிறக் குறியீட்டுகள்";
+"feature_unlimited_collections_title" = "அளவில்லா சேமிப்புகள் மற்றும் நிறப்பட்டிகள்";
+"feature_advanced_search_title" = "மேம்பட்ட தேடல்";
+"feature_harmony_colors_title" = "ஒத்திசைவு மற்றும் தொடர்புடைய நிறங்கள்";
+"feature_multiple_layouts_title" = "பல அமைப்புக் காட்சிகள்";
+"feature_smart_filters_title" = "புத்திசாலி வடிகட்டிகள் மற்றும் வரிசைப்படுத்தல்";
+"feature_color_matches_title" = "புகைப்படம் மற்றும் நேரடி பொருந்தும் நிறங்கள்";
+"feature_unlimited_access_title" = "அளவில்லா அணுகல்";
+
+/* ======================================================
+   TOASTS / GENERIC MESSAGES
+   ====================================================== */
+"toast_copied" = "நகலெடுக்கப்பட்டது";
+"toast_added" = "சேர்க்கப்பட்டது";
+"toast_removed" = "நீக்கப்பட்டது";
+"toast_share" = "பகிர்";
+"toast_info" = "தகவல்";

@@ -1,34 +1,200 @@
-"unlock_title" = "Unlock Colorit Pro";
-"unlock_subtitle" = "Experience AI color intelligence & design freedom.";
-"plan_weekly" = "Weekly – $5.99/week";
-"plan_monthly" = "Monthly – $14.99/month";
-"plan_yearly" = "Yearly – $59.99/year";
-"trial_badge" = "Start free for 3 days";
-"discount_badge_today" = "50% OFF today only";
-"discount_badge_limited" = "Save 50% – Limited Time";
-"regular_price_monthly" = "Regular $29.99/month";
-"regular_price_yearly" = "Regular $119.99/year";
-"cta_start_trial_save" = "Start My Free Trial & Save 50%";
-"footer_note" = "Limited-time launch offer. Cancel anytime in Settings. Offer may end soon.";
-"cancel_anytime" = "Cancel anytime";
-"best_value" = "Best Value";
-"selected" = "Selected";
-"offer_ends_in" = "Offer ends in";
-"get_started" = "Get Started";
-"camera" = "Camera";
-"photos" = "Photos";
-"browse" = "Browse";
-"discover" = "Discover";
-"home" = "Home";
-"profile" = "Profile";
-"quick_actions" = "Quick Actions";
-"open_camera" = "Open Camera";
-"from_photos" = "From Photos";
-"unlock_pro" = "Unlock Pro";
-"pick_photo" = "Pick a photo";
-"choose_photo" = "Choose Photo";
-"extract_palette" = "Extract Palette";
-"pro_tips" = "Pro Tips";
-"tip_natural_light" = "Capture under natural light";
-"tip_avoid_glare" = "Avoid reflections and glare";
-"tip_contrast" = "Try contrasty backgrounds";
+/* ======================================================
+   MAIN APP STRUCTURE
+   ====================================================== */
+"tab_collections" = "مجموعه‌ها";
+"tab_search" = "جستجو";
+"tab_camera" = "دوربین";
+"tab_photos" = "عکس‌ها";
+"tab_settings" = "تنظیمات";
+"pro_badge" = "PRO";
+"unlock_pro" = "باز کردن Pro";
+"unlock_pro_subtitle" = "دسترسی به همه ویژگی‌های ویژه";
+"unlock_picker" = "باز کردن انتخاب‌گر";
+
+/* ======================================================
+   SEARCH / COLOR DETAIL
+   ====================================================== */
+"color_harmony" = "هماهنگی رنگ";
+"mode" = "حالت";
+"harmony" = "هماهنگی";
+"copy" = "کپی";
+"share" = "اشتراک‌گذاری";
+"add" = "افزودن";
+"added" = "افزوده شد";
+"close" = "بستن";
+"copied_to_clipboard" = "در کلیپ‌بورد کپی شد";
+"share_preparing" = "در حال آماده‌سازی پیش‌نمایش اشتراک...";
+"red" = "قرمز";
+"green" = "سبز";
+"blue" = "آبی";
+"hex" = "هگز";
+"hue" = "ته‌رنگ";
+"saturation" = "اشباع";
+"brightness" = "روشنایی";
+"cyan" = "فیروزه‌ای";
+"magenta" = "ارغوانی";
+"yellow" = "زرد";
+"black" = "سیاه";
+"show_more" = "نمایش بیشتر";
+"bucket" = "سطل";
+"color_not_found" = "رنگ در کتابخانه یافت نشد";
+"shades_tints" = "سایه‌ها و تنالیته‌ها";
+"contrast_preview" = "پیش‌نمایش کنتراست";
+"vendor" = "تولیدکننده";
+"brand" = "برند";
+"code" = "کد";
+"locator" = "یابنده";
+"open_vendor_page" = "باز کردن صفحه تولیدکننده";
+"line" = "سری";
+"made_with" = "ساخته شده با Colorit";
+"url" = "www.colorit.app";
+"opening_share_sheet" = "در حال باز کردن صفحه اشتراک...";
+"failed_to_open_share_sheet" = "باز کردن صفحه اشتراک ناموفق بود.";
+"unlock_pro_to_view_harmony" = "برای مشاهده هماهنگی، Pro را باز کن";
+"unlock_pro_to_view_shades_tints" = "برای مشاهده سایه‌ها و تنالیته‌ها، Pro را باز کن";
+"text_sample" = "نمونه متن";
+"excellent_AAA" = "عالی (AAA)";
+"good_AA" = "خوب (AA)";
+"low_contrast" = "کنتراست پایین";
+"select_paint" = "انتخاب رنگ";
+"sort_alphabetically" = "مرتب‌سازی الفبایی";
+"sort_by_brightness" = "مرتب‌سازی بر اساس روشنایی";
+"toggle_layout" = "تغییر چیدمان";
+"search_by" = "جستجو بر اساس نام، هگز، برند یا کد";
+"paints" = "رنگ‌ها";
+"general_palette" = "پالت عمومی";
+
+/* ======================================================
+   CAMERA SCREEN
+   ====================================================== */
+"no_match_found" = "موردی یافت نشد";
+"added_to_collections" = "به مجموعه‌ها افزوده شد";
+"removed_from_collections" = "از مجموعه‌ها حذف شد";
+"sort_by_alphabetic" = "مرتب‌سازی الفبایی";
+"free_preview" = "پیش‌نمایش رایگان – برای دسترسی کامل PRO را باز کن";
+"unlock_live_camera" = "باز کردن دوربین زنده کامل";
+"generate_palette" = "ایجاد پالت";
+"precision" = "دقت";
+"save" = "ذخیره";
+"save_color_to_collections" = "ذخیره رنگ در مجموعه‌ها";
+"color_matches" = "تطابق رنگ‌ها";
+
+/* ======================================================
+   LIVE / PHOTO PALETTE DETAILS
+   ====================================================== */
+"add_palette_to_collections" = "افزودن پالت به مجموعه‌ها";
+"palette_saved" = "پالت ذخیره شد";
+"palette_added" = "پالت به مجموعه‌ها افزوده شد";
+"live_palette" = "پالت زنده";
+"photo_palette" = "پالت عکس";
+"unlock_full_palette_color_matches" = "باز کردن پالت کامل و تطابق رنگ";
+
+/* ======================================================
+   FAVORITES / COLLECTIONS
+   ====================================================== */
+"colors" = "رنگ‌ها";
+"color" = "رنگ";
+"palettes" = "پالت‌ها";
+"palette" = "پالت";
+"all" = "همه";
+"no_collections_yet" = "هنوز مجموعه‌ای وجود ندارد";
+"no_collections_subtitle" = "رنگ‌ها و پالت‌ها را ذخیره کن تا بعداً در اینجا ببینی.";
+"clear_all_collections" = "حذف همه مجموعه‌ها؟";
+"yes" = "بله";
+"no" = "خیر";
+"create_palette" = "ایجاد پالت";
+"palette_name_optional" = "نام پالت (اختیاری)";
+"palette_name" = "نام پالت";
+"add_color" = "افزودن رنگ";
+"edit" = "ویرایش";
+"cancel" = "لغو";
+"done" = "انجام شد";
+"delete_palette" = "حذف این پالت؟";
+"collections" = "مجموعه‌ها";
+"new_palette" = "پالت جدید";
+"untitled_palette" = "پالت بدون نام";
+"delete" = "حذف";
+"all_colors_already_added" = "تمام رنگ‌ها قبلاً افزوده شده‌اند.";
+"select_colors_to_add" = "انتخاب رنگ‌ها برای افزودن";
+
+/* ======================================================
+   PHOTOS SCREEN
+   ====================================================== */
+"detected_palette" = "پالت شناسایی‌شده";
+"choose_photo" = "انتخاب عکس";
+"pick_photo" = "انتخاب یک عکس";
+"pick_color" = "انتخاب رنگ";
+"change_photo" = "تغییر عکس";
+"choose_an_image_to_find_matching_colors" = "برای یافتن رنگ‌های مشابه یک تصویر انتخاب کن";
+"unlock_full_palette" = "باز کردن پالت کامل";
+"unnamed_color" = "رنگ بدون نام";
+"color_added_to_collections" = "رنگ به مجموعه‌ها افزوده شد";
+
+/* ======================================================
+   SETTINGS SCREEN
+   ====================================================== */
+"appearance" = "ظاهر";
+"theme" = "تم";
+"language" = "زبان";
+"about" = "درباره";
+"version" = "نسخه:";
+"rate_app" = "امتیاز به برنامه";
+"help" = "راهنما";
+"send_feedback" = "ارسال بازخورد";
+"app_name" = "Colorit";
+"hrs" = "ساعت";
+"min" = "دقیقه";
+"sec" = "ثانیه";
+"system" = "سیستم";
+"light" = "روشن";
+"dark" = "تاریک";
+"general" = "عمومی";
+
+/* ======================================================
+   PAYWALL / PRO FEATURES
+   ====================================================== */
+"flash_sale" = "تخفیف تا ۸۰٪ - پایان در";
+"best_value" = "بهترین ارزش";
+"terms_of_use" = "شرایط استفاده";
+"privacy_policy" = "سیاست حفظ حریم خصوصی";
+"try_free" = "امتحان رایگان";
+"continue" = "ادامه";
+"unlock_pro_features" = "باز کردن ویژگی‌های Pro";
+"included_in_pro" = "شامل در Pro";
+"feature_live_color_id_subtitle" = "رنگ‌ها را فوراً از طریق دوربین خود در زمان واقعی شناسایی کنید.";
+"feature_photo_color_picker_subtitle" = "پالت‌های حرفه‌ای را از هر عکس با دقت هوش مصنوعی استخراج کنید.";
+"feature_paint_catalogues_subtitle" = "پالت‌های منتخب از چندین مجموعه رنگ را کاوش کنید.";
+"feature_unlimited_collections_subtitle" = "پالت‌های نامحدود برای کار یا الهام خود ایجاد و سازماندهی کنید.";
+"feature_advanced_search_subtitle" = "رنگ‌ها را با HEX، RGB یا نام فوراً پیدا کنید.";
+"feature_harmony_colors_subtitle" = "طرح‌های هماهنگ ایجاد کرده و رنگ‌های مشابه را به راحتی کشف کنید.";
+"feature_multiple_layouts_subtitle" = "بین نماهای شبکه‌ای و لیستی جابه‌جا شوید.";
+"feature_smart_filters_subtitle" = "بر اساس ته‌رنگ، روشنایی یا هماهنگی با دقت فیلتر کنید.";
+"feature_color_matches_subtitle" = "تطابق بین نمونه‌های زنده و عکس را مقایسه و مشاهده کنید.";
+"feature_unlimited_access_subtitle" = "بدون محدودیت — از همه ابزارها، پالت‌ها و ویژگی‌ها برای همیشه لذت ببرید.";
+"your_purchases_have_been_restored" = "خریدهای شما بازیابی شدند";
+"no_previous_purchases_found" = "خرید قبلی یافت نشد.";
+"restore_purchases" = "بازیابی خریدها";
+"cancel_anytime" = "لغو در هر زمان";
+"family_sharing_enabled" = "اشتراک‌گذاری خانوادگی فعال است";
+"3_day_free_trial" = "آزمایش رایگان ۳ روزه";
+"1_year_plan" = "طرح یک‌ساله";
+"1_week_plan" = "طرح هفتگی";
+"feature_live_color_id_title" = "شناسایی زنده رنگ";
+"feature_photo_color_picker_title" = "انتخاب‌گر رنگ عکس";
+"feature_paint_catalogues_title" = "کاتالوگ‌های رنگ حرفه‌ای";
+"feature_unlimited_collections_title" = "مجموعه‌ها و پالت‌های نامحدود";
+"feature_advanced_search_title" = "جستجوی پیشرفته";
+"feature_harmony_colors_title" = "هماهنگی و رنگ‌های مشابه";
+"feature_multiple_layouts_title" = "چیدمان‌های چندگانه";
+"feature_smart_filters_title" = "فیلترها و مرتب‌سازی هوشمند";
+"feature_color_matches_title" = "تطابق رنگ برای عکس و شناسایی زنده";
+"feature_unlimited_access_title" = "دسترسی نامحدود";
+
+/* ======================================================
+   TOASTS / GENERIC MESSAGES
+   ====================================================== */
+"toast_copied" = "کپی شد";
+"toast_added" = "افزوده شد";
+"toast_removed" = "حذف شد";
+"toast_share" = "اشتراک‌گذاری";
+"toast_info" = "اطلاعات";

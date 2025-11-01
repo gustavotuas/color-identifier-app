@@ -1,34 +1,200 @@
-"unlock_title" = "Unlock Colorit Pro";
-"unlock_subtitle" = "Experience AI color intelligence & design freedom.";
-"plan_weekly" = "Weekly – $5.99/week";
-"plan_monthly" = "Monthly – $14.99/month";
-"plan_yearly" = "Yearly – $59.99/year";
-"trial_badge" = "Start free for 3 days";
-"discount_badge_today" = "50% OFF today only";
-"discount_badge_limited" = "Save 50% – Limited Time";
-"regular_price_monthly" = "Regular $29.99/month";
-"regular_price_yearly" = "Regular $119.99/year";
-"cta_start_trial_save" = "Start My Free Trial & Save 50%";
-"footer_note" = "Limited-time launch offer. Cancel anytime in Settings. Offer may end soon.";
-"cancel_anytime" = "Cancel anytime";
-"best_value" = "Best Value";
-"selected" = "Selected";
-"offer_ends_in" = "Offer ends in";
-"get_started" = "Get Started";
-"camera" = "Camera";
-"photos" = "Photos";
-"browse" = "Browse";
-"discover" = "Discover";
-"home" = "Home";
-"profile" = "Profile";
-"quick_actions" = "Quick Actions";
-"open_camera" = "Open Camera";
-"from_photos" = "From Photos";
-"unlock_pro" = "Unlock Pro";
-"pick_photo" = "Pick a photo";
-"choose_photo" = "Choose Photo";
-"extract_palette" = "Extract Palette";
-"pro_tips" = "Pro Tips";
-"tip_natural_light" = "Capture under natural light";
-"tip_avoid_glare" = "Avoid reflections and glare";
-"tip_contrast" = "Try contrasty backgrounds";
+/* ======================================================
+   MAIN APP STRUCTURE
+   ====================================================== */
+"tab_collections" = "컬렉션";
+"tab_search" = "검색";
+"tab_camera" = "카메라";
+"tab_photos" = "사진";
+"tab_settings" = "설정";
+"pro_badge" = "PRO";
+"unlock_pro" = "Pro 잠금 해제";
+"unlock_pro_subtitle" = "모든 프리미엄 기능에 액세스";
+"unlock_picker" = "색상 선택기 잠금 해제";
+
+/* ======================================================
+   SEARCH / COLOR DETAIL
+   ====================================================== */
+"color_harmony" = "색상 조화";
+"mode" = "모드";
+"harmony" = "조화";
+"copy" = "복사";
+"share" = "공유";
+"add" = "추가";
+"added" = "추가됨";
+"close" = "닫기";
+"copied_to_clipboard" = "클립보드에 복사됨";
+"share_preparing" = "공유 미리보기를 준비 중...";
+"red" = "빨강";
+"green" = "초록";
+"blue" = "파랑";
+"hex" = "Hex";
+"hue" = "색조";
+"saturation" = "채도";
+"brightness" = "명도";
+"cyan" = "청록";
+"magenta" = "마젠타";
+"yellow" = "노랑";
+"black" = "검정";
+"show_more" = "더 보기";
+"bucket" = "버킷";
+"color_not_found" = "라이브러리에서 색상을 찾을 수 없습니다";
+"shades_tints" = "음영 및 톤";
+"contrast_preview" = "대비 미리보기";
+"vendor" = "제조사";
+"brand" = "브랜드";
+"code" = "코드";
+"locator" = "위치 찾기";
+"open_vendor_page" = "제조사 페이지 열기";
+"line" = "라인";
+"made_with" = "Colorit으로 제작됨";
+"url" = "www.colorit.app";
+"opening_share_sheet" = "공유 시트를 여는 중...";
+"failed_to_open_share_sheet" = "공유 시트를 열지 못했습니다.";
+"unlock_pro_to_view_harmony" = "Pro를 잠금 해제하여 색상 조화 보기";
+"unlock_pro_to_view_shades_tints" = "Pro를 잠금 해제하여 음영과 톤 보기";
+"text_sample" = "텍스트 예시";
+"excellent_AAA" = "우수 (AAA)";
+"good_AA" = "좋음 (AA)";
+"low_contrast" = "대비 낮음";
+"select_paint" = "페인트 선택";
+"sort_alphabetically" = "가나다순 정렬";
+"sort_by_brightness" = "밝기순 정렬";
+"toggle_layout" = "레이아웃 전환";
+"search_by" = "이름, Hex, 브랜드 또는 코드로 검색";
+"paints" = "페인트";
+"general_palette" = "일반 팔레트";
+
+/* ======================================================
+   CAMERA SCREEN
+   ====================================================== */
+"no_match_found" = "일치 항목이 없습니다";
+"added_to_collections" = "컬렉션에 추가됨";
+"removed_from_collections" = "컬렉션에서 제거됨";
+"sort_by_alphabetic" = "가나다순 정렬";
+"free_preview" = "무료 미리보기 – 전체 액세스를 위해 PRO 잠금 해제";
+"unlock_live_camera" = "라이브 카메라 전체 잠금 해제";
+"generate_palette" = "팔레트 생성";
+"precision" = "정확도";
+"save" = "저장";
+"save_color_to_collections" = "색상을 컬렉션에 저장";
+"color_matches" = "색상 일치";
+
+/* ======================================================
+   LIVE / PHOTO PALETTE DETAILS
+   ====================================================== */
+"add_palette_to_collections" = "팔레트를 컬렉션에 추가";
+"palette_saved" = "팔레트 저장됨";
+"palette_added" = "팔레트가 컬렉션에 추가됨";
+"live_palette" = "라이브 팔레트";
+"photo_palette" = "사진 팔레트";
+"unlock_full_palette_color_matches" = "전체 팔레트 및 색상 일치 보기 잠금 해제";
+
+/* ======================================================
+   FAVORITES / COLLECTIONS
+   ====================================================== */
+"colors" = "색상";
+"color" = "색상";
+"palettes" = "팔레트";
+"palette" = "팔레트";
+"all" = "전체";
+"no_collections_yet" = "아직 컬렉션이 없습니다";
+"no_collections_subtitle" = "색상과 팔레트를 저장해 나중에 다시 확인하세요.";
+"clear_all_collections" = "모든 컬렉션을 삭제하시겠습니까?";
+"yes" = "예";
+"no" = "아니요";
+"create_palette" = "팔레트 만들기";
+"palette_name_optional" = "팔레트 이름 (선택 사항)";
+"palette_name" = "팔레트 이름";
+"add_color" = "색상 추가";
+"edit" = "편집";
+"cancel" = "취소";
+"done" = "완료";
+"delete_palette" = "이 팔레트를 삭제하시겠습니까?";
+"collections" = "컬렉션";
+"new_palette" = "새 팔레트";
+"untitled_palette" = "제목 없는 팔레트";
+"delete" = "삭제";
+"all_colors_already_added" = "모든 색상이 이미 추가되었습니다.";
+"select_colors_to_add" = "추가할 색상을 선택";
+
+/* ======================================================
+   PHOTOS SCREEN
+   ====================================================== */
+"detected_palette" = "감지된 팔레트";
+"choose_photo" = "사진 선택";
+"pick_photo" = "사진 가져오기";
+"pick_color" = "색상 선택";
+"change_photo" = "사진 변경";
+"choose_an_image_to_find_matching_colors" = "일치하는 색상을 찾을 이미지를 선택하세요";
+"unlock_full_palette" = "전체 팔레트 잠금 해제";
+"unnamed_color" = "이름 없는 색상";
+"color_added_to_collections" = "색상이 컬렉션에 추가되었습니다";
+
+/* ======================================================
+   SETTINGS SCREEN
+   ====================================================== */
+"appearance" = "모양";
+"theme" = "테마";
+"language" = "언어";
+"about" = "정보";
+"version" = "버전:";
+"rate_app" = "앱 평가";
+"help" = "도움말";
+"send_feedback" = "피드백 보내기";
+"app_name" = "Colorit";
+"hrs" = "시간";
+"min" = "분";
+"sec" = "초";
+"system" = "시스템";
+"light" = "라이트";
+"dark" = "다크";
+"general" = "일반";
+
+/* ======================================================
+   PAYWALL / PRO FEATURES
+   ====================================================== */
+"flash_sale" = "최대 80% 할인 플래시 세일 종료까지";
+"best_value" = "최고의 가치";
+"terms_of_use" = "이용 약관";
+"privacy_policy" = "개인정보 처리방침";
+"try_free" = "무료로 체험하기";
+"continue" = "계속";
+"unlock_pro_features" = "Pro 기능 잠금 해제";
+"included_in_pro" = "Pro에 포함됨";
+"feature_live_color_id_subtitle" = "실시간으로 카메라를 통해 색상을 즉시 식별합니다.";
+"feature_photo_color_picker_subtitle" = "AI 정밀도로 어떤 사진에서도 전문가용 팔레트를 추출합니다.";
+"feature_paint_catalogues_subtitle" = "다양한 페인트 컬렉션에서 엄선된 팔레트를 탐색합니다.";
+"feature_unlimited_collections_subtitle" = "작업이나 영감을 위해 무제한 팔레트를 만들고 정리하세요.";
+"feature_advanced_search_subtitle" = "HEX, RGB 또는 이름으로 직관적으로 색상을 즉시 검색합니다.";
+"feature_harmony_colors_subtitle" = "조화로운 색 구성표를 생성하고 쉽게 어울리는 톤을 찾습니다.";
+"feature_multiple_layouts_subtitle" = "그리드 및 리스트 보기로 전환하여 시각적으로 탐색합니다.";
+"feature_smart_filters_subtitle" = "색조, 밝기 또는 조화로 정밀하게 필터링합니다.";
+"feature_color_matches_subtitle" = "실시간 및 캡처된 샘플 간의 색상 일치를 비교하고 시각화합니다.";
+"feature_unlimited_access_subtitle" = "제한 없이 모든 도구, 팔레트 및 기능을 영원히 이용하세요.";
+"your_purchases_have_been_restored" = "구매 항목이 복원되었습니다";
+"no_previous_purchases_found" = "이전 구매 항목이 없습니다.";
+"restore_purchases" = "구매 복원";
+"cancel_anytime" = "언제든지 취소 가능";
+"family_sharing_enabled" = "가족 공유 사용 가능";
+"3_day_free_trial" = "3일 무료 체험";
+"1_year_plan" = "1년 플랜";
+"1_week_plan" = "1주 플랜";
+"feature_live_color_id_title" = "라이브 색상 인식";
+"feature_photo_color_picker_title" = "사진 색상 선택기";
+"feature_paint_catalogues_title" = "전문 페인트 카탈로그";
+"feature_unlimited_collections_title" = "무제한 컬렉션 및 팔레트";
+"feature_advanced_search_title" = "고급 검색";
+"feature_harmony_colors_title" = "조화 및 유사 색상";
+"feature_multiple_layouts_title" = "다중 레이아웃 보기";
+"feature_smart_filters_title" = "스마트 필터 및 정렬";
+"feature_color_matches_title" = "사진 및 라이브 ID 색상 일치";
+"feature_unlimited_access_title" = "무제한 액세스";
+
+/* ======================================================
+   TOASTS / GENERIC MESSAGES
+   ====================================================== */
+"toast_copied" = "복사됨";
+"toast_added" = "추가됨";
+"toast_removed" = "삭제됨";
+"toast_share" = "공유";
+"toast_info" = "정보";

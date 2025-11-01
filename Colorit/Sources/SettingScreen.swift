@@ -99,10 +99,10 @@ if !store.isPro {
                 }
 
                 VStack(alignment: .leading, spacing: 3) {
-                    Text("Unlock Pro")
+                    Text("unlock_pro".localized)
                         .font(.system(size: 17, weight: .semibold))
                         .foregroundColor(.primary)
-                    Text("Access all premium features")
+                    Text("unlock_pro_subtitle".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -127,8 +127,8 @@ if !store.isPro {
 
 
             // MARK: - Appearance
-            Section(header: Text("Appearance")) {
-                Picker("Theme", selection: $theme.selectedTheme) {
+            Section(header: Text("appearance".localized)) {
+                Picker("theme".localized, selection: $theme.selectedTheme) {
                     ForEach(AppTheme.allCases) { option in
                         Text(option.displayName).tag(option)
                     }
@@ -137,7 +137,7 @@ if !store.isPro {
             }
 
             // MARK: - Language (custom dropdown)
-            Section(header: Text("Language")) {
+            Section(header: Text("language".localized)) {
                 VStack(alignment: .leading, spacing: 8) {
                     Menu {
                         ForEach(languages, id: \.code) { lang in
@@ -179,22 +179,22 @@ if !store.isPro {
 
 
             // MARK: - About
-            Section(header: Text("About")) {
+            Section(header: Text("about".localized)) {
                 SettingRow(icon: "info.circle.fill",
                            iconColor: .gray,
-                           text: "Version: \(appVersion)",
+                           text: "\("version".localized): \(appVersion)",
                            link: nil)
                 SettingRow(icon: "star.fill",
                            iconColor: .orange,
-                           text: "Rate the app",
+                           text: "rate_app".localized,
                            link: "https://apps.apple.com/app/idXXXXXXXXX?action=write-review")
             }
 
             // MARK: - Help
-            Section(header: Text("Help")) {
+            Section(header: Text("help".localized)) {
                 SettingRow(icon: "envelope.fill",
                            iconColor: .blue,
-                           text: "Send feedback",
+                           text: "send_feedback".localized,
                            link: "mailto:getscodes@gmail.com")
             }
 
@@ -203,7 +203,7 @@ if !store.isPro {
                 HStack {
                     Spacer()
                     VStack(spacing: 4) {
-                        Text("Colorit")
+                        Text("app_name".localized)
                             .font(.footnote)
                             .foregroundColor(.secondary)
                         Text(appVersion)
@@ -218,7 +218,7 @@ if !store.isPro {
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .background(Color(.systemGroupedBackground))
-        .navigationTitle("Settings")
+        .navigationTitle("tab_settings".localized)
         .sheet(isPresented: $store.showPaywall) {
             PaywallView().environmentObject(store)
         }

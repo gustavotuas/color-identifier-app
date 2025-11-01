@@ -1,34 +1,200 @@
-"unlock_title" = "Unlock Colorit Pro";
-"unlock_subtitle" = "Experience AI color intelligence & design freedom.";
-"plan_weekly" = "Weekly – $5.99/week";
-"plan_monthly" = "Monthly – $14.99/month";
-"plan_yearly" = "Yearly – $59.99/year";
-"trial_badge" = "Start free for 3 days";
-"discount_badge_today" = "50% OFF today only";
-"discount_badge_limited" = "Save 50% – Limited Time";
-"regular_price_monthly" = "Regular $29.99/month";
-"regular_price_yearly" = "Regular $119.99/year";
-"cta_start_trial_save" = "Start My Free Trial & Save 50%";
-"footer_note" = "Limited-time launch offer. Cancel anytime in Settings. Offer may end soon.";
-"cancel_anytime" = "Cancel anytime";
-"best_value" = "Best Value";
-"selected" = "Selected";
-"offer_ends_in" = "Offer ends in";
-"get_started" = "Get Started";
-"camera" = "Camera";
-"photos" = "Photos";
-"browse" = "Browse";
-"discover" = "Discover";
-"home" = "Home";
-"profile" = "Profile";
-"quick_actions" = "Quick Actions";
-"open_camera" = "Open Camera";
-"from_photos" = "From Photos";
-"unlock_pro" = "Unlock Pro";
-"pick_photo" = "Pick a photo";
-"choose_photo" = "Choose Photo";
-"extract_palette" = "Extract Palette";
-"pro_tips" = "Pro Tips";
-"tip_natural_light" = "Capture under natural light";
-"tip_avoid_glare" = "Avoid reflections and glare";
-"tip_contrast" = "Try contrasty backgrounds";
+/* ======================================================
+   MAIN APP STRUCTURE
+   ====================================================== */
+"tab_collections" = "收藏";
+"tab_search" = "搜尋";
+"tab_camera" = "相機";
+"tab_photos" = "照片";
+"tab_settings" = "設定";
+"pro_badge" = "PRO";
+"unlock_pro" = "解鎖專業版";
+"unlock_pro_subtitle" = "存取所有高級功能";
+"unlock_picker" = "解鎖取色器";
+
+/* ======================================================
+   SEARCH / COLOR DETAIL
+   ====================================================== */
+"color_harmony" = "色彩和諧";
+"mode" = "模式";
+"harmony" = "和諧";
+"copy" = "複製";
+"share" = "分享";
+"add" = "新增";
+"added" = "已新增";
+"close" = "關閉";
+"copied_to_clipboard" = "已複製到剪貼簿";
+"share_preparing" = "正在準備分享預覽...";
+"red" = "紅色";
+"green" = "綠色";
+"blue" = "藍色";
+"hex" = "Hex";
+"hue" = "色相";
+"saturation" = "飽和度";
+"brightness" = "亮度";
+"cyan" = "青色";
+"magenta" = "洋紅";
+"yellow" = "黃色";
+"black" = "黑色";
+"show_more" = "顯示更多";
+"bucket" = "取色桶";
+"color_not_found" = "未在資料庫中找到顏色";
+"shades_tints" = "明暗與色調";
+"contrast_preview" = "對比預覽";
+"vendor" = "供應商";
+"brand" = "品牌";
+"code" = "代碼";
+"locator" = "定位";
+"open_vendor_page" = "開啟品牌頁面";
+"line" = "系列";
+"made_with" = "由 Colorit 製作";
+"url" = "www.colorit.app";
+"opening_share_sheet" = "正在開啟分享選單...";
+"failed_to_open_share_sheet" = "無法開啟分享選單。";
+"unlock_pro_to_view_harmony" = "解鎖專業版以檢視配色";
+"unlock_pro_to_view_shades_tints" = "解鎖專業版以檢視明暗與色調";
+"text_sample" = "文字範例";
+"excellent_AAA" = "極佳 (AAA)";
+"good_AA" = "良好 (AA)";
+"low_contrast" = "對比度低";
+"select_paint" = "選擇油漆";
+"sort_alphabetically" = "按字母排序";
+"sort_by_brightness" = "按亮度排序";
+"toggle_layout" = "切換版面";
+"search_by" = "以名稱、hex、品牌或代碼搜尋";
+"paints" = "油漆";
+"general_palette" = "通用調色板";
+
+/* ======================================================
+   CAMERA SCREEN
+   ====================================================== */
+"no_match_found" = "未找到相符結果";
+"added_to_collections" = "已新增到收藏";
+"removed_from_collections" = "已從收藏移除";
+"sort_by_alphabetic" = "按字母排序";
+"free_preview" = "免費預覽 – 解鎖 PRO 以獲得完整存取權";
+"unlock_live_camera" = "解鎖即時相機";
+"generate_palette" = "產生調色板";
+"precision" = "精確度";
+"save" = "儲存";
+"save_color_to_collections" = "將顏色儲存到收藏";
+"color_matches" = "顏色匹配";
+
+/* ======================================================
+   LIVE / PHOTO PALETTE DETAILS
+   ====================================================== */
+"add_palette_to_collections" = "將調色板新增到收藏";
+"palette_saved" = "調色板已儲存";
+"palette_added" = "調色板已新增到收藏";
+"live_palette" = "即時調色板";
+"photo_palette" = "照片調色板";
+"unlock_full_palette_color_matches" = "解鎖完整調色板與顏色匹配";
+
+/* ======================================================
+   FAVORITES / COLLECTIONS
+   ====================================================== */
+"colors" = "顏色";
+"color" = "顏色";
+"palettes" = "調色板";
+"palette" = "調色板";
+"all" = "全部";
+"no_collections_yet" = "尚無收藏";
+"no_collections_subtitle" = "儲存顏色與調色板以便稍後在此查看。";
+"clear_all_collections" = "清除所有收藏？";
+"yes" = "是";
+"no" = "否";
+"create_palette" = "建立調色板";
+"palette_name_optional" = "調色板名稱（可選）";
+"palette_name" = "調色板名稱";
+"add_color" = "新增顏色";
+"edit" = "編輯";
+"cancel" = "取消";
+"done" = "完成";
+"delete_palette" = "刪除此調色板？";
+"collections" = "收藏";
+"new_palette" = "新調色板";
+"untitled_palette" = "未命名調色板";
+"delete" = "刪除";
+"all_colors_already_added" = "所有顏色已新增。";
+"select_colors_to_add" = "選擇要新增的顏色";
+
+/* ======================================================
+   PHOTOS SCREEN
+   ====================================================== */
+"detected_palette" = "已偵測到的調色板";
+"choose_photo" = "選擇照片";
+"pick_photo" = "挑選照片";
+"pick_color" = "挑選顏色";
+"change_photo" = "更換照片";
+"choose_an_image_to_find_matching_colors" = "選擇圖片以尋找相符顏色";
+"unlock_full_palette" = "解鎖完整調色板";
+"unnamed_color" = "未命名顏色";
+"color_added_to_collections" = "顏色已新增到收藏";
+
+/* ======================================================
+   SETTINGS SCREEN
+   ====================================================== */
+"appearance" = "外觀";
+"theme" = "主題";
+"language" = "語言";
+"about" = "關於";
+"version" = "版本：";
+"rate_app" = "評價應用程式";
+"help" = "說明";
+"send_feedback" = "傳送意見回饋";
+"app_name" = "Colorit";
+"hrs" = "小時";
+"min" = "分鐘";
+"sec" = "秒";
+"system" = "系統";
+"light" = "淺色";
+"dark" = "深色";
+"general" = "一般";
+
+/* ======================================================
+   PAYWALL / PRO FEATURES
+   ====================================================== */
+"flash_sale" = "限時特惠高達 -80%，結束於";
+"best_value" = "最佳優惠";
+"terms_of_use" = "使用條款";
+"privacy_policy" = "隱私政策";
+"try_free" = "免費試用";
+"continue" = "繼續";
+"unlock_pro_features" = "解鎖專業功能";
+"included_in_pro" = "包含於專業版中";
+"feature_live_color_id_subtitle" = "使用相機即時辨識顏色。";
+"feature_photo_color_picker_subtitle" = "以 AI 精準提取任何照片中的專業調色板。";
+"feature_paint_catalogues_subtitle" = "探索多個油漆品牌的精選調色板。";
+"feature_unlimited_collections_subtitle" = "建立並整理無限調色板，適用於工作或靈感。";
+"feature_advanced_search_subtitle" = "透過 HEX、RGB 或名稱即時搜尋顏色。";
+"feature_harmony_colors_subtitle" = "產生和諧的配色方案，輕鬆發現相襯色調。";
+"feature_multiple_layouts_subtitle" = "在網格與列表檢視間切換以視覺化探索調色板。";
+"feature_smart_filters_subtitle" = "依色相、亮度或和諧度精準篩選。";
+"feature_color_matches_subtitle" = "比較並視覺化即時與拍攝樣本之間的顏色匹配。";
+"feature_unlimited_access_subtitle" = "無限制 — 永久享受所有工具、調色板與功能。";
+"your_purchases_have_been_restored" = "您的購買已恢復";
+"no_previous_purchases_found" = "未找到先前的購買紀錄。";
+"restore_purchases" = "恢復購買";
+"cancel_anytime" = "可隨時取消";
+"family_sharing_enabled" = "已啟用家庭共享";
+"3_day_free_trial" = "3 天免費試用";
+"1_year_plan" = "一年方案";
+"1_week_plan" = "一週方案";
+"feature_live_color_id_title" = "即時顏色辨識";
+"feature_photo_color_picker_title" = "照片取色器";
+"feature_paint_catalogues_title" = "專業油漆目錄";
+"feature_unlimited_collections_title" = "無限收藏與調色板";
+"feature_advanced_search_title" = "進階搜尋";
+"feature_harmony_colors_title" = "和諧與相似顏色";
+"feature_multiple_layouts_title" = "多種版面檢視";
+"feature_smart_filters_title" = "智慧篩選與排序";
+"feature_color_matches_title" = "照片與即時顏色匹配";
+"feature_unlimited_access_title" = "無限制存取";
+
+/* ======================================================
+   TOASTS / GENERIC MESSAGES
+   ====================================================== */
+"toast_copied" = "已複製";
+"toast_added" = "已新增";
+"toast_removed" = "已移除";
+"toast_share" = "分享";
+"toast_info" = "資訊";

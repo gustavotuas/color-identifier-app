@@ -358,7 +358,7 @@ struct CameraScreen: View {
                     .environmentObject(catalogs)
                     .environmentObject(store)
             }
-            .navigationTitle("Camera")
+            .navigationTitle("tab_camera".localized)
             .navigationBarTitleDisplayMode(.large)
         }
         .sheet(isPresented: $showVendorSheet) { vendorSheet }
@@ -415,7 +415,7 @@ struct CameraScreen: View {
         if !store.isPro && trialTimerActive {
             VStack(spacing: 6) {
                 // 🔹 Texto informativo
-                Text("Free Preview – Unlock PRO for full access")
+                Text("free_preview".localized)
                     .font(.caption.bold())
                     .foregroundColor(.white)
                     .shadow(color: .black.opacity(0.5), radius: 3, y: 1)
@@ -469,14 +469,14 @@ struct CameraScreen: View {
                         .foregroundColor(.white.opacity(0.9))
                         .padding(.bottom, 4)
 
-                    Text("Unlock Full Live Camera")
+                    Text("unlock_live_camera".localized)
                         .font(.title3.bold())
                         .foregroundColor(.white)
 
                     Button {
                         store.showPaywall = true
                     } label: {
-                        Text("Go Pro")
+                        Text("unlock_pro".localized)
                             .font(.headline)
                             .padding(.horizontal, 30)
                             .padding(.vertical, 10)
@@ -519,7 +519,7 @@ struct CameraScreen: View {
                     Circle().stroke(Color.primary, lineWidth: 4).frame(width: 62, height: 62)
                     Circle().fill(Color.primary).opacity(0.2).frame(width: 50, height: 50)
                 }
-                .accessibilityLabel("Generate Palette")
+                .accessibilityLabel("generate_palette".localized)
             }
             .buttonStyle(SquishButtonStyle())
         }
@@ -620,7 +620,7 @@ private var toolbarItems: some ToolbarContent {
             Button { showVendorSheet = true } label: {
                 Image(systemName: "paintpalette.fill")
             }
-            .accessibilityLabel("Select Paint")
+            .accessibilityLabel("select_paint".localized)
         }
 
         // Trailing
@@ -641,7 +641,7 @@ private var toolbarItems: some ToolbarContent {
             // Paywall PRO
             if !store.isPro {
                 Button { store.showPaywall = true } label: {
-                    Text("PRO")
+                    Text("pro_badge".localized)
                         .font(.caption.bold())
                         .padding(.horizontal, 10)
                         .padding(.vertical, 6)
@@ -679,7 +679,7 @@ private var toolbarItems: some ToolbarContent {
     guard let nearest = pool.min(by: {
         hexToRGB($0.hex).distance(to: rgb) < hexToRGB($1.hex).distance(to: rgb)
     }) else {
-        toastMessage = "No match found"
+        toastMessage = "no_match_found".localized
         return
     }
 
@@ -694,10 +694,10 @@ private var toolbarItems: some ToolbarContent {
     // 5️⃣ Guardar o eliminar
     if favs.colors.contains(where: { normalizeHex($0.color.hex) == normalizeHex(nearest.hex) }) {
         favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(nearest.hex) }
-        toastMessage = "Removed from Collections"
+        toastMessage = "removed_from_collections".localized
     } else {
         favs.add(color: matchedRGB)
-        toastMessage = "Added to Collections \(nearest.name) (\(Int(precision))%)"
+       toastMessage = "added_to_collections".localized + " \(nearest.name) (\(Int(precision))%)"
     }
 
     // 6️⃣ Animación del corazón
@@ -980,7 +980,7 @@ struct ColorIsland: View {
                 // }
 
                 // Línea existente de precisión (queda igual)
-                Text(String(format: "Precision %.0f%%", precisionValue))
+                Text(String(format: "precision".localized + " %.0f%%", precisionValue))
                     .font(.caption.bold())
                     .foregroundStyle(precisionColor)
             }
@@ -991,7 +991,7 @@ struct ColorIsland: View {
                 // 🔒 Solo mostrar botón Save si el usuario es PRO
                 if store.isPro {
                     Button(action: onFavorite) {
-                        Label("Save", systemImage: "square.and.arrow.down")
+                        Label("save".localized, systemImage: "square.and.arrow.down")
                             .labelStyle(.iconOnly)
                             .font(.title3.weight(.semibold))
                             .foregroundStyle(.white)
@@ -999,7 +999,7 @@ struct ColorIsland: View {
                             .shadow(color: .black.opacity(0.25), radius: 2, y: 1)
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("Save color to collections")
+                    .accessibilityLabel("save_color_to_collections".localized)
                 }
             }
         }

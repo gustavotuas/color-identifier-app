@@ -286,17 +286,17 @@ private struct BucketDetailSheet: View {
                         } label: {
                             HStack {
                                 Spacer()
-                                Text("Show more (\(min(pageStep, itemsAll.count - pageSize)))")
+                                Text("show_more".localized + " (\(min(pageStep, itemsAll.count - pageSize)))")
                                     .font(.subheadline.weight(.semibold))
                                 Spacer()
                             }
                         }
                     }
                 } header: {
-                    Text("Colors \(min(pageSize, itemsAll.count))/\(itemsAll.count)")
+                    Text("colors".localized + " \(min(pageSize, itemsAll.count))/\(itemsAll.count)")
                 }
             }
-            .navigationTitle("Bucket \(key.hIdx + 1) · \(key.yIdx + 1)")
+            .navigationTitle("bucket".localized + " \(key.hIdx + 1) · \(key.yIdx + 1)")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -304,7 +304,7 @@ private struct BucketDetailSheet: View {
                     } label: {
                         HStack(spacing: 4) {
                             Image(systemName: "xmark.circle.fill")
-                            Text("Close").font(.subheadline.bold())
+                            Text("close".localized).font(.subheadline.bold())
                         }
                     }
                     .tint(.secondary)

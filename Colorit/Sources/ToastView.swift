@@ -6,9 +6,9 @@ struct ToastView: View {
 
     var body: some View {
         let bgColor: Color = {
-            if message.contains("Added") { return Color.green.opacity(0.75) }
-            if message.contains("Removed") { return Color.red.opacity(0.75) }
-            if message.contains("Share") { return Color.blue.opacity(0.75) }
+            if message.contains("added".localized) { return Color.green.opacity(0.75) }
+            if message.contains("toast_removed".localized) { return Color.red.opacity(0.75) }
+            if message.contains("share".localized) { return Color.blue.opacity(0.75) }
             return Color.gray.opacity(0.7)
         }()
 
@@ -34,10 +34,10 @@ struct ToastView: View {
 
     private func iconForToast(_ message: String) -> String {
         switch message {
-        case _ where message.contains("Copied"): return "doc.on.doc"
-        case _ where message.contains("Added"): return "checkmark.circle.fill"
-        case _ where message.contains("Removed"): return "trash.fill"
-        case _ where message.contains("Share"): return "square.and.arrow.up"
+        case _ where message.contains("toast_copied".localized): return "doc.on.doc"
+        case _ where message.contains("added".localized): return "checkmark.circle.fill"
+        case _ where message.contains("toast_removed".localized): return "trash.fill"
+        case _ where message.contains("share".localized): return "square.and.arrow.up"
         default: return "info.circle"
         }
     }

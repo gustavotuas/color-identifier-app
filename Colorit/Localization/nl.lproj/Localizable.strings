@@ -1,34 +1,200 @@
-"unlock_title" = "Unlock Colorit Pro";
-"unlock_subtitle" = "Experience AI color intelligence & design freedom.";
-"plan_weekly" = "Weekly – $5.99/week";
-"plan_monthly" = "Monthly – $14.99/month";
-"plan_yearly" = "Yearly – $59.99/year";
-"trial_badge" = "Start free for 3 days";
-"discount_badge_today" = "50% OFF today only";
-"discount_badge_limited" = "Save 50% – Limited Time";
-"regular_price_monthly" = "Regular $29.99/month";
-"regular_price_yearly" = "Regular $119.99/year";
-"cta_start_trial_save" = "Start My Free Trial & Save 50%";
-"footer_note" = "Limited-time launch offer. Cancel anytime in Settings. Offer may end soon.";
-"cancel_anytime" = "Cancel anytime";
-"best_value" = "Best Value";
-"selected" = "Selected";
-"offer_ends_in" = "Offer ends in";
-"get_started" = "Get Started";
-"camera" = "Camera";
-"photos" = "Photos";
-"browse" = "Browse";
-"discover" = "Discover";
-"home" = "Home";
-"profile" = "Profile";
-"quick_actions" = "Quick Actions";
-"open_camera" = "Open Camera";
-"from_photos" = "From Photos";
-"unlock_pro" = "Unlock Pro";
-"pick_photo" = "Pick a photo";
-"choose_photo" = "Choose Photo";
-"extract_palette" = "Extract Palette";
-"pro_tips" = "Pro Tips";
-"tip_natural_light" = "Capture under natural light";
-"tip_avoid_glare" = "Avoid reflections and glare";
-"tip_contrast" = "Try contrasty backgrounds";
+/* ======================================================
+   MAIN APP STRUCTURE
+   ====================================================== */
+"tab_collections" = "Collecties";
+"tab_search" = "Zoeken";
+"tab_camera" = "Camera";
+"tab_photos" = "Foto’s";
+"tab_settings" = "Instellingen";
+"pro_badge" = "PRO";
+"unlock_pro" = "Ontgrendel Pro";
+"unlock_pro_subtitle" = "Toegang tot alle premiumfuncties";
+"unlock_picker" = "Ontgrendel Kiezer";
+
+/* ======================================================
+   SEARCH / COLOR DETAIL
+   ====================================================== */
+"color_harmony" = "Kleurharmonie";
+"mode" = "Modus";
+"harmony" = "Harmonie";
+"copy" = "Kopiëren";
+"share" = "Delen";
+"add" = "Toevoegen";
+"added" = "Toegevoegd";
+"close" = "Sluiten";
+"copied_to_clipboard" = "Gekopieerd naar klembord";
+"share_preparing" = "Voorbeeld van delen voorbereiden...";
+"red" = "Rood";
+"green" = "Groen";
+"blue" = "Blauw";
+"hex" = "Hex";
+"hue" = "Tint";
+"saturation" = "Verzadiging";
+"brightness" = "Helderheid";
+"cyan" = "Cyaan";
+"magenta" = "Magenta";
+"yellow" = "Geel";
+"black" = "Zwart";
+"show_more" = "Meer weergeven";
+"bucket" = "Emmer";
+"color_not_found" = "Kleur niet gevonden in bibliotheek";
+"shades_tints" = "Schaduwen & Tint";
+"contrast_preview" = "Contrastvoorbeeld";
+"vendor" = "Leverancier";
+"brand" = "Merk";
+"code" = "Code";
+"locator" = "Zoeker";
+"open_vendor_page" = "Open leverancierspagina";
+"line" = "Lijn";
+"made_with" = "Gemaakt met Colorit";
+"url" = "www.colorit.app";
+"opening_share_sheet" = "Delen-menu openen...";
+"failed_to_open_share_sheet" = "Kon delen-menu niet openen.";
+"unlock_pro_to_view_harmony" = "Ontgrendel Pro om Harmonie te bekijken";
+"unlock_pro_to_view_shades_tints" = "Ontgrendel Pro om Schaduwen & Tint te bekijken";
+"text_sample" = "Tekstvoorbeeld";
+"excellent_AAA" = "Uitstekend (AAA)";
+"good_AA" = "Goed (AA)";
+"low_contrast" = "Lage contrast";
+"select_paint" = "Selecteer verf";
+"sort_alphabetically" = "Sorteer alfabetisch";
+"sort_by_brightness" = "Sorteer op helderheid";
+"toggle_layout" = "Schakel lay-out";
+"search_by" = "Zoek op naam, hex, merk of code";
+"paints" = "Verfkleuren";
+"general_palette" = "Algemene palet";
+
+/* ======================================================
+   CAMERA SCREEN
+   ====================================================== */
+"no_match_found" = "Geen overeenkomst gevonden";
+"added_to_collections" = "Toegevoegd aan collecties";
+"removed_from_collections" = "Verwijderd uit collecties";
+"sort_by_alphabetic" = "Alfabetisch sorteren";
+"free_preview" = "Gratis voorbeeld – Ontgrendel PRO voor volledige toegang";
+"unlock_live_camera" = "Ontgrendel volledige live-camera";
+"generate_palette" = "Genereer palet";
+"precision" = "Precisie";
+"save" = "Opslaan";
+"save_color_to_collections" = "Sla kleur op in collecties";
+"color_matches" = "Kleurovereenkomsten";
+
+/* ======================================================
+   LIVE / PHOTO PALETTE DETAILS
+   ====================================================== */
+"add_palette_to_collections" = "Voeg palet toe aan collecties";
+"palette_saved" = "Palet opgeslagen";
+"palette_added" = "Palet toegevoegd aan collecties";
+"live_palette" = "Live-palet";
+"photo_palette" = "Foto-palet";
+"unlock_full_palette_color_matches" = "Ontgrendel volledig palet en kleurovereenkomsten";
+
+/* ======================================================
+   FAVORITES / COLLECTIONS
+   ====================================================== */
+"colors" = "Kleuren";
+"color" = "Kleur";
+"palettes" = "Paletten";
+"palette" = "Palet";
+"all" = "Alles";
+"no_collections_yet" = "Nog geen collecties";
+"no_collections_subtitle" = "Sla kleuren en paletten op om ze hier terug te vinden.";
+"clear_all_collections" = "Alle collecties wissen?";
+"yes" = "Ja";
+"no" = "Nee";
+"create_palette" = "Maak palet";
+"palette_name_optional" = "Paletnaam (optioneel)";
+"palette_name" = "Paletnaam";
+"add_color" = "Voeg kleur toe";
+"edit" = "Bewerken";
+"cancel" = "Annuleren";
+"done" = "Gereed";
+"delete_palette" = "Dit palet verwijderen?";
+"collections" = "Collecties";
+"new_palette" = "Nieuw palet";
+"untitled_palette" = "Naamloos palet";
+"delete" = "Verwijderen";
+"all_colors_already_added" = "Alle kleuren zijn al toegevoegd.";
+"select_colors_to_add" = "Selecteer kleuren om toe te voegen";
+
+/* ======================================================
+   PHOTOS SCREEN
+   ====================================================== */
+"detected_palette" = "Gedetecteerd palet";
+"choose_photo" = "Kies foto";
+"pick_photo" = "Selecteer foto";
+"pick_color" = "Kies kleur";
+"change_photo" = "Wijzig foto";
+"choose_an_image_to_find_matching_colors" = "Kies een afbeelding om overeenkomende kleuren te vinden";
+"unlock_full_palette" = "Ontgrendel volledig palet";
+"unnamed_color" = "Naamloze kleur";
+"color_added_to_collections" = "Kleur toegevoegd aan collecties";
+
+/* ======================================================
+   SETTINGS SCREEN
+   ====================================================== */
+"appearance" = "Uiterlijk";
+"theme" = "Thema";
+"language" = "Taal";
+"about" = "Over";
+"version" = "Versie:";
+"rate_app" = "Beoordeel app";
+"help" = "Hulp";
+"send_feedback" = "Stuur feedback";
+"app_name" = "Colorit";
+"hrs" = "uur";
+"min" = "min";
+"sec" = "sec";
+"system" = "Systeem";
+"light" = "Licht";
+"dark" = "Donker";
+"general" = "Algemeen";
+
+/* ======================================================
+   PAYWALL / PRO FEATURES
+   ====================================================== */
+"flash_sale" = "Flitsverkoop tot -80% korting eindigt over";
+"best_value" = "Beste waarde";
+"terms_of_use" = "Gebruiksvoorwaarden";
+"privacy_policy" = "Privacybeleid";
+"try_free" = "Probeer gratis";
+"continue" = "Doorgaan";
+"unlock_pro_features" = "Ontgrendel Pro-functies";
+"included_in_pro" = "Inbegrepen in Pro";
+"feature_live_color_id_subtitle" = "Identificeer kleuren direct via je camera in realtime.";
+"feature_photo_color_picker_subtitle" = "Extraheer professionele paletten uit elke foto met AI-precisie.";
+"feature_paint_catalogues_subtitle" = "Ontdek zorgvuldig samengestelde paletten uit verschillende verfcatalogi.";
+"feature_unlimited_collections_subtitle" = "Maak en organiseer onbeperkte paletten voor werk of inspiratie.";
+"feature_advanced_search_subtitle" = "Vind kleuren snel en intuïtief via HEX, RGB of naam.";
+"feature_harmony_colors_subtitle" = "Genereer harmonische schema’s en ontdek bijpassende tinten eenvoudig.";
+"feature_multiple_layouts_subtitle" = "Schakel tussen raster- en lijstweergave om visueel te verkennen.";
+"feature_smart_filters_subtitle" = "Filter op tint, helderheid of harmonie met precisie.";
+"feature_color_matches_subtitle" = "Vergelijk en visualiseer overeenkomsten tussen live- en fotosamples.";
+"feature_unlimited_access_subtitle" = "Geen beperkingen — geniet van alle tools, paletten en functies voor altijd.";
+"your_purchases_have_been_restored" = "Je aankopen zijn hersteld";
+"no_previous_purchases_found" = "Geen eerdere aankopen gevonden.";
+"restore_purchases" = "Aankopen herstellen";
+"cancel_anytime" = "Altijd opzegbaar";
+"family_sharing_enabled" = "Gezinsdeling ingeschakeld";
+"3_day_free_trial" = "3-daagse gratis proefperiode";
+"1_year_plan" = "1-jarig abonnement";
+"1_week_plan" = "1-weeks abonnement";
+"feature_live_color_id_title" = "Live-kleuridentificatie";
+"feature_photo_color_picker_title" = "Foto-kleurkiezer";
+"feature_paint_catalogues_title" = "Professionele verfcatalogi";
+"feature_unlimited_collections_title" = "Onbeperkte collecties & paletten";
+"feature_advanced_search_title" = "Geavanceerd zoeken";
+"feature_harmony_colors_title" = "Harmonie & Soortgelijke kleuren";
+"feature_multiple_layouts_title" = "Meerdere lay-outweergaven";
+"feature_smart_filters_title" = "Slimme filters & sortering";
+"feature_color_matches_title" = "Kleurovereenkomsten voor Foto & Live-ID";
+"feature_unlimited_access_title" = "Onbeperkte toegang";
+
+/* ======================================================
+   TOASTS / GENERIC MESSAGES
+   ====================================================== */
+"toast_copied" = "Gekopieerd";
+"toast_added" = "Toegevoegd";
+"toast_removed" = "Verwijderd";
+"toast_share" = "Delen";
+"toast_info" = "Informatie";

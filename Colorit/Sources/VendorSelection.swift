@@ -18,7 +18,7 @@ public enum CatalogSelection: Hashable, Equatable {
     public var filterSubtitle: String {
         switch self {
         case .genericOnly:
-            return "General palette"
+            return "general_palette".localized
         case .vendor(let id):
             return "\(id.displayName)"
         }

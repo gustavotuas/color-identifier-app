@@ -1,34 +1,200 @@
-"unlock_title" = "Unlock Colorit Pro";
-"unlock_subtitle" = "Experience AI color intelligence & design freedom.";
-"plan_weekly" = "Weekly – $5.99/week";
-"plan_monthly" = "Monthly – $14.99/month";
-"plan_yearly" = "Yearly – $59.99/year";
-"trial_badge" = "Start free for 3 days";
-"discount_badge_today" = "50% OFF today only";
-"discount_badge_limited" = "Save 50% – Limited Time";
-"regular_price_monthly" = "Regular $29.99/month";
-"regular_price_yearly" = "Regular $119.99/year";
-"cta_start_trial_save" = "Start My Free Trial & Save 50%";
-"footer_note" = "Limited-time launch offer. Cancel anytime in Settings. Offer may end soon.";
-"cancel_anytime" = "Cancel anytime";
-"best_value" = "Best Value";
-"selected" = "Selected";
-"offer_ends_in" = "Offer ends in";
-"get_started" = "Get Started";
-"camera" = "Camera";
-"photos" = "Photos";
-"browse" = "Browse";
-"discover" = "Discover";
-"home" = "Home";
-"profile" = "Profile";
-"quick_actions" = "Quick Actions";
-"open_camera" = "Open Camera";
-"from_photos" = "From Photos";
-"unlock_pro" = "Unlock Pro";
-"pick_photo" = "Pick a photo";
-"choose_photo" = "Choose Photo";
-"extract_palette" = "Extract Palette";
-"pro_tips" = "Pro Tips";
-"tip_natural_light" = "Capture under natural light";
-"tip_avoid_glare" = "Avoid reflections and glare";
-"tip_contrast" = "Try contrasty backgrounds";
+/* ======================================================
+   MAIN APP STRUCTURE
+   ====================================================== */
+"tab_collections" = "Kokoelmat";
+"tab_search" = "Haku";
+"tab_camera" = "Kamera";
+"tab_photos" = "Kuvat";
+"tab_settings" = "Asetukset";
+"pro_badge" = "PRO";
+"unlock_pro" = "Avaa Pro";
+"unlock_pro_subtitle" = "Pääsy kaikkiin premium-ominaisuuksiin";
+"unlock_picker" = "Avaa valitsin";
+
+/* ======================================================
+   SEARCH / COLOR DETAIL
+   ====================================================== */
+"color_harmony" = "Värien harmonia";
+"mode" = "Tila";
+"harmony" = "Harmonia";
+"copy" = "Kopioi";
+"share" = "Jaa";
+"add" = "Lisää";
+"added" = "Lisätty";
+"close" = "Sulje";
+"copied_to_clipboard" = "Kopioitu leikepöydälle";
+"share_preparing" = "Valmistellaan jakonäkymää...";
+"red" = "Punainen";
+"green" = "Vihreä";
+"blue" = "Sininen";
+"hex" = "Hex";
+"hue" = "Sävy";
+"saturation" = "Kylläisyys";
+"brightness" = "Kirkkaus";
+"cyan" = "Syaani";
+"magenta" = "Magenta";
+"yellow" = "Keltainen";
+"black" = "Musta";
+"show_more" = "Näytä lisää";
+"bucket" = "Ämpäri";
+"color_not_found" = "Väriä ei löytynyt kirjastosta";
+"shades_tints" = "Sävyt ja varjot";
+"contrast_preview" = "Kontrastin esikatselu";
+"vendor" = "Toimittaja";
+"brand" = "Brändi";
+"code" = "Koodi";
+"locator" = "Sijainnin etsijä";
+"open_vendor_page" = "Avaa toimittajan sivu";
+"line" = "Sarja";
+"made_with" = "Tehty Coloritilla";
+"url" = "www.colorit.app";
+"opening_share_sheet" = "Avataan jakonäkymää...";
+"failed_to_open_share_sheet" = "Jakonäkymää ei voitu avata.";
+"unlock_pro_to_view_harmony" = "Avaa Pro nähdäksesi harmonian";
+"unlock_pro_to_view_shades_tints" = "Avaa Pro nähdäksesi sävyt ja varjot";
+"text_sample" = "Tekstin esimerkki";
+"excellent_AAA" = "Erinomainen (AAA)";
+"good_AA" = "Hyvä (AA)";
+"low_contrast" = "Matala kontrasti";
+"select_paint" = "Valitse maali";
+"sort_alphabetically" = "Lajittele aakkosjärjestyksessä";
+"sort_by_brightness" = "Lajittele kirkkauden mukaan";
+"toggle_layout" = "Vaihda asettelua";
+"search_by" = "Hae nimellä, hexillä, brändillä tai koodilla";
+"paints" = "Maalit";
+"general_palette" = "Yleinen paletti";
+
+/* ======================================================
+   CAMERA SCREEN
+   ====================================================== */
+"no_match_found" = "Ei tuloksia";
+"added_to_collections" = "Lisätty kokoelmiin";
+"removed_from_collections" = "Poistettu kokoelmista";
+"sort_by_alphabetic" = "Lajittele aakkosjärjestyksessä";
+"free_preview" = "Ilmainen esikatselu – Avaa PRO saadaksesi täyden pääsyn";
+"unlock_live_camera" = "Avaa koko Live-kamera";
+"generate_palette" = "Luo paletti";
+"precision" = "Tarkkuus";
+"save" = "Tallenna";
+"save_color_to_collections" = "Tallenna väri kokoelmiin";
+"color_matches" = "Värisovitukset";
+
+/* ======================================================
+   LIVE / PHOTO PALETTE DETAILS
+   ====================================================== */
+"add_palette_to_collections" = "Lisää paletti kokoelmiin";
+"palette_saved" = "Paletti tallennettu";
+"palette_added" = "Paletti lisätty kokoelmiin";
+"live_palette" = "Live-paletti";
+"photo_palette" = "Kuvapaletti";
+"unlock_full_palette_color_matches" = "Avaa koko paletti ja värisovitukset";
+
+/* ======================================================
+   FAVORITES / COLLECTIONS
+   ====================================================== */
+"colors" = "Värit";
+"color" = "Väri";
+"palettes" = "Paletit";
+"palette" = "Paletti";
+"all" = "Kaikki";
+"no_collections_yet" = "Ei vielä kokoelmia";
+"no_collections_subtitle" = "Tallenna värejä ja paletteja nähdäksesi ne myöhemmin täällä.";
+"clear_all_collections" = "Tyhjennetäänkö kaikki kokoelmat?";
+"yes" = "Kyllä";
+"no" = "Ei";
+"create_palette" = "Luo paletti";
+"palette_name_optional" = "Paletin nimi (valinnainen)";
+"palette_name" = "Paletin nimi";
+"add_color" = "Lisää väri";
+"edit" = "Muokkaa";
+"cancel" = "Peruuta";
+"done" = "Valmis";
+"delete_palette" = "Poistetaanko tämä paletti?";
+"collections" = "Kokoelmat";
+"new_palette" = "Uusi paletti";
+"untitled_palette" = "Nimetön paletti";
+"delete" = "Poista";
+"all_colors_already_added" = "Kaikki värit on jo lisätty.";
+"select_colors_to_add" = "Valitse lisättävät värit";
+
+/* ======================================================
+   PHOTOS SCREEN
+   ====================================================== */
+"detected_palette" = "Tunnistettu paletti";
+"choose_photo" = "Valitse kuva";
+"pick_photo" = "Valitse valokuva";
+"pick_color" = "Valitse väri";
+"change_photo" = "Vaihda kuva";
+"choose_an_image_to_find_matching_colors" = "Valitse kuva löytääksesi vastaavia värejä";
+"unlock_full_palette" = "Avaa koko paletti";
+"unnamed_color" = "Nimetön väri";
+"color_added_to_collections" = "Väri lisätty kokoelmiin";
+
+/* ======================================================
+   SETTINGS SCREEN
+   ====================================================== */
+"appearance" = "Ulkoasu";
+"theme" = "Teema";
+"language" = "Kieli";
+"about" = "Tietoja";
+"version" = "Versio:";
+"rate_app" = "Arvostele sovellus";
+"help" = "Apua";
+"send_feedback" = "Lähetä palautetta";
+"app_name" = "Colorit";
+"hrs" = "t";
+"min" = "min";
+"sec" = "s";
+"system" = "Järjestelmä";
+"light" = "Vaalea";
+"dark" = "Tumma";
+"general" = "Yleinen";
+
+/* ======================================================
+   PAYWALL / PRO FEATURES
+   ====================================================== */
+"flash_sale" = "Saletarjous jopa -80 % päättyy";
+"best_value" = "Paras arvo";
+"terms_of_use" = "Käyttöehdot";
+"privacy_policy" = "Tietosuojakäytäntö";
+"try_free" = "Kokeile ilmaiseksi";
+"continue" = "Jatka";
+"unlock_pro_features" = "Avaa Pro-ominaisuudet";
+"included_in_pro" = "Sisältyy Pro-versioon";
+"feature_live_color_id_subtitle" = "Tunnista värit välittömästi kamerallasi reaaliajassa.";
+"feature_photo_color_picker_subtitle" = "Luo ammattimaisia paletteja mistä tahansa kuvasta tekoälyn tarkkuudella.";
+"feature_paint_catalogues_subtitle" = "Tutki valittuja paletteja useista maalikokoelmista.";
+"feature_unlimited_collections_subtitle" = "Luo ja järjestä rajattomasti paletteja työhön tai inspiraatioon.";
+"feature_advanced_search_subtitle" = "Etsi värejä HEX-, RGB- tai nimiperusteisesti heti ja intuitiivisesti.";
+"feature_harmony_colors_subtitle" = "Luo harmonisia väriyhdistelmiä ja löydä vastaavia sävyjä helposti.";
+"feature_multiple_layouts_subtitle" = "Vaihda ruutu- ja listanäkymän välillä tutkiaksesi paletteja visuaalisesti.";
+"feature_smart_filters_subtitle" = "Suodata sävyn, kirkkauden tai harmonian perusteella tarkasti.";
+"feature_color_matches_subtitle" = "Vertaa ja visualisoi väriosumia elävien ja otettujen näytteiden välillä.";
+"feature_unlimited_access_subtitle" = "Ei rajoituksia — nauti kaikista työkaluista, paleteista ja ominaisuuksista ikuisesti.";
+"your_purchases_have_been_restored" = "Ostoksesi on palautettu";
+"no_previous_purchases_found" = "Aiempi ostos ei löytynyt.";
+"restore_purchases" = "Palauta ostot";
+"cancel_anytime" = "Peruuta milloin tahansa";
+"family_sharing_enabled" = "Perhejakaminen käytössä";
+"3_day_free_trial" = "3 päivän ilmainen kokeilu";
+"1_year_plan" = "Vuosisuunnitelma";
+"1_week_plan" = "Viikkosuunnitelma";
+"feature_live_color_id_title" = "Live-väritunnistus";
+"feature_photo_color_picker_title" = "Valokuvan värinvalitsin";
+"feature_paint_catalogues_title" = "Ammattimaiset värikatalogit";
+"feature_unlimited_collections_title" = "Rajoittamattomat kokoelmat ja paletit";
+"feature_advanced_search_title" = "Edistynyt haku";
+"feature_harmony_colors_title" = "Harmonia ja samankaltaiset värit";
+"feature_multiple_layouts_title" = "Useita asettelunäkymiä";
+"feature_smart_filters_title" = "Älykkäät suodattimet ja lajittelu";
+"feature_color_matches_title" = "Värisovitukset valokuville ja live-tunnistukselle";
+"feature_unlimited_access_title" = "Rajoittamaton pääsy";
+
+/* ======================================================
+   TOASTS / GENERIC MESSAGES
+   ====================================================== */
+"toast_copied" = "Kopioitu";
+"toast_added" = "Lisätty";
+"toast_removed" = "Poistettu";
+"toast_share" = "Jaa";
+"toast_info" = "Tiedot";

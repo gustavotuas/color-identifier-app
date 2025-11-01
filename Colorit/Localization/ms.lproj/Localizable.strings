@@ -1,34 +1,200 @@
-"unlock_title" = "Unlock Colorit Pro";
-"unlock_subtitle" = "Experience AI color intelligence & design freedom.";
-"plan_weekly" = "Weekly – $5.99/week";
-"plan_monthly" = "Monthly – $14.99/month";
-"plan_yearly" = "Yearly – $59.99/year";
-"trial_badge" = "Start free for 3 days";
-"discount_badge_today" = "50% OFF today only";
-"discount_badge_limited" = "Save 50% – Limited Time";
-"regular_price_monthly" = "Regular $29.99/month";
-"regular_price_yearly" = "Regular $119.99/year";
-"cta_start_trial_save" = "Start My Free Trial & Save 50%";
-"footer_note" = "Limited-time launch offer. Cancel anytime in Settings. Offer may end soon.";
-"cancel_anytime" = "Cancel anytime";
-"best_value" = "Best Value";
-"selected" = "Selected";
-"offer_ends_in" = "Offer ends in";
-"get_started" = "Get Started";
-"camera" = "Camera";
-"photos" = "Photos";
-"browse" = "Browse";
-"discover" = "Discover";
-"home" = "Home";
-"profile" = "Profile";
-"quick_actions" = "Quick Actions";
-"open_camera" = "Open Camera";
-"from_photos" = "From Photos";
-"unlock_pro" = "Unlock Pro";
-"pick_photo" = "Pick a photo";
-"choose_photo" = "Choose Photo";
-"extract_palette" = "Extract Palette";
-"pro_tips" = "Pro Tips";
-"tip_natural_light" = "Capture under natural light";
-"tip_avoid_glare" = "Avoid reflections and glare";
-"tip_contrast" = "Try contrasty backgrounds";
+/* ======================================================
+   MAIN APP STRUCTURE
+   ====================================================== */
+"tab_collections" = "Koleksi";
+"tab_search" = "Carian";
+"tab_camera" = "Kamera";
+"tab_photos" = "Foto";
+"tab_settings" = "Tetapan";
+"pro_badge" = "PRO";
+"unlock_pro" = "Buka Kunci Pro";
+"unlock_pro_subtitle" = "Akses semua ciri premium";
+"unlock_picker" = "Buka Kunci Pemilih Warna";
+
+/* ======================================================
+   SEARCH / COLOR DETAIL
+   ====================================================== */
+"color_harmony" = "Harmoni Warna";
+"mode" = "Mod";
+"harmony" = "Harmoni";
+"copy" = "Salin";
+"share" = "Kongsi";
+"add" = "Tambah";
+"added" = "Ditambah";
+"close" = "Tutup";
+"copied_to_clipboard" = "Disalin ke papan klip";
+"share_preparing" = "Menyediakan pratonton perkongsian...";
+"red" = "Merah";
+"green" = "Hijau";
+"blue" = "Biru";
+"hex" = "Hex";
+"hue" = "Warna Asas";
+"saturation" = "Ketepuan";
+"brightness" = "Kecerahan";
+"cyan" = "Sian";
+"magenta" = "Magenta";
+"yellow" = "Kuning";
+"black" = "Hitam";
+"show_more" = "Lihat lagi";
+"bucket" = "Baldi";
+"color_not_found" = "Warna tidak ditemui dalam pustaka";
+"shades_tints" = "Bayang & Tona";
+"contrast_preview" = "Pratonton Kontras";
+"vendor" = "Vendor";
+"brand" = "Jenama";
+"code" = "Kod";
+"locator" = "Pencari";
+"open_vendor_page" = "Buka Halaman Vendor";
+"line" = "Garis";
+"made_with" = "Dibuat dengan Colorit";
+"url" = "www.colorit.app";
+"opening_share_sheet" = "Membuka helaian perkongsian...";
+"failed_to_open_share_sheet" = "Gagal membuka helaian perkongsian.";
+"unlock_pro_to_view_harmony" = "Buka Pro untuk melihat Harmoni";
+"unlock_pro_to_view_shades_tints" = "Buka Pro untuk melihat Bayang & Tona";
+"text_sample" = "Contoh Teks";
+"excellent_AAA" = "Cemerlang (AAA)";
+"good_AA" = "Baik (AA)";
+"low_contrast" = "Kontras Rendah";
+"select_paint" = "Pilih Cat";
+"sort_alphabetically" = "Isih mengikut abjad";
+"sort_by_brightness" = "Isih mengikut kecerahan";
+"toggle_layout" = "Tukar susun atur";
+"search_by" = "Cari mengikut nama, hex, jenama atau kod";
+"paints" = "Cat";
+"general_palette" = "Palet Umum";
+
+/* ======================================================
+   CAMERA SCREEN
+   ====================================================== */
+"no_match_found" = "Tiada padanan ditemui";
+"added_to_collections" = "Ditambah ke Koleksi";
+"removed_from_collections" = "Dikeluarkan daripada Koleksi";
+"sort_by_alphabetic" = "Isih mengikut abjad";
+"free_preview" = "Pratonton Percuma – Buka PRO untuk akses penuh";
+"unlock_live_camera" = "Buka Kunci Kamera Langsung Penuh";
+"generate_palette" = "Hasilkan Palet";
+"precision" = "Ketepatan";
+"save" = "Simpan";
+"save_color_to_collections" = "Simpan warna ke koleksi";
+"color_matches" = "Padanan Warna";
+
+/* ======================================================
+   LIVE / PHOTO PALETTE DETAILS
+   ====================================================== */
+"add_palette_to_collections" = "Tambah Palet ke Koleksi";
+"palette_saved" = "Palet Disimpan";
+"palette_added" = "Palet Ditambah ke Koleksi";
+"live_palette" = "Palet Langsung";
+"photo_palette" = "Palet Foto";
+"unlock_full_palette_color_matches" = "Buka kunci Palet Penuh & Padanan Warna";
+
+/* ======================================================
+   FAVORITES / COLLECTIONS
+   ====================================================== */
+"colors" = "Warna";
+"color" = "Warna";
+"palettes" = "Palet";
+"palette" = "Palet";
+"all" = "Semua";
+"no_collections_yet" = "Belum ada koleksi";
+"no_collections_subtitle" = "Simpan warna dan palet untuk dilihat semula di sini.";
+"clear_all_collections" = "Padam semua Koleksi?";
+"yes" = "Ya";
+"no" = "Tidak";
+"create_palette" = "Cipta Palet";
+"palette_name_optional" = "Nama palet (pilihan)";
+"palette_name" = "Nama Palet";
+"add_color" = "Tambah Warna";
+"edit" = "Edit";
+"cancel" = "Batal";
+"done" = "Selesai";
+"delete_palette" = "Padam palet ini?";
+"collections" = "Koleksi";
+"new_palette" = "Palet Baharu";
+"untitled_palette" = "Palet Tanpa Tajuk";
+"delete" = "Padam";
+"all_colors_already_added" = "Semua warna telah ditambah.";
+"select_colors_to_add" = "Pilih warna untuk ditambah";
+
+/* ======================================================
+   PHOTOS SCREEN
+   ====================================================== */
+"detected_palette" = "Palet Dikesan";
+"choose_photo" = "Pilih Foto";
+"pick_photo" = "Ambil Foto";
+"pick_color" = "Pilih Warna";
+"change_photo" = "Tukar Foto";
+"choose_an_image_to_find_matching_colors" = "Pilih imej untuk mencari warna yang sepadan";
+"unlock_full_palette" = "Buka Kunci Palet Penuh";
+"unnamed_color" = "Warna Tanpa Nama";
+"color_added_to_collections" = "Warna Ditambah ke Koleksi";
+
+/* ======================================================
+   SETTINGS SCREEN
+   ====================================================== */
+"appearance" = "Penampilan";
+"theme" = "Tema";
+"language" = "Bahasa";
+"about" = "Tentang";
+"version" = "Versi:";
+"rate_app" = "Nilai Aplikasi";
+"help" = "Bantuan";
+"send_feedback" = "Hantar Maklum Balas";
+"app_name" = "Colorit";
+"hrs" = "jam";
+"min" = "min";
+"sec" = "saat";
+"system" = "Sistem";
+"light" = "Cerah";
+"dark" = "Gelap";
+"general" = "Umum";
+
+/* ======================================================
+   PAYWALL / PRO FEATURES
+   ====================================================== */
+"flash_sale" = "Jualan Pantas sehingga -80% tamat dalam";
+"best_value" = "Nilai Terbaik";
+"terms_of_use" = "Terma Penggunaan";
+"privacy_policy" = "Dasar Privasi";
+"try_free" = "Cuba Percuma";
+"continue" = "Teruskan";
+"unlock_pro_features" = "Buka Kunci Ciri Pro";
+"included_in_pro" = "Termasuk dalam Pro";
+"feature_live_color_id_subtitle" = "Kenal pasti warna secara langsung melalui kamera anda dalam masa nyata.";
+"feature_photo_color_picker_subtitle" = "Ekstrak palet profesional daripada mana-mana foto dengan ketepatan AI.";
+"feature_paint_catalogues_subtitle" = "Terokai palet terpilih daripada pelbagai koleksi cat.";
+"feature_unlimited_collections_subtitle" = "Cipta dan urus palet tanpa had untuk kerja atau inspirasi.";
+"feature_advanced_search_subtitle" = "Cari warna mengikut HEX, RGB, atau nama dengan pantas dan intuitif.";
+"feature_harmony_colors_subtitle" = "Hasilkan skim harmoni dan temui tona padanan dengan mudah.";
+"feature_multiple_layouts_subtitle" = "Tukar antara paparan grid dan senarai untuk meneroka secara visual.";
+"feature_smart_filters_subtitle" = "Tapis mengikut rona, kecerahan, atau harmoni dengan ketepatan.";
+"feature_color_matches_subtitle" = "Bandingkan dan visualkan padanan antara sampel langsung dan foto.";
+"feature_unlimited_access_subtitle" = "Tiada had — nikmati semua alat, palet dan ciri selama-lamanya.";
+"your_purchases_have_been_restored" = "Pembelian anda telah dipulihkan";
+"no_previous_purchases_found" = "Tiada pembelian terdahulu ditemui.";
+"restore_purchases" = "Pulihkan Pembelian";
+"cancel_anytime" = "Boleh batal bila-bila masa";
+"family_sharing_enabled" = "Perkongsian Keluarga Didayakan";
+"3_day_free_trial" = "Percubaan Percuma 3 Hari";
+"1_year_plan" = "Pelan 1 Tahun";
+"1_week_plan" = "Pelan 1 Minggu";
+"feature_live_color_id_title" = "Pengenalan Warna Langsung";
+"feature_photo_color_picker_title" = "Pemilih Warna Foto";
+"feature_paint_catalogues_title" = "Katalog Cat Profesional";
+"feature_unlimited_collections_title" = "Koleksi & Palet Tanpa Had";
+"feature_advanced_search_title" = "Carian Lanjutan";
+"feature_harmony_colors_title" = "Harmoni & Warna Serupa";
+"feature_multiple_layouts_title" = "Paparan Susun Atur Pelbagai";
+"feature_smart_filters_title" = "Penapis & Isihan Pintar";
+"feature_color_matches_title" = "Padanan Warna untuk Foto & Live ID";
+"feature_unlimited_access_title" = "Akses Tanpa Had";
+
+/* ======================================================
+   TOASTS / GENERIC MESSAGES
+   ====================================================== */
+"toast_copied" = "Disalin";
+"toast_added" = "Ditambah";
+"toast_removed" = "Dikeluarkan";
+"toast_share" = "Kongsi";
+"toast_info" = "Maklumat";

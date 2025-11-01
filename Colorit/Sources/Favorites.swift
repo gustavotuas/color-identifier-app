@@ -47,7 +47,7 @@ struct FavoritePalette: Identifiable, Codable, Equatable {
         self.date = Date()
         self.id = colors.map { $0.hex }.joined(separator: "-") + formatter.string(from: date)
         self.colors = colors
-        self.name = name ?? "Palette \(formatter.string(from: date))"
+        self.name = name ?? "\("palette".localized) \(formatter.string(from: date))"
     }
 }
 
@@ -189,7 +189,7 @@ struct FavoritesScreen: View {
                                 }
                                 UIImpactFeedbackGenerator(style: .soft).impactOccurred()
                             } label: {
-                                Text(filter.rawValue)
+                                Text(filter.rawValue.localized)
                                     .font(.subheadline.bold())
                                     .padding(.vertical, 6)
                                     .padding(.horizontal, 16)
@@ -211,7 +211,7 @@ struct FavoritesScreen: View {
 
                     // 🧩 Favorite Palettes
                     if !filteredPalettes.isEmpty {
-                        Text("Palettes")
+                        Text("palettes".localized)
                             .font(.headline)
                             .padding(.horizontal)
 
@@ -227,7 +227,7 @@ struct FavoritesScreen: View {
 
                     // 🎨 Favorite Colors
                     if !filteredColors.isEmpty {
-                        Text("Colors")
+                        Text("colors".localized)
                             .font(.headline)
                             .padding(.horizontal)
 
@@ -248,9 +248,9 @@ struct FavoritesScreen: View {
                             Image(systemName: "rectangle.stack.fill")
                                 .font(.largeTitle)
                                 .foregroundColor(.secondary)
-                            Text("No collections yet")
+                            Text("no_collections_yet".localized)
                                 .font(.headline)
-                            Text("Save colors and palettes to revisit them here.")
+                            Text("no_collections_subtitle".localized)
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
                         }
@@ -259,7 +259,7 @@ struct FavoritesScreen: View {
                     }
                 }
             }
-            .navigationTitle("Collections")
+            .navigationTitle("collections".localized)
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
 
@@ -295,7 +295,7 @@ struct FavoritesScreen: View {
                                 .rotationEffect(.degrees(ascending ? 0 : 180))
                                 .animation(.spring(response: 0.3, dampingFraction: 0.6), value: ascending)
                         }
-                        .accessibilityLabel("Sort by alphabetic")
+                        .accessibilityLabel("sort_by_alphabetic".localized)
                     }
 
                     // Limpiar todo
@@ -312,7 +312,7 @@ struct FavoritesScreen: View {
                         Button {
                             store.showPaywall = true
                         } label: {
-                            Text("PRO")
+                            Text("pro_badge".localized)
                                 .font(.caption.bold())
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 6)
@@ -327,9 +327,9 @@ struct FavoritesScreen: View {
                     }
                 }
             }
-            .alert("Clear all Collections?", isPresented: $showClearAlert) {
-                Button("Yes", role: .destructive) { favs.clearAll() }
-                Button("No", role: .cancel) {}
+            .alert("clear_all_collections".localized, isPresented: $showClearAlert) {
+                Button("yes".localized, role: .destructive) { favs.clearAll() }
+                Button("no".localized, role: .cancel) {}
             }
             .sheet(isPresented: $showNewPaletteSheet) {
                 NewPaletteSheet(showSheet: $showNewPaletteSheet)
@@ -345,9 +345,9 @@ struct FavoritesScreen: View {
 
 // MARK: - Filter Enum
 enum FavoritesFilter: String, CaseIterable {
-    case all = "All"
-    case palettes = "Palettes"
-    case colors = "Colors"
+    case all = "all"
+    case palettes = "palettes"
+    case colors = "colors"
 }
 
 
@@ -367,7 +367,7 @@ struct NewPaletteSheet: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
-                TextField("Palette name (optional)", text: $paletteName)
+                TextField("palette_name_optional".localized, text: $paletteName)
                     .textFieldStyle(.roundedBorder)
                     .padding(.horizontal)
                     .focused($nameFieldFocused)
@@ -394,7 +394,7 @@ struct NewPaletteSheet: View {
 
 
                 Button(action: createPalette) {
-                    Text("Create Palette")
+                    Text("create_palette".localized)
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -407,10 +407,10 @@ struct NewPaletteSheet: View {
 
                 Spacer()
             }
-            .navigationTitle("New Palette")
+            .navigationTitle("new_palette".localized)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
+                    Button("cancel".localized) {
                         hideKeyboard()
                         showSheet = false
                     }
@@ -558,7 +558,7 @@ struct FavoritePaletteTile: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(palette.name ?? "Untitled Palette")
+            Text(palette.name ?? "untitled_palette".localized)
                 .font(.headline)
                 .padding(.horizontal, 4)
 
@@ -581,7 +581,7 @@ struct FavoritePaletteTile: View {
                     .presentationDragIndicator(.visible)
             }
 
-            Text("\(palette.colors.count) \(palette.colors.count == 1 ? "Color" : "Colors")")
+            Text("\(palette.colors.count) \(palette.colors.count == 1 ? "color".localized : "colors".localized)")
                 .font(.caption)
                 .foregroundColor(.secondary)
                 .padding(.horizontal, 4)

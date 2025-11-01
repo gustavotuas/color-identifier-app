@@ -1,34 +1,200 @@
-"unlock_title" = "Unlock Colorit Pro";
-"unlock_subtitle" = "Experience AI color intelligence & design freedom.";
-"plan_weekly" = "Weekly – $5.99/week";
-"plan_monthly" = "Monthly – $14.99/month";
-"plan_yearly" = "Yearly – $59.99/year";
-"trial_badge" = "Start free for 3 days";
-"discount_badge_today" = "50% OFF today only";
-"discount_badge_limited" = "Save 50% – Limited Time";
-"regular_price_monthly" = "Regular $29.99/month";
-"regular_price_yearly" = "Regular $119.99/year";
-"cta_start_trial_save" = "Start My Free Trial & Save 50%";
-"footer_note" = "Limited-time launch offer. Cancel anytime in Settings. Offer may end soon.";
-"cancel_anytime" = "Cancel anytime";
-"best_value" = "Best Value";
-"selected" = "Selected";
-"offer_ends_in" = "Offer ends in";
-"get_started" = "Get Started";
-"camera" = "Camera";
-"photos" = "Photos";
-"browse" = "Browse";
-"discover" = "Discover";
-"home" = "Home";
-"profile" = "Profile";
-"quick_actions" = "Quick Actions";
-"open_camera" = "Open Camera";
-"from_photos" = "From Photos";
-"unlock_pro" = "Unlock Pro";
-"pick_photo" = "Pick a photo";
-"choose_photo" = "Choose Photo";
-"extract_palette" = "Extract Palette";
-"pro_tips" = "Pro Tips";
-"tip_natural_light" = "Capture under natural light";
-"tip_avoid_glare" = "Avoid reflections and glare";
-"tip_contrast" = "Try contrasty backgrounds";
+/* ======================================================
+   MAIN APP STRUCTURE
+   ====================================================== */
+"tab_collections" = "Gyűjtemények";
+"tab_search" = "Keresés";
+"tab_camera" = "Kamera";
+"tab_photos" = "Fotók";
+"tab_settings" = "Beállítások";
+"pro_badge" = "PRO";
+"unlock_pro" = "Pro feloldása";
+"unlock_pro_subtitle" = "Hozzáférés minden prémium funkcióhoz";
+"unlock_picker" = "Választó feloldása";
+
+/* ======================================================
+   SEARCH / COLOR DETAIL
+   ====================================================== */
+"color_harmony" = "Színharmónia";
+"mode" = "Mód";
+"harmony" = "Harmónia";
+"copy" = "Másolás";
+"share" = "Megosztás";
+"add" = "Hozzáadás";
+"added" = "Hozzáadva";
+"close" = "Bezárás";
+"copied_to_clipboard" = "Vágólapra másolva";
+"share_preparing" = "Megosztási előnézet előkészítése...";
+"red" = "Piros";
+"green" = "Zöld";
+"blue" = "Kék";
+"hex" = "Hex";
+"hue" = "Árnyalat";
+"saturation" = "Telítettség";
+"brightness" = "Fényerő";
+"cyan" = "Cián";
+"magenta" = "Magenta";
+"yellow" = "Sárga";
+"black" = "Fekete";
+"show_more" = "Több megjelenítése";
+"bucket" = "Vödör";
+"color_not_found" = "A szín nem található a könyvtárban";
+"shades_tints" = "Árnyalatok és tónusok";
+"contrast_preview" = "Kontraszt előnézet";
+"vendor" = "Gyártó";
+"brand" = "Márka";
+"code" = "Kód";
+"locator" = "Kereső";
+"open_vendor_page" = "Gyártói oldal megnyitása";
+"line" = "Sorozat";
+"made_with" = "Készült a Colorit segítségével";
+"url" = "www.colorit.app";
+"opening_share_sheet" = "Megosztás megnyitása...";
+"failed_to_open_share_sheet" = "Nem sikerült megnyitni a megosztási lapot.";
+"unlock_pro_to_view_harmony" = "Feloldja a Pro-t a harmónia megtekintéséhez";
+"unlock_pro_to_view_shades_tints" = "Feloldja a Pro-t az árnyalatok és tónusok megtekintéséhez";
+"text_sample" = "Szöveg minta";
+"excellent_AAA" = "Kiváló (AAA)";
+"good_AA" = "Jó (AA)";
+"low_contrast" = "Alacsony kontraszt";
+"select_paint" = "Festék kiválasztása";
+"sort_alphabetically" = "Rendezés ábécé szerint";
+"sort_by_brightness" = "Rendezés fényerő szerint";
+"toggle_layout" = "Elrendezés váltása";
+"search_by" = "Keresés név, hex, márka vagy kód szerint";
+"paints" = "Festékek";
+"general_palette" = "Általános paletta";
+
+/* ======================================================
+   CAMERA SCREEN
+   ====================================================== */
+"no_match_found" = "Nincs találat";
+"added_to_collections" = "Hozzáadva a gyűjteményhez";
+"removed_from_collections" = "Eltávolítva a gyűjteményből";
+"sort_by_alphabetic" = "Rendezés ábécé szerint";
+"free_preview" = "Ingyenes előnézet – Teljes hozzáféréshez PRO feloldása";
+"unlock_live_camera" = "Élő kamera feloldása";
+"generate_palette" = "Paletta létrehozása";
+"precision" = "Pontosság";
+"save" = "Mentés";
+"save_color_to_collections" = "Szín mentése a gyűjteménybe";
+"color_matches" = "Szín egyezések";
+
+/* ======================================================
+   LIVE / PHOTO PALETTE DETAILS
+   ====================================================== */
+"add_palette_to_collections" = "Paletta hozzáadása a gyűjteményhez";
+"palette_saved" = "Paletta elmentve";
+"palette_added" = "Paletta hozzáadva a gyűjteményhez";
+"live_palette" = "Élő paletta";
+"photo_palette" = "Fotópaletta";
+"unlock_full_palette_color_matches" = "Teljes paletta és színegyezés feloldása";
+
+/* ======================================================
+   FAVORITES / COLLECTIONS
+   ====================================================== */
+"colors" = "Színek";
+"color" = "Szín";
+"palettes" = "Paletták";
+"palette" = "Paletta";
+"all" = "Összes";
+"no_collections_yet" = "Még nincsenek gyűjtemények";
+"no_collections_subtitle" = "Mentsen színeket és palettákat, hogy később újra megtekinthesse őket.";
+"clear_all_collections" = "Összes gyűjtemény törlése?";
+"yes" = "Igen";
+"no" = "Nem";
+"create_palette" = "Paletta létrehozása";
+"palette_name_optional" = "Paletta neve (nem kötelező)";
+"palette_name" = "Paletta neve";
+"add_color" = "Szín hozzáadása";
+"edit" = "Szerkesztés";
+"cancel" = "Mégse";
+"done" = "Kész";
+"delete_palette" = "Törli ezt a palettát?";
+"collections" = "Gyűjtemények";
+"new_palette" = "Új paletta";
+"untitled_palette" = "Névtelen paletta";
+"delete" = "Törlés";
+"all_colors_already_added" = "Minden szín már hozzá lett adva.";
+"select_colors_to_add" = "Válasszon színeket a hozzáadáshoz";
+
+/* ======================================================
+   PHOTOS SCREEN
+   ====================================================== */
+"detected_palette" = "Észlelt paletta";
+"choose_photo" = "Fotó kiválasztása";
+"pick_photo" = "Fotó kiválasztása";
+"pick_color" = "Szín kiválasztása";
+"change_photo" = "Fotó cseréje";
+"choose_an_image_to_find_matching_colors" = "Válasszon egy képet a megfelelő színek megtalálásához";
+"unlock_full_palette" = "Teljes paletta feloldása";
+"unnamed_color" = "Névtelen szín";
+"color_added_to_collections" = "Szín hozzáadva a gyűjteményhez";
+
+/* ======================================================
+   SETTINGS SCREEN
+   ====================================================== */
+"appearance" = "Megjelenés";
+"theme" = "Téma";
+"language" = "Nyelv";
+"about" = "Névjegy";
+"version" = "Verzió:";
+"rate_app" = "Értékeld az alkalmazást";
+"help" = "Súgó";
+"send_feedback" = "Visszajelzés küldése";
+"app_name" = "Colorit";
+"hrs" = "óra";
+"min" = "perc";
+"sec" = "mp";
+"system" = "Rendszer";
+"light" = "Világos";
+"dark" = "Sötét";
+"general" = "Általános";
+
+/* ======================================================
+   PAYWALL / PRO FEATURES
+   ====================================================== */
+"flash_sale" = "Villámakció akár -80% kedvezménnyel, vége:";
+"best_value" = "Legjobb ajánlat";
+"terms_of_use" = "Felhasználási feltételek";
+"privacy_policy" = "Adatvédelmi irányelvek";
+"try_free" = "Próbáld ki ingyen";
+"continue" = "Folytatás";
+"unlock_pro_features" = "Pro funkciók feloldása";
+"included_in_pro" = "Benne van a Pro-ban";
+"feature_live_color_id_subtitle" = "Azonosítsd azonnal a színeket a kameráddal valós időben.";
+"feature_photo_color_picker_subtitle" = "Készíts professzionális palettákat bármely fotóból mesterséges intelligencia pontossággal.";
+"feature_paint_catalogues_subtitle" = "Fedezd fel a válogatott festékgyűjteményeket több katalógusból.";
+"feature_unlimited_collections_subtitle" = "Hozz létre és rendszerezz korlátlan palettákat munkához vagy inspirációhoz.";
+"feature_advanced_search_subtitle" = "Keress színeket HEX, RGB vagy név alapján gyorsan és intuitívan.";
+"feature_harmony_colors_subtitle" = "Készíts harmonikus színsémákat és fedezd fel a hozzáillő árnyalatokat.";
+"feature_multiple_layouts_subtitle" = "Válts rács- vagy lista nézet között a vizuális böngészéshez.";
+"feature_smart_filters_subtitle" = "Szűrés árnyalat, fényerő vagy harmónia alapján pontosan.";
+"feature_color_matches_subtitle" = "Hasonlítsd össze az élő és rögzített minták színét.";
+"feature_unlimited_access_subtitle" = "Nincs korlátozás — élvezd az összes eszközt, palettát és funkciót örökre.";
+"your_purchases_have_been_restored" = "Vásárlások visszaállítva";
+"no_previous_purchases_found" = "Korábbi vásárlás nem található.";
+"restore_purchases" = "Vásárlások visszaállítása";
+"cancel_anytime" = "Bármikor lemondható";
+"family_sharing_enabled" = "Családi megosztás engedélyezve";
+"3_day_free_trial" = "3 napos ingyenes próbaidőszak";
+"1_year_plan" = "Éves előfizetés";
+"1_week_plan" = "Heti előfizetés";
+"feature_live_color_id_title" = "Élő színazonosító";
+"feature_photo_color_picker_title" = "Fotószín-választó";
+"feature_paint_catalogues_title" = "Professzionális festékkatalógusok";
+"feature_unlimited_collections_title" = "Korlátlan gyűjtemények és paletták";
+"feature_advanced_search_title" = "Fejlett keresés";
+"feature_harmony_colors_title" = "Harmónia és hasonló színek";
+"feature_multiple_layouts_title" = "Többféle elrendezés";
+"feature_smart_filters_title" = "Okos szűrők és rendezés";
+"feature_color_matches_title" = "Szín egyezések fotóhoz és élő azonosításhoz";
+"feature_unlimited_access_title" = "Korlátlan hozzáférés";
+
+/* ======================================================
+   TOASTS / GENERIC MESSAGES
+   ====================================================== */
+"toast_copied" = "Másolva";
+"toast_added" = "Hozzáadva";
+"toast_removed" = "Eltávolítva";
+"toast_share" = "Megosztás";
+"toast_info" = "Információ";

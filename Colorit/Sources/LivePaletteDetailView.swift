@@ -27,7 +27,7 @@ struct LivePaletteDetailView: View {
 
                         // MARK: - Header title + save button
                         HStack {
-                            Text("Color Matches")
+                            Text("color_matches".localized)
                                 .font(.largeTitle.bold())
                             Spacer()
                         }
@@ -57,7 +57,7 @@ struct LivePaletteDetailView: View {
                             HStack(spacing: 6) {
                                 Image(systemName: addedPalette ? "checkmark.circle.fill" : "square.and.arrow.down")
                                     .font(.system(size: 17, weight: .semibold))
-                                Text(addedPalette ? "Palette Saved" : "Add Palette to Collections")
+                                Text(addedPalette ? "palette_saved".localized : "add_palette_to_collections".localized)
                                     .font(.system(size: 17, weight: .semibold))
                             }
                             .foregroundColor(Color.accentColor)
@@ -140,7 +140,7 @@ struct LivePaletteDetailView: View {
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: "xmark.circle.fill")
-                            Text("Close")
+                            Text("close".localized)
                         }
                         .font(.headline)
                         .foregroundColor(.secondary)
@@ -164,13 +164,13 @@ struct LivePaletteDetailView: View {
             formatter.dateFormat = "MMM d, yyyy • hh:mm a"
             let dateString = formatter.string(from: Date())
 
-            let paletteName = "Live Palette – \(dateString)"
+            let paletteName = "\("live_palette".localized) – \(dateString)"
             favs.addPalette(name: paletteName, colors: unique)
 
             withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
                 addedPalette = true
             }
-            toastMessage = "Palette Added to Collections"
+            toastMessage = "palette_added".localized
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
                 withAnimation { toastMessage = nil }
                 addedPalette = false
@@ -213,7 +213,7 @@ private struct MagicalUnlockButton: View {
                 .shadow(color: .white.opacity(0.4), radius: 3, y: 1)
 
             Button(action: onTap) {
-                Text("Unlock Full Palette & Color Matches")
+                Text("unlock_full_palette_color_matches".localized)
                     .font(.headline)
                     .foregroundColor(.white)
                     .padding(.horizontal, 26)
@@ -312,10 +312,10 @@ private struct LiveColorRow: View {
         let key = normalizeHex(named.hex)
         if favs.colors.contains(where: { normalizeHex($0.color.hex) == key }) {
             favs.removeColor(hex: named.hex)
-            toast = "Removed from Collections"
+            toast = "removed_from_collections".localized
         } else {
             favs.add(color: hexToRGB(named.hex))
-            toast = "Added to Collections \(named.name)"
+            toast = "\("added_to_collections".localized) \(named.name)"
         }
 
         UIImpactFeedbackGenerator(style: .soft).impactOccurred()

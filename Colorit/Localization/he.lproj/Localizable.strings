@@ -1,34 +1,200 @@
-"unlock_title" = "Unlock Colorit Pro";
-"unlock_subtitle" = "Experience AI color intelligence & design freedom.";
-"plan_weekly" = "Weekly – $5.99/week";
-"plan_monthly" = "Monthly – $14.99/month";
-"plan_yearly" = "Yearly – $59.99/year";
-"trial_badge" = "Start free for 3 days";
-"discount_badge_today" = "50% OFF today only";
-"discount_badge_limited" = "Save 50% – Limited Time";
-"regular_price_monthly" = "Regular $29.99/month";
-"regular_price_yearly" = "Regular $119.99/year";
-"cta_start_trial_save" = "Start My Free Trial & Save 50%";
-"footer_note" = "Limited-time launch offer. Cancel anytime in Settings. Offer may end soon.";
-"cancel_anytime" = "Cancel anytime";
-"best_value" = "Best Value";
-"selected" = "Selected";
-"offer_ends_in" = "Offer ends in";
-"get_started" = "Get Started";
-"camera" = "Camera";
-"photos" = "Photos";
-"browse" = "Browse";
-"discover" = "Discover";
-"home" = "Home";
-"profile" = "Profile";
-"quick_actions" = "Quick Actions";
-"open_camera" = "Open Camera";
-"from_photos" = "From Photos";
-"unlock_pro" = "Unlock Pro";
-"pick_photo" = "Pick a photo";
-"choose_photo" = "Choose Photo";
-"extract_palette" = "Extract Palette";
-"pro_tips" = "Pro Tips";
-"tip_natural_light" = "Capture under natural light";
-"tip_avoid_glare" = "Avoid reflections and glare";
-"tip_contrast" = "Try contrasty backgrounds";
+/* ======================================================
+   MAIN APP STRUCTURE
+   ====================================================== */
+"tab_collections" = "אוספים";
+"tab_search" = "חיפוש";
+"tab_camera" = "מצלמה";
+"tab_photos" = "תמונות";
+"tab_settings" = "הגדרות";
+"pro_badge" = "PRO";
+"unlock_pro" = "פתח Pro";
+"unlock_pro_subtitle" = "גישה לכל התכונות המתקדמות";
+"unlock_picker" = "פתח את הבורר";
+
+/* ======================================================
+   SEARCH / COLOR DETAIL
+   ====================================================== */
+"color_harmony" = "הרמוניית צבעים";
+"mode" = "מצב";
+"harmony" = "הרמוניה";
+"copy" = "העתק";
+"share" = "שתף";
+"add" = "הוסף";
+"added" = "נוסף";
+"close" = "סגור";
+"copied_to_clipboard" = "הועתק ללוח";
+"share_preparing" = "מכין תצוגה מקדימה לשיתוף...";
+"red" = "אדום";
+"green" = "ירוק";
+"blue" = "כחול";
+"hex" = "Hex";
+"hue" = "גוון";
+"saturation" = "רוויה";
+"brightness" = "בהירות";
+"cyan" = "ציאן";
+"magenta" = "מג'נטה";
+"yellow" = "צהוב";
+"black" = "שחור";
+"show_more" = "הצג עוד";
+"bucket" = "דלי";
+"color_not_found" = "הצבע לא נמצא בספרייה";
+"shades_tints" = "גוונים ובהירויות";
+"contrast_preview" = "תצוגה מקדימה של ניגודיות";
+"vendor" = "ספק";
+"brand" = "מותג";
+"code" = "קוד";
+"locator" = "איתור";
+"open_vendor_page" = "פתח את דף הספק";
+"line" = "סדרה";
+"made_with" = "נוצר בעזרת Colorit";
+"url" = "www.colorit.app";
+"opening_share_sheet" = "פותח מסך שיתוף...";
+"failed_to_open_share_sheet" = "נכשל בפתיחת מסך השיתוף.";
+"unlock_pro_to_view_harmony" = "פתח Pro כדי לראות את ההרמוניה";
+"unlock_pro_to_view_shades_tints" = "פתח Pro כדי לראות גוונים ובהירויות";
+"text_sample" = "דוגמת טקסט";
+"excellent_AAA" = "מעולה (AAA)";
+"good_AA" = "טוב (AA)";
+"low_contrast" = "ניגודיות נמוכה";
+"select_paint" = "בחר צבע";
+"sort_alphabetically" = "מיין לפי אלפבית";
+"sort_by_brightness" = "מיין לפי בהירות";
+"toggle_layout" = "שנה פריסה";
+"search_by" = "חפש לפי שם, hex, מותג או קוד";
+"paints" = "צבעים";
+"general_palette" = "פלטה כללית";
+
+/* ======================================================
+   CAMERA SCREEN
+   ====================================================== */
+"no_match_found" = "לא נמצאה התאמה";
+"added_to_collections" = "נוסף לאוספים";
+"removed_from_collections" = "הוסר מהאוספים";
+"sort_by_alphabetic" = "מיין לפי אלפבית";
+"free_preview" = "תצוגה חינמית – פתח PRO לגישה מלאה";
+"unlock_live_camera" = "פתח מצלמה חיה מלאה";
+"generate_palette" = "צור פלטה";
+"precision" = "דיוק";
+"save" = "שמור";
+"save_color_to_collections" = "שמור צבע באוספים";
+"color_matches" = "התאמות צבע";
+
+/* ======================================================
+   LIVE / PHOTO PALETTE DETAILS
+   ====================================================== */
+"add_palette_to_collections" = "הוסף פלטה לאוספים";
+"palette_saved" = "הפלטה נשמרה";
+"palette_added" = "הפלטה נוספה לאוספים";
+"live_palette" = "פלטה חיה";
+"photo_palette" = "פלטת תמונה";
+"unlock_full_palette_color_matches" = "פתח פלטה מלאה והתאמות צבע";
+
+/* ======================================================
+   FAVORITES / COLLECTIONS
+   ====================================================== */
+"colors" = "צבעים";
+"color" = "צבע";
+"palettes" = "פלטות";
+"palette" = "פלטה";
+"all" = "הכול";
+"no_collections_yet" = "אין עדיין אוספים";
+"no_collections_subtitle" = "שמור צבעים ופלטות כדי לגשת אליהם כאן מאוחר יותר.";
+"clear_all_collections" = "למחוק את כל האוספים?";
+"yes" = "כן";
+"no" = "לא";
+"create_palette" = "צור פלטה";
+"palette_name_optional" = "שם פלטה (לא חובה)";
+"palette_name" = "שם פלטה";
+"add_color" = "הוסף צבע";
+"edit" = "ערוך";
+"cancel" = "בטל";
+"done" = "בוצע";
+"delete_palette" = "למחוק את הפלטה הזו?";
+"collections" = "אוספים";
+"new_palette" = "פלטה חדשה";
+"untitled_palette" = "פלטה ללא שם";
+"delete" = "מחק";
+"all_colors_already_added" = "כל הצבעים כבר נוספו.";
+"select_colors_to_add" = "בחר צבעים להוספה";
+
+/* ======================================================
+   PHOTOS SCREEN
+   ====================================================== */
+"detected_palette" = "פלטה שזוהתה";
+"choose_photo" = "בחר תמונה";
+"pick_photo" = "בחר תמונה";
+"pick_color" = "בחר צבע";
+"change_photo" = "שנה תמונה";
+"choose_an_image_to_find_matching_colors" = "בחר תמונה כדי למצוא צבעים תואמים";
+"unlock_full_palette" = "פתח פלטה מלאה";
+"unnamed_color" = "צבע ללא שם";
+"color_added_to_collections" = "צבע נוסף לאוספים";
+
+/* ======================================================
+   SETTINGS SCREEN
+   ====================================================== */
+"appearance" = "מראה";
+"theme" = "ערכת נושא";
+"language" = "שפה";
+"about" = "אודות";
+"version" = "גרסה:";
+"rate_app" = "דרג את האפליקציה";
+"help" = "עזרה";
+"send_feedback" = "שלח משוב";
+"app_name" = "Colorit";
+"hrs" = "ש";
+"min" = "ד";
+"sec" = "שנ";
+"system" = "מערכת";
+"light" = "בהיר";
+"dark" = "כהה";
+"general" = "כללי";
+
+/* ======================================================
+   PAYWALL / PRO FEATURES
+   ====================================================== */
+"flash_sale" = "מבצע בזק עד -80% מסתיים בעוד";
+"best_value" = "הערך הטוב ביותר";
+"terms_of_use" = "תנאי שימוש";
+"privacy_policy" = "מדיניות פרטיות";
+"try_free" = "נסה בחינם";
+"continue" = "המשך";
+"unlock_pro_features" = "פתח תכונות Pro";
+"included_in_pro" = "נכלל ב-Pro";
+"feature_live_color_id_subtitle" = "זהה צבעים מיידית באמצעות המצלמה שלך בזמן אמת.";
+"feature_photo_color_picker_subtitle" = "חלץ פלטות מקצועיות מכל תמונה בדיוק של בינה מלאכותית.";
+"feature_paint_catalogues_subtitle" = "גלה פלטות נבחרות ממגוון קטלוגי צבעים.";
+"feature_unlimited_collections_subtitle" = "צור וארגן אינסוף פלטות לעבודה או השראה.";
+"feature_advanced_search_subtitle" = "מצא צבעים לפי HEX, RGB או שם בקלות ובמהירות.";
+"feature_harmony_colors_subtitle" = "צור סכמות הרמוניות וגלה גוונים תואמים בקלות.";
+"feature_multiple_layouts_subtitle" = "החלף בין תצוגת רשת לרשימה לחקר ויזואלי.";
+"feature_smart_filters_subtitle" = "סנן לפי גוון, בהירות או הרמוניה בדיוק.";
+"feature_color_matches_subtitle" = "השווה והצג התאמות בין דגימות חיות ומצולמות.";
+"feature_unlimited_access_subtitle" = "ללא הגבלות — תהנה מכל הכלים, הפלטות והתכונות לנצח.";
+"your_purchases_have_been_restored" = "הרכישות שלך שוחזרו";
+"no_previous_purchases_found" = "לא נמצאו רכישות קודמות.";
+"restore_purchases" = "שחזר רכישות";
+"cancel_anytime" = "בטל בכל עת";
+"family_sharing_enabled" = "שיתוף משפחתי מופעל";
+"3_day_free_trial" = "ניסיון חינם ל-3 ימים";
+"1_year_plan" = "תוכנית שנתית";
+"1_week_plan" = "תוכנית שבועית";
+"feature_live_color_id_title" = "זיהוי צבע חי";
+"feature_photo_color_picker_title" = "בורר צבעי תמונה";
+"feature_paint_catalogues_title" = "קטלוגי צבע מקצועיים";
+"feature_unlimited_collections_title" = "אוספים ופלטות ללא הגבלה";
+"feature_advanced_search_title" = "חיפוש מתקדם";
+"feature_harmony_colors_title" = "הרמוניה וצבעים דומים";
+"feature_multiple_layouts_title" = "תצוגות מרובות";
+"feature_smart_filters_title" = "מסננים חכמים ומיון";
+"feature_color_matches_title" = "התאמות צבע לתמונה ול-Live ID";
+"feature_unlimited_access_title" = "גישה ללא הגבלה";
+
+/* ======================================================
+   TOASTS / GENERIC MESSAGES
+   ====================================================== */
+"toast_copied" = "הועתק";
+"toast_added" = "נוסף";
+"toast_removed" = "הוסר";
+"toast_share" = "שתף";
+"toast_info" = "מידע";

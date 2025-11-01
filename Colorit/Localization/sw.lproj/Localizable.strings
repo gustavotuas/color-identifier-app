@@ -1,34 +1,200 @@
-"unlock_title" = "Unlock Colorit Pro";
-"unlock_subtitle" = "Experience AI color intelligence & design freedom.";
-"plan_weekly" = "Weekly – $5.99/week";
-"plan_monthly" = "Monthly – $14.99/month";
-"plan_yearly" = "Yearly – $59.99/year";
-"trial_badge" = "Start free for 3 days";
-"discount_badge_today" = "50% OFF today only";
-"discount_badge_limited" = "Save 50% – Limited Time";
-"regular_price_monthly" = "Regular $29.99/month";
-"regular_price_yearly" = "Regular $119.99/year";
-"cta_start_trial_save" = "Start My Free Trial & Save 50%";
-"footer_note" = "Limited-time launch offer. Cancel anytime in Settings. Offer may end soon.";
-"cancel_anytime" = "Cancel anytime";
-"best_value" = "Best Value";
-"selected" = "Selected";
-"offer_ends_in" = "Offer ends in";
-"get_started" = "Get Started";
-"camera" = "Camera";
-"photos" = "Photos";
-"browse" = "Browse";
-"discover" = "Discover";
-"home" = "Home";
-"profile" = "Profile";
-"quick_actions" = "Quick Actions";
-"open_camera" = "Open Camera";
-"from_photos" = "From Photos";
-"unlock_pro" = "Unlock Pro";
-"pick_photo" = "Pick a photo";
-"choose_photo" = "Choose Photo";
-"extract_palette" = "Extract Palette";
-"pro_tips" = "Pro Tips";
-"tip_natural_light" = "Capture under natural light";
-"tip_avoid_glare" = "Avoid reflections and glare";
-"tip_contrast" = "Try contrasty backgrounds";
+/* ======================================================
+   MAIN APP STRUCTURE
+   ====================================================== */
+"tab_collections" = "Mikusanyiko";
+"tab_search" = "Tafuta";
+"tab_camera" = "Kamera";
+"tab_photos" = "Picha";
+"tab_settings" = "Mipangilio";
+"pro_badge" = "PRO";
+"unlock_pro" = "Fungua Pro";
+"unlock_pro_subtitle" = "Fikia vipengele vyote vya hali ya juu";
+"unlock_picker" = "Fungua Kichagua";
+
+/* ======================================================
+   SEARCH / COLOR DETAIL
+   ====================================================== */
+"color_harmony" = "Ulinganifu wa Rangi";
+"mode" = "Hali";
+"harmony" = "Ulinganifu";
+"copy" = "Nakili";
+"share" = "Shiriki";
+"add" = "Ongeza";
+"added" = "Imeongezwa";
+"close" = "Funga";
+"copied_to_clipboard" = "Imenakiliwa kwenye ubao wa kunakilia";
+"share_preparing" = "Inatayarisha mwonekano wa kushiriki...";
+"red" = "Nyekundu";
+"green" = "Kijani";
+"blue" = "Bluu";
+"hex" = "Hex";
+"hue" = "Rangi";
+"saturation" = "Shamriba";
+"brightness" = "Mwanga";
+"cyan" = "Cyan";
+"magenta" = "Magenta";
+"yellow" = "Manjano";
+"black" = "Nyeusi";
+"show_more" = "Onyesha zaidi";
+"bucket" = "Kibakuli";
+"color_not_found" = "Rangi haijapatikana kwenye maktaba";
+"shades_tints" = "Vivuli na Matone";
+"contrast_preview" = "Mwonekano wa utofauti";
+"vendor" = "Muuzaji";
+"brand" = "Chapa";
+"code" = "Msimbo";
+"locator" = "Kipataji";
+"open_vendor_page" = "Fungua ukurasa wa muuzaji";
+"line" = "Mstari";
+"made_with" = "Imetengenezwa kwa Colorit";
+"url" = "www.colorit.app";
+"opening_share_sheet" = "Inafungua ukurasa wa kushiriki...";
+"failed_to_open_share_sheet" = "Imeshindwa kufungua ukurasa wa kushiriki.";
+"unlock_pro_to_view_harmony" = "Fungua Pro kuona Ulinganifu";
+"unlock_pro_to_view_shades_tints" = "Fungua Pro kuona Vivuli na Matone";
+"text_sample" = "Mfano wa maandishi";
+"excellent_AAA" = "Bora sana (AAA)";
+"good_AA" = "Nzuri (AA)";
+"low_contrast" = "Utofauti mdogo";
+"select_paint" = "Chagua rangi ya kupaka";
+"sort_alphabetically" = "Panga kwa alfabeti";
+"sort_by_brightness" = "Panga kwa mwanga";
+"toggle_layout" = "Badilisha mpangilio";
+"search_by" = "Tafuta kwa jina, hex, chapa au msimbo";
+"paints" = "Rangi";
+"general_palette" = "Paleti ya jumla";
+
+/* ======================================================
+   CAMERA SCREEN
+   ====================================================== */
+"no_match_found" = "Hakuna inayolingana imepatikana";
+"added_to_collections" = "Imeongezwa kwenye mikusanyiko";
+"removed_from_collections" = "Imeondolewa kwenye mikusanyiko";
+"sort_by_alphabetic" = "Panga kwa alfabeti";
+"free_preview" = "Mwonekano wa bure – fungua PRO kwa ufikiaji kamili";
+"unlock_live_camera" = "Fungua Kamera ya Moja kwa Moja Kamili";
+"generate_palette" = "Tengeneza paleti";
+"precision" = "Usahihi";
+"save" = "Hifadhi";
+"save_color_to_collections" = "Hifadhi rangi kwenye mikusanyiko";
+"color_matches" = "Rangi zinazofanana";
+
+/* ======================================================
+   LIVE / PHOTO PALETTE DETAILS
+   ====================================================== */
+"add_palette_to_collections" = "Ongeza paleti kwenye mikusanyiko";
+"palette_saved" = "Paleti imehifadhiwa";
+"palette_added" = "Paleti imeongezwa kwenye mikusanyiko";
+"live_palette" = "Paleti ya Moja kwa Moja";
+"photo_palette" = "Paleti ya Picha";
+"unlock_full_palette_color_matches" = "Fungua paleti kamili na rangi zinazofanana";
+
+/* ======================================================
+   FAVORITES / COLLECTIONS
+   ====================================================== */
+"colors" = "Rangi";
+"color" = "Rangi";
+"palettes" = "Paleti";
+"palette" = "Paleti";
+"all" = "Zote";
+"no_collections_yet" = "Hakuna mikusanyiko bado";
+"no_collections_subtitle" = "Hifadhi rangi na paleti uzione tena hapa.";
+"clear_all_collections" = "Futa mikusanyiko yote?";
+"yes" = "Ndiyo";
+"no" = "Hapana";
+"create_palette" = "Tengeneza paleti";
+"palette_name_optional" = "Jina la paleti (hiari)";
+"palette_name" = "Jina la paleti";
+"add_color" = "Ongeza rangi";
+"edit" = "Hariri";
+"cancel" = "Ghairi";
+"done" = "Imekamilika";
+"delete_palette" = "Futa paleti hii?";
+"collections" = "Mikusanyiko";
+"new_palette" = "Paleti Mpya";
+"untitled_palette" = "Paleti Isiyo na Jina";
+"delete" = "Futa";
+"all_colors_already_added" = "Rangi zote tayari zimeongezwa.";
+"select_colors_to_add" = "Chagua rangi za kuongeza";
+
+/* ======================================================
+   PHOTOS SCREEN
+   ====================================================== */
+"detected_palette" = "Paleti Iliyogunduliwa";
+"choose_photo" = "Chagua picha";
+"pick_photo" = "Chagua Picha";
+"pick_color" = "Chagua Rangi";
+"change_photo" = "Badilisha Picha";
+"choose_an_image_to_find_matching_colors" = "Chagua picha kupata rangi zinazofanana";
+"unlock_full_palette" = "Fungua Paleti Kamili";
+"unnamed_color" = "Rangi Isiyo na Jina";
+"color_added_to_collections" = "Rangi imeongezwa kwenye mikusanyiko";
+
+/* ======================================================
+   SETTINGS SCREEN
+   ====================================================== */
+"appearance" = "Mwonekano";
+"theme" = "Mandhari";
+"language" = "Lugha";
+"about" = "Kuhusu";
+"version" = "Toleo:";
+"rate_app" = "Kadiria programu";
+"help" = "Msaada";
+"send_feedback" = "Tuma maoni";
+"app_name" = "Colorit";
+"hrs" = "saa";
+"min" = "dak";
+"sec" = "sek";
+"system" = "Mfumo";
+"light" = "Mwanga";
+"dark" = "Giza";
+"general" = "Jumla";
+
+/* ======================================================
+   PAYWALL / PRO FEATURES
+   ====================================================== */
+"flash_sale" = "Uuzaji wa Haraka hadi -80% unaisha ndani ya";
+"best_value" = "Thamani Bora";
+"terms_of_use" = "Masharti ya Matumizi";
+"privacy_policy" = "Sera ya Faragha";
+"try_free" = "Jaribu Bila Malipo";
+"continue" = "Endelea";
+"unlock_pro_features" = "Fungua Vipengele vya Pro";
+"included_in_pro" = "Imejumuishwa kwenye Pro";
+"feature_live_color_id_subtitle" = "Tambua rangi papo hapo kupitia kamera yako kwa muda halisi.";
+"feature_photo_color_picker_subtitle" = "Toa paleti za kitaalamu kutoka kwa picha yoyote kwa usahihi wa AI.";
+"feature_paint_catalogues_subtitle" = "Gundua paleti zilizochaguliwa kutoka kwa makusanyo mbalimbali ya rangi.";
+"feature_unlimited_collections_subtitle" = "Tengeneza na panga paleti zisizo na kikomo kwa kazi au msukumo.";
+"feature_advanced_search_subtitle" = "Tafuta rangi kwa HEX, RGB au jina kwa haraka na urahisi.";
+"feature_harmony_colors_subtitle" = "Tengeneza mpangilio wa rangi unaolingana na gundua rangi zinazoshabihiana kwa urahisi.";
+"feature_multiple_layouts_subtitle" = "Badilisha kati ya mtazamo wa gridi na orodha ili kuchunguza kwa macho.";
+"feature_smart_filters_subtitle" = "Chuja kwa rangi, mwanga au ulinganifu kwa usahihi.";
+"feature_color_matches_subtitle" = "Linganisha na onyesha rangi zinazofanana kati ya sampuli za moja kwa moja na zilizohifadhiwa.";
+"feature_unlimited_access_subtitle" = "Hakuna vizuizi — furahia zana, paleti na vipengele vyote milele.";
+"your_purchases_have_been_restored" = "Ununuzi wako umehifadhiwa upya";
+"no_previous_purchases_found" = "Hakuna ununuzi wa awali uliopatikana.";
+"restore_purchases" = "Rejesha ununuzi";
+"cancel_anytime" = "Ghairi wakati wowote";
+"family_sharing_enabled" = "Kushiriki kwa Familia Kumewezeshwa";
+"3_day_free_trial" = "Majaribio ya Siku 3 Bila Malipo";
+"1_year_plan" = "Mpango wa Mwaka 1";
+"1_week_plan" = "Mpango wa Wiki 1";
+"feature_live_color_id_title" = "Utambulisho wa Rangi Moja kwa Moja";
+"feature_photo_color_picker_title" = "Kichagua Rangi cha Picha";
+"feature_paint_catalogues_title" = "Katalogi za Rangi za Kitaalamu";
+"feature_unlimited_collections_title" = "Mikusanyiko na Paleti Zisizo na Kikomo";
+"feature_advanced_search_title" = "Utafutaji wa Kina";
+"feature_harmony_colors_title" = "Ulinganifu wa Rangi na Zinazofanana";
+"feature_multiple_layouts_title" = "Miundo Mingi ya Mpangilio";
+"feature_smart_filters_title" = "Vichujio na Upangaji wa Kina";
+"feature_color_matches_title" = "Rangi Zinazofanana kwa Picha na Moja kwa Moja";
+"feature_unlimited_access_title" = "Ufikiaji Usio na Kizuizi";
+
+/* ======================================================
+   TOASTS / GENERIC MESSAGES
+   ====================================================== */
+"toast_copied" = "Imenakiliwa";
+"toast_added" = "Imeongezwa";
+"toast_removed" = "Imeondolewa";
+"toast_share" = "Shiriki";
+"toast_info" = "Taarifa";

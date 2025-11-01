@@ -1,34 +1,200 @@
-"unlock_title" = "Unlock Colorit Pro";
-"unlock_subtitle" = "Experience AI color intelligence & design freedom.";
-"plan_weekly" = "Weekly – $5.99/week";
-"plan_monthly" = "Monthly – $14.99/month";
-"plan_yearly" = "Yearly – $59.99/year";
-"trial_badge" = "Start free for 3 days";
-"discount_badge_today" = "50% OFF today only";
-"discount_badge_limited" = "Save 50% – Limited Time";
-"regular_price_monthly" = "Regular $29.99/month";
-"regular_price_yearly" = "Regular $119.99/year";
-"cta_start_trial_save" = "Start My Free Trial & Save 50%";
-"footer_note" = "Limited-time launch offer. Cancel anytime in Settings. Offer may end soon.";
-"cancel_anytime" = "Cancel anytime";
-"best_value" = "Best Value";
-"selected" = "Selected";
-"offer_ends_in" = "Offer ends in";
-"get_started" = "Get Started";
-"camera" = "Camera";
-"photos" = "Photos";
-"browse" = "Browse";
-"discover" = "Discover";
-"home" = "Home";
-"profile" = "Profile";
-"quick_actions" = "Quick Actions";
-"open_camera" = "Open Camera";
-"from_photos" = "From Photos";
-"unlock_pro" = "Unlock Pro";
-"pick_photo" = "Pick a photo";
-"choose_photo" = "Choose Photo";
-"extract_palette" = "Extract Palette";
-"pro_tips" = "Pro Tips";
-"tip_natural_light" = "Capture under natural light";
-"tip_avoid_glare" = "Avoid reflections and glare";
-"tip_contrast" = "Try contrasty backgrounds";
+/* ======================================================
+   MAIN APP STRUCTURE
+   ====================================================== */
+"tab_collections" = "Samlingar";
+"tab_search" = "Sök";
+"tab_camera" = "Kamera";
+"tab_photos" = "Foton";
+"tab_settings" = "Inställningar";
+"pro_badge" = "PRO";
+"unlock_pro" = "Lås upp Pro";
+"unlock_pro_subtitle" = "Få tillgång till alla premiumfunktioner";
+"unlock_picker" = "Lås upp färgväljaren";
+
+/* ======================================================
+   SEARCH / COLOR DETAIL
+   ====================================================== */
+"color_harmony" = "Färgharmoni";
+"mode" = "Läge";
+"harmony" = "Harmoni";
+"copy" = "Kopiera";
+"share" = "Dela";
+"add" = "Lägg till";
+"added" = "Tillagd";
+"close" = "Stäng";
+"copied_to_clipboard" = "Kopierat till urklipp";
+"share_preparing" = "Förbereder delningsförhandsvisning...";
+"red" = "Röd";
+"green" = "Grön";
+"blue" = "Blå";
+"hex" = "Hex";
+"hue" = "Nyans";
+"saturation" = "Mättnad";
+"brightness" = "Ljusstyrka";
+"cyan" = "Cyan";
+"magenta" = "Magenta";
+"yellow" = "Gul";
+"black" = "Svart";
+"show_more" = "Visa mer";
+"bucket" = "Hink";
+"color_not_found" = "Färgen hittades inte i biblioteket";
+"shades_tints" = "Nyans och ton";
+"contrast_preview" = "Kontrastförhandsvisning";
+"vendor" = "Leverantör";
+"brand" = "Varumärke";
+"code" = "Kod";
+"locator" = "Plats";
+"open_vendor_page" = "Öppna leverantörssida";
+"line" = "Linje";
+"made_with" = "Skapad med Colorit";
+"url" = "www.colorit.app";
+"opening_share_sheet" = "Öppnar delningsfönster...";
+"failed_to_open_share_sheet" = "Det gick inte att öppna delningsfönstret.";
+"unlock_pro_to_view_harmony" = "Lås upp Pro för att visa harmoni";
+"unlock_pro_to_view_shades_tints" = "Lås upp Pro för att visa nyanser och toner";
+"text_sample" = "Textprov";
+"excellent_AAA" = "Utmärkt (AAA)";
+"good_AA" = "Bra (AA)";
+"low_contrast" = "Låg kontrast";
+"select_paint" = "Välj färg";
+"sort_alphabetically" = "Sortera alfabetiskt";
+"sort_by_brightness" = "Sortera efter ljusstyrka";
+"toggle_layout" = "Byt layout";
+"search_by" = "Sök efter namn, hex, varumärke eller kod";
+"paints" = "Färger";
+"general_palette" = "Allmän palett";
+
+/* ======================================================
+   CAMERA SCREEN
+   ====================================================== */
+"no_match_found" = "Ingen matchning hittades";
+"added_to_collections" = "Tillagd i samlingar";
+"removed_from_collections" = "Borttagen från samlingar";
+"sort_by_alphabetic" = "Sortera alfabetiskt";
+"free_preview" = "Gratis förhandsvisning – lås upp PRO för full åtkomst";
+"unlock_live_camera" = "Lås upp full Live-kamera";
+"generate_palette" = "Skapa palett";
+"precision" = "Precision";
+"save" = "Spara";
+"save_color_to_collections" = "Spara färg till samlingar";
+"color_matches" = "Färgmatchningar";
+
+/* ======================================================
+   LIVE / PHOTO PALETTE DETAILS
+   ====================================================== */
+"add_palette_to_collections" = "Lägg till palett i samlingar";
+"palette_saved" = "Palett sparad";
+"palette_added" = "Palett tillagd i samlingar";
+"live_palette" = "Live-palett";
+"photo_palette" = "Foto-palett";
+"unlock_full_palette_color_matches" = "Lås upp full palett och färgmatchningar";
+
+/* ======================================================
+   FAVORITES / COLLECTIONS
+   ====================================================== */
+"colors" = "Färger";
+"color" = "Färg";
+"palettes" = "Paletter";
+"palette" = "Palett";
+"all" = "Alla";
+"no_collections_yet" = "Inga samlingar än";
+"no_collections_subtitle" = "Spara färger och paletter för att se dem här senare.";
+"clear_all_collections" = "Rensa alla samlingar?";
+"yes" = "Ja";
+"no" = "Nej";
+"create_palette" = "Skapa palett";
+"palette_name_optional" = "Palettnamn (valfritt)";
+"palette_name" = "Palettnamn";
+"add_color" = "Lägg till färg";
+"edit" = "Redigera";
+"cancel" = "Avbryt";
+"done" = "Klar";
+"delete_palette" = "Radera denna palett?";
+"collections" = "Samlingar";
+"new_palette" = "Ny palett";
+"untitled_palette" = "Namnlös palett";
+"delete" = "Radera";
+"all_colors_already_added" = "Alla färger har redan lagts till.";
+"select_colors_to_add" = "Välj färger att lägga till";
+
+/* ======================================================
+   PHOTOS SCREEN
+   ====================================================== */
+"detected_palette" = "Upptäckt palett";
+"choose_photo" = "Välj foto";
+"pick_photo" = "Välj ett foto";
+"pick_color" = "Välj färg";
+"change_photo" = "Byt foto";
+"choose_an_image_to_find_matching_colors" = "Välj en bild för att hitta matchande färger";
+"unlock_full_palette" = "Lås upp full palett";
+"unnamed_color" = "Namnlös färg";
+"color_added_to_collections" = "Färg tillagd i samlingar";
+
+/* ======================================================
+   SETTINGS SCREEN
+   ====================================================== */
+"appearance" = "Utseende";
+"theme" = "Tema";
+"language" = "Språk";
+"about" = "Om";
+"version" = "Version:";
+"rate_app" = "Betygsätt appen";
+"help" = "Hjälp";
+"send_feedback" = "Skicka feedback";
+"app_name" = "Colorit";
+"hrs" = "tim";
+"min" = "min";
+"sec" = "sek";
+"system" = "System";
+"light" = "Ljust";
+"dark" = "Mörkt";
+"general" = "Allmänt";
+
+/* ======================================================
+   PAYWALL / PRO FEATURES
+   ====================================================== */
+"flash_sale" = "Blixtrea upp till −80 % slutar om";
+"best_value" = "Bästa värde";
+"terms_of_use" = "Användarvillkor";
+"privacy_policy" = "Integritetspolicy";
+"try_free" = "Prova gratis";
+"continue" = "Fortsätt";
+"unlock_pro_features" = "Lås upp Pro-funktioner";
+"included_in_pro" = "Ingår i Pro";
+"feature_live_color_id_subtitle" = "Identifiera färger direkt genom kameran i realtid.";
+"feature_photo_color_picker_subtitle" = "Extrahera professionella paletter från vilket foto som helst med AI-precision.";
+"feature_paint_catalogues_subtitle" = "Utforska utvalda paletter från flera färgkollektioner.";
+"feature_unlimited_collections_subtitle" = "Skapa och organisera obegränsade paletter för arbete eller inspiration.";
+"feature_advanced_search_subtitle" = "Hitta färger med HEX, RGB eller namn snabbt och intuitivt.";
+"feature_harmony_colors_subtitle" = "Skapa harmoniska färgscheman och upptäck matchande toner enkelt.";
+"feature_multiple_layouts_subtitle" = "Växla mellan rutnät- och listvyer för visuell utforskning.";
+"feature_smart_filters_subtitle" = "Filtrera efter nyans, ljusstyrka eller harmoni med precision.";
+"feature_color_matches_subtitle" = "Jämför och visualisera matchningar mellan live och sparade prover.";
+"feature_unlimited_access_subtitle" = "Inga begränsningar — njut av alla verktyg, paletter och funktioner för alltid.";
+"your_purchases_have_been_restored" = "Dina köp har återställts";
+"no_previous_purchases_found" = "Inga tidigare köp hittades.";
+"restore_purchases" = "Återställ köp";
+"cancel_anytime" = "Avbryt när som helst";
+"family_sharing_enabled" = "Familjedelning aktiverad";
+"3_day_free_trial" = "3 dagars gratis provperiod";
+"1_year_plan" = "Årsplan";
+"1_week_plan" = "Veckoplan";
+"feature_live_color_id_title" = "Live-färgidentifiering";
+"feature_photo_color_picker_title" = "Foto-färgväljare";
+"feature_paint_catalogues_title" = "Professionella färgkataloger";
+"feature_unlimited_collections_title" = "Obegränsade samlingar och paletter";
+"feature_advanced_search_title" = "Avancerad sökning";
+"feature_harmony_colors_title" = "Harmoni och liknande färger";
+"feature_multiple_layouts_title" = "Flera layoutvyer";
+"feature_smart_filters_title" = "Smarta filter och sortering";
+"feature_color_matches_title" = "Färgmatchningar för foto och live";
+"feature_unlimited_access_title" = "Obegränsad åtkomst";
+
+/* ======================================================
+   TOASTS / GENERIC MESSAGES
+   ====================================================== */
+"toast_copied" = "Kopierat";
+"toast_added" = "Tillagt";
+"toast_removed" = "Borttaget";
+"toast_share" = "Dela";
+"toast_info" = "Info";

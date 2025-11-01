@@ -1,34 +1,200 @@
-"unlock_title" = "Unlock Colorit Pro";
-"unlock_subtitle" = "Experience AI color intelligence & design freedom.";
-"plan_weekly" = "Weekly – $5.99/week";
-"plan_monthly" = "Monthly – $14.99/month";
-"plan_yearly" = "Yearly – $59.99/year";
-"trial_badge" = "Start free for 3 days";
-"discount_badge_today" = "50% OFF today only";
-"discount_badge_limited" = "Save 50% – Limited Time";
-"regular_price_monthly" = "Regular $29.99/month";
-"regular_price_yearly" = "Regular $119.99/year";
-"cta_start_trial_save" = "Start My Free Trial & Save 50%";
-"footer_note" = "Limited-time launch offer. Cancel anytime in Settings. Offer may end soon.";
-"cancel_anytime" = "Cancel anytime";
-"best_value" = "Best Value";
-"selected" = "Selected";
-"offer_ends_in" = "Offer ends in";
-"get_started" = "Get Started";
-"camera" = "Camera";
-"photos" = "Photos";
-"browse" = "Browse";
-"discover" = "Discover";
-"home" = "Home";
-"profile" = "Profile";
-"quick_actions" = "Quick Actions";
-"open_camera" = "Open Camera";
-"from_photos" = "From Photos";
-"unlock_pro" = "Unlock Pro";
-"pick_photo" = "Pick a photo";
-"choose_photo" = "Choose Photo";
-"extract_palette" = "Extract Palette";
-"pro_tips" = "Pro Tips";
-"tip_natural_light" = "Capture under natural light";
-"tip_avoid_glare" = "Avoid reflections and glare";
-"tip_contrast" = "Try contrasty backgrounds";
+/* ======================================================
+   MAIN APP STRUCTURE
+   ====================================================== */
+"tab_collections" = "Kolekce";
+"tab_search" = "Hledat";
+"tab_camera" = "Fotoaparát";
+"tab_photos" = "Fotky";
+"tab_settings" = "Nastavení";
+"pro_badge" = "PRO";
+"unlock_pro" = "Odemknout Pro";
+"unlock_pro_subtitle" = "Získej přístup ke všem prémiovým funkcím";
+"unlock_picker" = "Odemknout výběr";
+
+/* ======================================================
+   SEARCH / COLOR DETAIL
+   ====================================================== */
+"color_harmony" = "Barevná harmonie";
+"mode" = "Režim";
+"harmony" = "Harmonie";
+"copy" = "Kopírovat";
+"share" = "Sdílet";
+"add" = "Přidat";
+"added" = "Přidáno";
+"close" = "Zavřít";
+"copied_to_clipboard" = "Zkopírováno do schránky";
+"share_preparing" = "Připravuje se náhled pro sdílení...";
+"red" = "Červená";
+"green" = "Zelená";
+"blue" = "Modrá";
+"hex" = "Hex";
+"hue" = "Odstín";
+"saturation" = "Sytost";
+"brightness" = "Jas";
+"cyan" = "Azurová";
+"magenta" = "Purpurová";
+"yellow" = "Žlutá";
+"black" = "Černá";
+"show_more" = "Zobrazit více";
+"bucket" = "Kbelík";
+"color_not_found" = "Barva nebyla nalezena v knihovně";
+"shades_tints" = "Odstíny a tónování";
+"contrast_preview" = "Náhled kontrastu";
+"vendor" = "Dodavatel";
+"brand" = "Značka";
+"code" = "Kód";
+"locator" = "Lokátor";
+"open_vendor_page" = "Otevřít stránku dodavatele";
+"line" = "Řada";
+"made_with" = "Vytvořeno pomocí Colorit";
+"url" = "www.colorit.app";
+"opening_share_sheet" = "Otevírání nabídky sdílení...";
+"failed_to_open_share_sheet" = "Nelze otevřít nabídku sdílení.";
+"unlock_pro_to_view_harmony" = "Odemkněte Pro pro zobrazení harmonie";
+"unlock_pro_to_view_shades_tints" = "Odemkněte Pro pro zobrazení odstínů a tónů";
+"text_sample" = "Ukázka textu";
+"excellent_AAA" = "Vynikající (AAA)";
+"good_AA" = "Dobré (AA)";
+"low_contrast" = "Nízký kontrast";
+"select_paint" = "Vyberte barvu";
+"sort_alphabetically" = "Řadit abecedně";
+"sort_by_brightness" = "Řadit podle jasu";
+"toggle_layout" = "Změnit rozložení";
+"search_by" = "Hledat podle názvu, hex, značky nebo kódu";
+"paints" = "Barvy";
+"general_palette" = "Obecná paleta";
+
+/* ======================================================
+   CAMERA SCREEN
+   ====================================================== */
+"no_match_found" = "Žádná shoda nenalezena";
+"added_to_collections" = "Přidáno do kolekcí";
+"removed_from_collections" = "Odebráno z kolekcí";
+"sort_by_alphabetic" = "Řadit abecedně";
+"free_preview" = "Zdarma náhled – odemkněte PRO pro plný přístup";
+"unlock_live_camera" = "Odemknout plnou živou kameru";
+"generate_palette" = "Vytvořit paletu";
+"precision" = "Přesnost";
+"save" = "Uložit";
+"save_color_to_collections" = "Uložit barvu do kolekcí";
+"color_matches" = "Barevné shody";
+
+/* ======================================================
+   LIVE / PHOTO PALETTE DETAILS
+   ====================================================== */
+"add_palette_to_collections" = "Přidat paletu do kolekcí";
+"palette_saved" = "Paleta uložena";
+"palette_added" = "Paleta přidána do kolekcí";
+"live_palette" = "Živá paleta";
+"photo_palette" = "Paleta z fotky";
+"unlock_full_palette_color_matches" = "Odemkněte plnou paletu a barevné shody";
+
+/* ======================================================
+   FAVORITES / COLLECTIONS
+   ====================================================== */
+"colors" = "Barvy";
+"color" = "Barva";
+"palettes" = "Palety";
+"palette" = "Paleta";
+"all" = "Vše";
+"no_collections_yet" = "Zatím žádné kolekce";
+"no_collections_subtitle" = "Ukládejte barvy a palety, abyste se k nim mohli později vrátit.";
+"clear_all_collections" = "Vymazat všechny kolekce?";
+"yes" = "Ano";
+"no" = "Ne";
+"create_palette" = "Vytvořit paletu";
+"palette_name_optional" = "Název palety (volitelné)";
+"palette_name" = "Název palety";
+"add_color" = "Přidat barvu";
+"edit" = "Upravit";
+"cancel" = "Zrušit";
+"done" = "Hotovo";
+"delete_palette" = "Smazat tuto paletu?";
+"collections" = "Kolekce";
+"new_palette" = "Nová paleta";
+"untitled_palette" = "Paleta bez názvu";
+"delete" = "Smazat";
+"all_colors_already_added" = "Všechny barvy již byly přidány.";
+"select_colors_to_add" = "Vyberte barvy k přidání";
+
+/* ======================================================
+   PHOTOS SCREEN
+   ====================================================== */
+"detected_palette" = "Zjištěná paleta";
+"choose_photo" = "Vyberte fotku";
+"pick_photo" = "Zvolit fotku";
+"pick_color" = "Vybrat barvu";
+"change_photo" = "Změnit fotku";
+"choose_an_image_to_find_matching_colors" = "Vyberte obrázek pro nalezení odpovídajících barev";
+"unlock_full_palette" = "Odemknout plnou paletu";
+"unnamed_color" = "Barva bez názvu";
+"color_added_to_collections" = "Barva přidána do kolekcí";
+
+/* ======================================================
+   SETTINGS SCREEN
+   ====================================================== */
+"appearance" = "Vzhled";
+"theme" = "Téma";
+"language" = "Jazyk";
+"about" = "O aplikaci";
+"version" = "Verze:";
+"rate_app" = "Ohodnoťte aplikaci";
+"help" = "Nápověda";
+"send_feedback" = "Odeslat zpětnou vazbu";
+"app_name" = "Colorit";
+"hrs" = "h";
+"min" = "min";
+"sec" = "s";
+"system" = "Systém";
+"light" = "Světlý";
+"dark" = "Tmavý";
+"general" = "Obecné";
+
+/* ======================================================
+   PAYWALL / PRO FEATURES
+   ====================================================== */
+"flash_sale" = "Bleskový výprodej až -80% končí za";
+"best_value" = "Nejlepší hodnota";
+"terms_of_use" = "Podmínky použití";
+"privacy_policy" = "Zásady ochrany osobních údajů";
+"try_free" = "Vyzkoušet zdarma";
+"continue" = "Pokračovat";
+"unlock_pro_features" = "Odemknout Pro funkce";
+"included_in_pro" = "Součástí Pro verze";
+"feature_live_color_id_subtitle" = "Okamžitě rozpoznávejte barvy pomocí kamery v reálném čase.";
+"feature_photo_color_picker_subtitle" = "Získejte profesionální palety z jakékoli fotografie s přesností AI.";
+"feature_paint_catalogues_subtitle" = "Prozkoumejte kurátorské palety z více katalogů barev.";
+"feature_unlimited_collections_subtitle" = "Vytvářejte a organizujte neomezené palety pro práci i inspiraci.";
+"feature_advanced_search_subtitle" = "Najděte barvy podle HEX, RGB nebo názvu rychle a intuitivně.";
+"feature_harmony_colors_subtitle" = "Generujte harmonické schémata a objevujte odpovídající tóny snadno.";
+"feature_multiple_layouts_subtitle" = "Přepínejte mezi zobrazením mřížky a seznamu pro vizuální průzkum palet.";
+"feature_smart_filters_subtitle" = "Filtrujte podle odstínu, jasu nebo harmonie s přesností.";
+"feature_color_matches_subtitle" = "Porovnejte a zobrazte shody mezi živými a zachycenými vzorky.";
+"feature_unlimited_access_subtitle" = "Bez omezení — užijte si všechny nástroje, palety a funkce napořád.";
+"your_purchases_have_been_restored" = "Vaše nákupy byly obnoveny";
+"no_previous_purchases_found" = "Nenalezeny žádné předchozí nákupy.";
+"restore_purchases" = "Obnovit nákupy";
+"cancel_anytime" = "Zrušit kdykoli";
+"family_sharing_enabled" = "Sdílení s rodinou povoleno";
+"3_day_free_trial" = "3denní bezplatná zkušební verze";
+"1_year_plan" = "Roční plán";
+"1_week_plan" = "Týdenní plán";
+"feature_live_color_id_title" = "Rozpoznání barvy v reálném čase";
+"feature_photo_color_picker_title" = "Výběr barvy z fotografie";
+"feature_paint_catalogues_title" = "Profesionální katalogy barev";
+"feature_unlimited_collections_title" = "Neomezené kolekce a palety";
+"feature_advanced_search_title" = "Pokročilé vyhledávání";
+"feature_harmony_colors_title" = "Harmonie a podobné barvy";
+"feature_multiple_layouts_title" = "Více typů rozložení";
+"feature_smart_filters_title" = "Chytré filtry a třídění";
+"feature_color_matches_title" = "Shody barev pro foto a živý přenos";
+"feature_unlimited_access_title" = "Neomezený přístup";
+
+/* ======================================================
+   TOASTS / GENERIC MESSAGES
+   ====================================================== */
+"toast_copied" = "Zkopírováno";
+"toast_added" = "Přidáno";
+"toast_removed" = "Odebráno";
+"toast_share" = "Sdílet";
+"toast_info" = "Informace";

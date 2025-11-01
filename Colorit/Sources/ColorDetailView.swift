@@ -76,7 +76,7 @@ struct ColorDetailView: View {
                                 Button(action: copyCurrentValue) {
                                     Image(systemName: "doc.on.doc").font(.title3)
                                 }
-                                Text("Copy").font(.caption2)
+                                Text("copy".localized).font(.caption2)
                             }
 
                             // Share
@@ -90,7 +90,7 @@ struct ColorDetailView: View {
                                         .font(.title3)
                                 }
 
-                                Text("Share").font(.caption2)
+                                Text("share".localized).font(.caption2)
                             }
 
                             // Add (+) → Added (check)
@@ -102,7 +102,7 @@ struct ColorDetailView: View {
                                         .scaleEffect(likePulse ? 1.12 : 1.0)
                                         .animation(.spring(response: 0.28, dampingFraction: 0.65), value: likePulse)
                                 }
-                                Text(isFavorite ? "Added" : "Add").font(.caption2)
+                                Text(isFavorite ? "added".localized : "add".localized).font(.caption2)
                             }
                         }
                         .foregroundColor(.primary)
@@ -110,7 +110,7 @@ struct ColorDetailView: View {
 
                         // MARK: - Color Info (container)
                         VStack(alignment: .leading, spacing: 12) {
-                            Picker("Mode", selection: $selectedTab) {
+                            Picker("mode".localized, selection: $selectedTab) {
                                 ForEach(ColorInfoMode.allCases, id: \.self) { tab in
                                     Text(tab.rawValue).tag(tab)
                                 }
@@ -121,22 +121,22 @@ struct ColorDetailView: View {
                             VStack(spacing: 10) {
                                 switch selectedTab {
                                 case .rgb:
-                                    ValueRow(label: "Red",   value: "\(rgb.r)", color: .red,   onCopy: copyFromRow)
-                                    ValueRow(label: "Green", value: "\(rgb.g)", color: .green, onCopy: copyFromRow)
-                                    ValueRow(label: "Blue",  value: "\(rgb.b)", color: .blue,  onCopy: copyFromRow)
+                                    ValueRow(label: "red".localized,   value: "\(rgb.r)", color: .red,   onCopy: copyFromRow)
+                                    ValueRow(label: "green".localized, value: "\(rgb.g)", color: .green, onCopy: copyFromRow)
+                                    ValueRow(label: "blue".localized,  value: "\(rgb.b)", color: .blue,  onCopy: copyFromRow)
                                 case .hex:
-                                    ValueRow(label: "Hex", value: color.hex, color: .gray, onCopy: copyFromRow)
+                                    ValueRow(label: "hex".localized, value: color.hex, color: .gray, onCopy: copyFromRow)
                                 case .hsb:
                                     let (h, s, b) = rgbToHSB(rgb)
-                                    ValueRow(label: "Hue",        value: "\(Int(h))°", color: .orange, onCopy: copyFromRow)
-                                    ValueRow(label: "Saturation", value: "\(Int(s))%", color: .pink,   onCopy: copyFromRow)
-                                    ValueRow(label: "Brightness", value: "\(Int(b))%", color: .yellow, onCopy: copyFromRow)
+                                    ValueRow(label: "hue".localized,        value: "\(Int(h))°", color: .orange, onCopy: copyFromRow)
+                                    ValueRow(label: "saturation".localized, value: "\(Int(s))%", color: .pink,   onCopy: copyFromRow)
+                                    ValueRow(label: "brightness".localized, value: "\(Int(b))%", color: .yellow, onCopy: copyFromRow)
                                 case .cmyk:
                                     let (c, m, y, k) = rgbToCMYK(rgb)
-                                    ValueRow(label: "Cyan",    value: "\(Int(c))%", color: .cyan,   onCopy: copyFromRow)
-                                    ValueRow(label: "Magenta", value: "\(Int(m))%", color: .pink,   onCopy: copyFromRow)
-                                    ValueRow(label: "Yellow",  value: "\(Int(y))%", color: .yellow, onCopy: copyFromRow)
-                                    ValueRow(label: "Black",   value: "\(Int(k))%", color: .black,  onCopy: copyFromRow)
+                                    ValueRow(label: "cyan".localized,    value: "\(Int(c))%", color: .cyan,   onCopy: copyFromRow)
+                                    ValueRow(label: "magenta".localized, value: "\(Int(m))%", color: .pink,   onCopy: copyFromRow)
+                                    ValueRow(label: "yellow".localized,  value: "\(Int(y))%", color: .yellow, onCopy: copyFromRow)
+                                    ValueRow(label: "black".localized,   value: "\(Int(k))%", color: .black,  onCopy: copyFromRow)
                                 }
                             }
                             .padding(12)
@@ -150,11 +150,11 @@ struct ColorDetailView: View {
                         // MARK: - Harmony (container)
                         VStack(alignment: .leading, spacing: 12) {
                             HStack {
-                                Text("Color Harmony").font(.headline)
+                                Text("color_harmony".localized).font(.headline)
                                 Spacer()
                             }
 
-                            Picker("Harmony", selection: $harmonyMode) {
+                            Picker("harmony".localized, selection: $harmonyMode) {
                                 ForEach(HarmonyMode.allCases, id: \.self) { mode in
                                     Text(mode.rawValue).tag(mode)
                                 }
@@ -167,7 +167,7 @@ struct ColorDetailView: View {
                                         selectedHarmonyColor = found
                                         showHarmonySheet = true
                                     } else {
-                                        showToast("Color not found in library")
+                                        showToast("color_not_found".localized)
                                     }
                                 } else {
                                     store.showPaywall = true
@@ -192,7 +192,7 @@ struct ColorDetailView: View {
                         // MARK: - Shades & Tints Section
                         VStack(alignment: .leading, spacing: 12) {
                             HStack {
-                                Text("Shades & Tints").font(.headline)
+                                Text("shades_tints".localized).font(.headline)
                                 Spacer()
                             }
 
@@ -202,7 +202,7 @@ struct ColorDetailView: View {
                                         selectedHarmonyColor = found
                                         showHarmonySheet = true
                                     } else {
-                                        showToast("Color not found in library")
+                                        showToast("color_not_found".localized)
                                     }
                                 } else {
                                     store.showPaywall = true
@@ -226,7 +226,7 @@ struct ColorDetailView: View {
                         // MARK: - Contrast Preview Section
                         VStack(alignment: .leading, spacing: 12) {
                             HStack {
-                                Text("Contrast Preview").font(.headline)
+                                Text("contrast_preview".localized).font(.headline)
                                 Spacer()
                             }
 
@@ -242,19 +242,19 @@ struct ColorDetailView: View {
                         // MARK: - Vendor Info (container)
                         if let v = color.vendor {
                             VStack(alignment: .leading, spacing: 6) {
-                                Text("Vendor").font(.headline)
-                                if let brand = v.brand, !brand.isEmpty { InfoRow(label: "Brand", value: brand) }
-                                if let code = v.code, !code.isEmpty { InfoRow(label: "Code", value: code) }
+                                Text("vendor".localized).font(.headline)
+                                if let brand = v.brand, !brand.isEmpty { InfoRow(label: "brand".localized, value: brand) }
+                                if let code = v.code, !code.isEmpty { InfoRow(label: "code".localized, value: code) }
                                 if let locator = v.locator, !locator.isEmpty, locator.uppercased() != "N/A" {
-                                    InfoRow(label: "Locator", value: locator)
+                                    InfoRow(label: "locator".localized, value: locator)
                                     if let url = URL(string: locator), UIApplication.shared.canOpenURL(url) {
-                                        Button("Open Vendor Page") { UIApplication.shared.open(url) }
+                                        Button("open_vendor_page".localized) { UIApplication.shared.open(url) }
                                             .buttonStyle(.borderedProminent)
                                             .tint(.accentColor)
                                             .padding(.top, 6)
                                     }
                                 }
-                                if let line = v.line, !line.isEmpty { InfoRow(label: "Line", value: line) }
+                                if let line = v.line, !line.isEmpty { InfoRow(label: "line".localized, value: line) }
                             }
                             .padding(12)
                             .background(scheme == .dark ? Color(.secondarySystemBackground) : .white)
@@ -279,7 +279,7 @@ struct ColorDetailView: View {
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: "xmark.circle.fill")
-                            Text("Close")
+                            Text("close".localized)
                         }
                         .font(.headline)
                         .foregroundColor(.secondary)
@@ -325,13 +325,13 @@ struct ColorDetailView: View {
         let text = currentValueString()
         UIPasteboard.general.string = text
         UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-        showToast("Copied to clipboard")
+        showToast("copied_to_clipboard".localized)
     }
 
     private func shareCurrentValue() {
         let isProUser = store.isPro
         UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-        showToast("Preparing share preview...")
+        showToast("share_preparing".localized)
 
         Task {
             // 1️⃣ Generar imagen en main actor
@@ -363,16 +363,16 @@ struct ColorDetailView: View {
                 if let v = color.vendor {
                     message += """
 
-                    🏷️ Vendor: \(v.brand ?? "—")
-                    Code: \(v.code ?? "—")
+                    🏷️ \("vendor".localized): \(v.brand ?? "—")
+                    \("code".localized): \(v.code ?? "—")
                     """
                 }
             } else {
-                message += "\n\n📱 Made with Colorit – www.colorit.app"
+                message += "\n\n📱 \("made_with".localized) – \("www.colorit.app".localized)"
             }
 
             // 3️⃣ Mostrar el share sheet
-            showToast("Opening share sheet...")
+            showToast("opening_share_sheet".localized)
 
             let activityVC = UIActivityViewController(activityItems: [message, fileURL], applicationActivities: nil)
             activityVC.excludedActivityTypes = [.assignToContact, .addToReadingList]
@@ -384,7 +384,7 @@ struct ColorDetailView: View {
                 top.present(activityVC, animated: true)
             } else {
                 print("⚠️ Could not find a valid rootViewController to present share sheet.")
-                showToast("Failed to open share sheet.")
+                showToast("failed_to_open_share_sheet".localized)
             }
         }
     }
@@ -418,7 +418,7 @@ private struct ProBlurOverlay: View {
                 .zIndex(2)
 
             // 🔒 Botón Unlock encima (mismo estilo que en el picker)
-            MagicalUnlockButton(title: "Unlock Pro")
+            MagicalUnlockButton(title: "unlock_pro".localized)
                 .onTapGesture { store.showPaywall = true }
                 .zIndex(3)
         }
@@ -460,7 +460,7 @@ private struct ProBlurOverlay: View {
 // ======================================================
 
 private struct MagicalUnlockButton: View {
-    var title: String = "Unlock Pro"
+    var title: String = "unlock_pro".localized
 
     var body: some View {
         VStack(spacing: 10) {
@@ -504,11 +504,11 @@ private struct MagicalUnlockButton: View {
         if favs.colors.contains(where: { normalizeHex($0.color.hex) == key }) {
             favs.colors.removeAll { normalizeHex($0.color.hex) == key }
             isFavorite = false
-            showToast("Removed from Collections")
+            showToast("removed_from_collections".localized)
         } else {
             favs.add(color: rgbValue) // agrega a favoritos individuales
             isFavorite = true
-            showToast("Added to Collections")
+            showToast("added_to_collections".localized)
         }
 
         UIImpactFeedbackGenerator(style: .soft).impactOccurred()
@@ -519,7 +519,7 @@ private struct MagicalUnlockButton: View {
     private func copyFromRow(_ text: String) {
         UIPasteboard.general.string = text
         UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-        showToast("Copied \(text)")
+        showToast("\("toast_copied".localized) \(text)")
     }
 
     // MARK: - Shades and Tints Helper
@@ -557,7 +557,7 @@ private func generateShareImage() -> UIImage {
         // MARK: - Color Harmony
         if store.isPro {
             VStack(alignment: .leading, spacing: 12) {
-                Text("Color Harmony").font(.headline)
+                Text("color_harmony".localized).font(.headline)
                 HarmonyStrip(base: rgb, mode: harmonyMode, isPro: store.isPro) { _ in }
             }
             .padding(16)
@@ -586,10 +586,10 @@ private func generateShareImage() -> UIImage {
                     .opacity(0.99)
 
                 VStack(spacing: 14) {
-                    Text("Unlock Pro to view Harmony")
+                    Text("unlock_pro_to_view_harmony".localized)
                         .font(.headline)
                         .foregroundColor(.secondary)
-                    MagicalUnlockButton(title: "Unlock Pro")
+                    MagicalUnlockButton(title: "unlock_pro".localized)
                         .padding(.top, 4)
                 }
                 .padding(30)
@@ -600,7 +600,7 @@ private func generateShareImage() -> UIImage {
         // MARK: - Shades & Tints
         if store.isPro {
             VStack(alignment: .leading, spacing: 12) {
-                Text("Shades & Tints").font(.headline)
+                Text("shades_tints".localized).font(.headline)
                 ShadesAndTintsView(base: rgb, isPro: store.isPro) { _ in }
             }
             .padding(16)
@@ -629,10 +629,10 @@ private func generateShareImage() -> UIImage {
                     .opacity(0.99)
 
                 VStack(spacing: 14) {
-                    Text("Unlock Pro to view Shades & Tints")
+                    Text("unlock_pro_to_view_shades_tints".localized)
                         .font(.headline)
                         .foregroundColor(.secondary)
-                    MagicalUnlockButton(title: "Unlock Pro")
+                    MagicalUnlockButton(title: "unlock_pro".localized)
                         .padding(.top, 4)
                 }
                 .padding(30)
@@ -642,7 +642,7 @@ private func generateShareImage() -> UIImage {
 
         // MARK: - Contrast Preview
         VStack(alignment: .leading, spacing: 12) {
-            Text("Contrast Preview").font(.headline)
+            Text("contrast_preview".localized).font(.headline)
             ContrastPreviewView(color: rgb)
         }
         .padding(16)
@@ -651,7 +651,7 @@ private func generateShareImage() -> UIImage {
         .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
 
         // MARK: - Footer
-        Text("Made with Colorit.app")
+        Text("made_with".localized)
             .font(.caption)
             .foregroundColor(.secondary)
             .padding(.top, 8)
@@ -823,8 +823,8 @@ private struct ContrastPreviewView: View {
         let contrastToWhite = contrastRatio(fg: .white, bg: color.uiColor)
 
         HStack(spacing: 12) {
-            contrastCard(text: "Text sample", textColor: .black, contrast: contrastToBlack)
-            contrastCard(text: "Text sample", textColor: .white, contrast: contrastToWhite)
+            contrastCard(text: "text_sample".localized, textColor: .black, contrast: contrastToBlack)
+            contrastCard(text: "text_sample".localized, textColor: .white, contrast: contrastToWhite)
         }
     }
 
@@ -848,9 +848,9 @@ private struct ContrastPreviewView: View {
     }
 
     private func contrastDescription(for ratio: Double) -> String {
-        if ratio >= 7 { return "Excellent (AAA)" }
-        else if ratio >= 4.5 { return "Good (AA)" }
-        else { return "Low Contrast" }
+        if ratio >= 7 { return "excellent_AAA".localized}
+        else if ratio >= 4.5 { return "good_AA".localized }
+        else { return "low_contrast".localized }
     }
 }
 

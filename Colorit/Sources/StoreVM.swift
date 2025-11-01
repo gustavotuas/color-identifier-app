@@ -127,11 +127,4 @@ final class StoreVM: ObservableObject {
     func hasLaunchDiscount(_ p: Product) -> Bool {
         isLaunchPromo && (p.id == yearly)
     }
-
-    func regularPriceText(_ p: Product) -> String {
-        if p.id == yearly {
-            return "Regular $119.99/year"
-        }
-        return ""
-    }
 }

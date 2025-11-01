@@ -129,7 +129,7 @@ struct SearchScreen: View {
                 .imageScale(.large)
                 .foregroundColor(iconColor) // 👈 color adaptativo
         }
-        .accessibilityLabel("Select Paint")
+        .accessibilityLabel("select_paint".localized)
 
         Spacer()
 
@@ -147,7 +147,7 @@ struct SearchScreen: View {
                 .imageScale(.large)
                 .foregroundColor(iconColor)
         }
-        .accessibilityLabel("Sort alphabetically")
+        .accessibilityLabel("sort_alphabetically".localized)
 
         // 🔹 3. Orden por brillo (Luminance)
         Button {
@@ -159,7 +159,7 @@ struct SearchScreen: View {
                 .imageScale(.large)
                 .foregroundColor(iconColor)
         }
-        .accessibilityLabel("Sort by brightness")
+        .accessibilityLabel("sort_by_brightness".localized)
 
         // 🔹 4. Layout (lista / grid / rueda)
         Button {
@@ -170,7 +170,7 @@ struct SearchScreen: View {
                 .imageScale(.large)
                 .foregroundColor(iconColor)
         }
-        .accessibilityLabel("Toggle layout")
+        .accessibilityLabel("toggle_layout".localized)
     }
     .padding(.horizontal, 8)
     .padding(.vertical, 8)
@@ -201,14 +201,14 @@ private var iconColor: Color {
 
             mainContent
         }
-        .navigationTitle("Colors")
+        .navigationTitle("colors".localized)
         .toolbar { toolbarContent }
         .sheet(isPresented: $showVendorSheet) { vendorSheet }
         .searchable(
             text: $query,
                 isPresented: $isSearching, // 👈 Detecta cuándo el search está activo
             placement: .navigationBarDrawer(displayMode: .always),
-            prompt: "Search by name, hex, brand or code"
+            prompt: "search_by".localized
         )
         .onChange(of: query) { text in
             performAsyncFilter(text)
@@ -761,13 +761,13 @@ struct ColorRow: View {
         if isFavoriteNormalized {
             favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
             // ✅ Toast remove
-            toast = "Removed from Collections"
+            toast = "removed_from_collections".localized
         } else {
             let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
             if !exists {
                 favs.add(color: rgb)
                 // ✅ Toast add
-                toast = "Added to Collections"
+                toast = "added_to_collections".localized
             }
         }
     }
@@ -887,13 +887,13 @@ struct ColorTile: View {
         if isFavoriteNormalized {
             favs.colors.removeAll { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
             // ✅ Toast remove
-            toast = "Removed from Collections"
+            toast = "removed_from_collections".localized
         } else {
             let exists = favs.colors.contains { normalizeHex($0.color.hex) == normalizeHex(rgb.hex) }
             if !exists {
                 favs.add(color: rgb)
                 // ✅ Toast add
-                toast = "Added to Collections"
+                toast = "added_to_collections".localized
             }
         }
     }

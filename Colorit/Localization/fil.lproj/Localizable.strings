@@ -1,34 +1,200 @@
-"unlock_title" = "Unlock Colorit Pro";
-"unlock_subtitle" = "Experience AI color intelligence & design freedom.";
-"plan_weekly" = "Weekly – $5.99/week";
-"plan_monthly" = "Monthly – $14.99/month";
-"plan_yearly" = "Yearly – $59.99/year";
-"trial_badge" = "Start free for 3 days";
-"discount_badge_today" = "50% OFF today only";
-"discount_badge_limited" = "Save 50% – Limited Time";
-"regular_price_monthly" = "Regular $29.99/month";
-"regular_price_yearly" = "Regular $119.99/year";
-"cta_start_trial_save" = "Start My Free Trial & Save 50%";
-"footer_note" = "Limited-time launch offer. Cancel anytime in Settings. Offer may end soon.";
-"cancel_anytime" = "Cancel anytime";
-"best_value" = "Best Value";
-"selected" = "Selected";
-"offer_ends_in" = "Offer ends in";
-"get_started" = "Get Started";
-"camera" = "Camera";
-"photos" = "Photos";
-"browse" = "Browse";
-"discover" = "Discover";
-"home" = "Home";
-"profile" = "Profile";
-"quick_actions" = "Quick Actions";
-"open_camera" = "Open Camera";
-"from_photos" = "From Photos";
-"unlock_pro" = "Unlock Pro";
-"pick_photo" = "Pick a photo";
-"choose_photo" = "Choose Photo";
-"extract_palette" = "Extract Palette";
-"pro_tips" = "Pro Tips";
-"tip_natural_light" = "Capture under natural light";
-"tip_avoid_glare" = "Avoid reflections and glare";
-"tip_contrast" = "Try contrasty backgrounds";
+/* ======================================================
+   MAIN APP STRUCTURE
+   ====================================================== */
+"tab_collections" = "Mga Koleksyon";
+"tab_search" = "Maghanap";
+"tab_camera" = "Kamera";
+"tab_photos" = "Mga Larawan";
+"tab_settings" = "Mga Setting";
+"pro_badge" = "PRO";
+"unlock_pro" = "I-unlock ang Pro";
+"unlock_pro_subtitle" = "I-access ang lahat ng premium na features";
+"unlock_picker" = "I-unlock ang Picker";
+
+/* ======================================================
+   SEARCH / COLOR DETAIL
+   ====================================================== */
+"color_harmony" = "Pagkakatugma ng Kulay";
+"mode" = "Mode";
+"harmony" = "Harmony";
+"copy" = "Kopyahin";
+"share" = "Ibahagi";
+"add" = "Idagdag";
+"added" = "Nadagdag";
+"close" = "Isara";
+"copied_to_clipboard" = "Nakopya sa clipboard";
+"share_preparing" = "Inihahanda ang preview para sa pagbabahagi...";
+"red" = "Pula";
+"green" = "Berde";
+"blue" = "Asul";
+"hex" = "Hex";
+"hue" = "Hue";
+"saturation" = "Saturation";
+"brightness" = "Liwanag";
+"cyan" = "Cyan";
+"magenta" = "Magenta";
+"yellow" = "Dilaw";
+"black" = "Itim";
+"show_more" = "Ipakita pa";
+"bucket" = "Balde";
+"color_not_found" = "Walang natagpuang kulay sa library";
+"shades_tints" = "Mga Lilim at Tono";
+"contrast_preview" = "Preview ng Kontrasta";
+"vendor" = "Tagapagtustos";
+"brand" = "Brand";
+"code" = "Code";
+"locator" = "Locator";
+"open_vendor_page" = "Buksan ang Pahina ng Vendor";
+"line" = "Linya";
+"made_with" = "Ginawa gamit ang Colorit";
+"url" = "www.colorit.app";
+"opening_share_sheet" = "Binubuksan ang share sheet...";
+"failed_to_open_share_sheet" = "Nabigong buksan ang share sheet.";
+"unlock_pro_to_view_harmony" = "I-unlock ang Pro upang makita ang Harmony";
+"unlock_pro_to_view_shades_tints" = "I-unlock ang Pro upang makita ang mga Lilim at Tono";
+"text_sample" = "Halimbawa ng Teksto";
+"excellent_AAA" = "Mahusay (AAA)";
+"good_AA" = "Maganda (AA)";
+"low_contrast" = "Mababang Kontrasta";
+"select_paint" = "Pumili ng Pintura";
+"sort_alphabetically" = "Ayusin ayon sa alpabeto";
+"sort_by_brightness" = "Ayusin ayon sa liwanag";
+"toggle_layout" = "Palitan ang layout";
+"search_by" = "Maghanap ayon sa pangalan, hex, brand o code";
+"paints" = "Mga Pintura";
+"general_palette" = "Pangkalahatang Palette";
+
+/* ======================================================
+   CAMERA SCREEN
+   ====================================================== */
+"no_match_found" = "Walang natagpuang tugma";
+"added_to_collections" = "Nadagdag sa mga Koleksyon";
+"removed_from_collections" = "Tinanggal mula sa mga Koleksyon";
+"sort_by_alphabetic" = "Ayusin ayon sa alpabeto";
+"free_preview" = "Libreng Preview – I-unlock ang PRO para sa buong access";
+"unlock_live_camera" = "I-unlock ang Buong Live Camera";
+"generate_palette" = "Gumawa ng Palette";
+"precision" = "Katumpakan";
+"save" = "I-save";
+"save_color_to_collections" = "I-save ang kulay sa mga koleksyon";
+"color_matches" = "Mga Tugmang Kulay";
+
+/* ======================================================
+   LIVE / PHOTO PALETTE DETAILS
+   ====================================================== */
+"add_palette_to_collections" = "Idagdag ang Palette sa Mga Koleksyon";
+"palette_saved" = "Na-save ang Palette";
+"palette_added" = "Idinagdag ang Palette sa Mga Koleksyon";
+"live_palette" = "Live Palette";
+"photo_palette" = "Photo Palette";
+"unlock_full_palette_color_matches" = "I-unlock ang Buong Palette at Mga Tugma ng Kulay";
+
+/* ======================================================
+   FAVORITES / COLLECTIONS
+   ====================================================== */
+"colors" = "Mga Kulay";
+"color" = "Kulay";
+"palettes" = "Mga Palette";
+"palette" = "Palette";
+"all" = "Lahat";
+"no_collections_yet" = "Wala pang mga koleksyon";
+"no_collections_subtitle" = "I-save ang mga kulay at palette para makita muli dito.";
+"clear_all_collections" = "I-clear ang lahat ng Koleksyon?";
+"yes" = "Oo";
+"no" = "Hindi";
+"create_palette" = "Gumawa ng Palette";
+"palette_name_optional" = "Pangalan ng Palette (opsyonal)";
+"palette_name" = "Pangalan ng Palette";
+"add_color" = "Idagdag ang Kulay";
+"edit" = "I-edit";
+"cancel" = "Kanselahin";
+"done" = "Tapos";
+"delete_palette" = "Burahin ang Palette na ito?";
+"collections" = "Mga Koleksyon";
+"new_palette" = "Bagong Palette";
+"untitled_palette" = "Walang Pangalan na Palette";
+"delete" = "Burahin";
+"all_colors_already_added" = "Lahat ng kulay ay naidagdag na.";
+"select_colors_to_add" = "Pumili ng mga kulay na idaragdag";
+
+/* ======================================================
+   PHOTOS SCREEN
+   ====================================================== */
+"detected_palette" = "Natukoy na Palette";
+"choose_photo" = "Pumili ng Larawan";
+"pick_photo" = "Pumili ng Photo";
+"pick_color" = "Pumili ng Kulay";
+"change_photo" = "Palitan ang Larawan";
+"choose_an_image_to_find_matching_colors" = "Pumili ng larawan upang makahanap ng mga tugmang kulay";
+"unlock_full_palette" = "I-unlock ang Buong Palette";
+"unnamed_color" = "Walang Pangalan na Kulay";
+"color_added_to_collections" = "Naidagdag ang Kulay sa Mga Koleksyon";
+
+/* ======================================================
+   SETTINGS SCREEN
+   ====================================================== */
+"appearance" = "Hitsura";
+"theme" = "Tema";
+"language" = "Wika";
+"about" = "Tungkol sa App";
+"version" = "Bersyon:";
+"rate_app" = "I-rate ang App";
+"help" = "Tulong";
+"send_feedback" = "Magpadala ng Feedback";
+"app_name" = "Colorit";
+"hrs" = "oras";
+"min" = "min";
+"sec" = "seg";
+"system" = "Sistema";
+"light" = "Maliwanag";
+"dark" = "Madilim";
+"general" = "Pangkalahatan";
+
+/* ======================================================
+   PAYWALL / PRO FEATURES
+   ====================================================== */
+"flash_sale" = "Flash Sale hanggang -80% off matatapos sa";
+"best_value" = "Pinakamahusay na Halaga";
+"terms_of_use" = "Mga Tuntunin ng Paggamit";
+"privacy_policy" = "Patakaran sa Privacy";
+"try_free" = "Subukan ng Libre";
+"continue" = "Magpatuloy";
+"unlock_pro_features" = "I-unlock ang Mga Pro Features";
+"included_in_pro" = "Kasama sa Pro";
+"feature_live_color_id_subtitle" = "Kilalanin agad ang mga kulay gamit ang iyong camera sa real-time.";
+"feature_photo_color_picker_subtitle" = "Kumuha ng mga propesyonal na palette mula sa anumang larawan gamit ang AI precision.";
+"feature_paint_catalogues_subtitle" = "Tuklasin ang mga curated palette mula sa iba't ibang koleksyon ng pintura.";
+"feature_unlimited_collections_subtitle" = "Gumawa at mag-ayos ng walang limitasyong mga palette para sa trabaho o inspirasyon.";
+"feature_advanced_search_subtitle" = "Maghanap ng mga kulay gamit ang HEX, RGB, o pangalan agad at madali.";
+"feature_harmony_colors_subtitle" = "Gumawa ng harmonikong mga scheme at tuklasin ang magkatugmang mga tono.";
+"feature_multiple_layouts_subtitle" = "Lumipat sa pagitan ng grid at list view upang biswal na tuklasin ang mga palette.";
+"feature_smart_filters_subtitle" = "I-filter ayon sa hue, liwanag, o harmony nang may katumpakan.";
+"feature_color_matches_subtitle" = "Ihambing at ipakita ang mga tugma sa pagitan ng live at nakuhang mga sample.";
+"feature_unlimited_access_subtitle" = "Walang limitasyon — tangkilikin ang bawat tool, palette, at feature magpakailanman.";
+"your_purchases_have_been_restored" = "Naibalik na ang iyong mga pagbili";
+"no_previous_purchases_found" = "Walang nakitang dating pagbili.";
+"restore_purchases" = "Ibalik ang Mga Pagbili";
+"cancel_anytime" = "Kanselahin anumang oras";
+"family_sharing_enabled" = "Pinagana ang Family Sharing";
+"3_day_free_trial" = "3 Araw na Libreng Pagsubok";
+"1_year_plan" = "Taunang Plano";
+"1_week_plan" = "Lingguhang Plano";
+"feature_live_color_id_title" = "Live Color ID";
+"feature_photo_color_picker_title" = "Photo Color Picker";
+"feature_paint_catalogues_title" = "Propesyonal na Paint Catalogues";
+"feature_unlimited_collections_title" = "Walang Limitasyong Koleksyon at Palette";
+"feature_advanced_search_title" = "Advanced Search";
+"feature_harmony_colors_title" = "Harmony at Mga Katugmang Kulay";
+"feature_multiple_layouts_title" = "Maramihang Layout Views";
+"feature_smart_filters_title" = "Smart Filters at Pag-uuri";
+"feature_color_matches_title" = "Color Matches para sa Photo at Live ID";
+"feature_unlimited_access_title" = "Walang Hanggang Access";
+
+/* ======================================================
+   TOASTS / GENERIC MESSAGES
+   ====================================================== */
+"toast_copied" = "Nakopya";
+"toast_added" = "Nadagdag";
+"toast_removed" = "Natanggal";
+"toast_share" = "Ibahagi";
+"toast_info" = "Impormasyon";

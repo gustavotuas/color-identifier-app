@@ -1,34 +1,200 @@
-"unlock_title" = "Unlock Colorit Pro";
-"unlock_subtitle" = "Experience AI color intelligence & design freedom.";
-"plan_weekly" = "Weekly – $5.99/week";
-"plan_monthly" = "Monthly – $14.99/month";
-"plan_yearly" = "Yearly – $59.99/year";
-"trial_badge" = "Start free for 3 days";
-"discount_badge_today" = "50% OFF today only";
-"discount_badge_limited" = "Save 50% – Limited Time";
-"regular_price_monthly" = "Regular $29.99/month";
-"regular_price_yearly" = "Regular $119.99/year";
-"cta_start_trial_save" = "Start My Free Trial & Save 50%";
-"footer_note" = "Limited-time launch offer. Cancel anytime in Settings. Offer may end soon.";
-"cancel_anytime" = "Cancel anytime";
-"best_value" = "Best Value";
-"selected" = "Selected";
-"offer_ends_in" = "Offer ends in";
-"get_started" = "Get Started";
-"camera" = "Camera";
-"photos" = "Photos";
-"browse" = "Browse";
-"discover" = "Discover";
-"home" = "Home";
-"profile" = "Profile";
-"quick_actions" = "Quick Actions";
-"open_camera" = "Open Camera";
-"from_photos" = "From Photos";
-"unlock_pro" = "Unlock Pro";
-"pick_photo" = "Pick a photo";
-"choose_photo" = "Choose Photo";
-"extract_palette" = "Extract Palette";
-"pro_tips" = "Pro Tips";
-"tip_natural_light" = "Capture under natural light";
-"tip_avoid_glare" = "Avoid reflections and glare";
-"tip_contrast" = "Try contrasty backgrounds";
+/* ======================================================
+   MAIN APP STRUCTURE
+   ====================================================== */
+"tab_collections" = "Colecții";
+"tab_search" = "Căutare";
+"tab_camera" = "Cameră";
+"tab_photos" = "Fotografii";
+"tab_settings" = "Setări";
+"pro_badge" = "PRO";
+"unlock_pro" = "Deblochează Pro";
+"unlock_pro_subtitle" = "Accesează toate funcțiile premium";
+"unlock_picker" = "Deblochează Selectorul";
+
+/* ======================================================
+   SEARCH / COLOR DETAIL
+   ====================================================== */
+"color_harmony" = "Armonie de culori";
+"mode" = "Mod";
+"harmony" = "Armonie";
+"copy" = "Copiază";
+"share" = "Distribuie";
+"add" = "Adaugă";
+"added" = "Adăugat";
+"close" = "Închide";
+"copied_to_clipboard" = "Copiat în clipboard";
+"share_preparing" = "Se pregătește previzualizarea pentru partajare...";
+"red" = "Roșu";
+"green" = "Verde";
+"blue" = "Albastru";
+"hex" = "Hex";
+"hue" = "Nuanță";
+"saturation" = "Saturație";
+"brightness" = "Luminozitate";
+"cyan" = "Cian";
+"magenta" = "Magenta";
+"yellow" = "Galben";
+"black" = "Negru";
+"show_more" = "Afișează mai mult";
+"bucket" = "Găleată";
+"color_not_found" = "Culoarea nu a fost găsită în bibliotecă";
+"shades_tints" = "Tonuri și Nuanțe";
+"contrast_preview" = "Previzualizare contrast";
+"vendor" = "Furnizor";
+"brand" = "Marcă";
+"code" = "Cod";
+"locator" = "Localizator";
+"open_vendor_page" = "Deschide pagina furnizorului";
+"line" = "Linie";
+"made_with" = "Creat cu Colorit";
+"url" = "www.colorit.app";
+"opening_share_sheet" = "Se deschide fereastra de partajare...";
+"failed_to_open_share_sheet" = "Nu s-a putut deschide fereastra de partajare.";
+"unlock_pro_to_view_harmony" = "Deblochează Pro pentru a vedea Armonia";
+"unlock_pro_to_view_shades_tints" = "Deblochează Pro pentru a vedea Tonurile și Nuanțele";
+"text_sample" = "Exemplu de text";
+"excellent_AAA" = "Excelent (AAA)";
+"good_AA" = "Bun (AA)";
+"low_contrast" = "Contrast scăzut";
+"select_paint" = "Selectează vopseaua";
+"sort_alphabetically" = "Sortează alfabetic";
+"sort_by_brightness" = "Sortează după luminozitate";
+"toggle_layout" = "Schimbă aspectul";
+"search_by" = "Caută după nume, hex, marcă sau cod";
+"paints" = "Vopsele";
+"general_palette" = "Paletă generală";
+
+/* ======================================================
+   CAMERA SCREEN
+   ====================================================== */
+"no_match_found" = "Nicio potrivire găsită";
+"added_to_collections" = "Adăugat în colecții";
+"removed_from_collections" = "Eliminat din colecții";
+"sort_by_alphabetic" = "Sortează alfabetic";
+"free_preview" = "Previzualizare gratuită – deblochează PRO pentru acces complet";
+"unlock_live_camera" = "Deblochează Camera Live completă";
+"generate_palette" = "Generează paletă";
+"precision" = "Precizie";
+"save" = "Salvează";
+"save_color_to_collections" = "Salvează culoarea în colecții";
+"color_matches" = "Potriviri de culori";
+
+/* ======================================================
+   LIVE / PHOTO PALETTE DETAILS
+   ====================================================== */
+"add_palette_to_collections" = "Adaugă paleta în colecții";
+"palette_saved" = "Paletă salvată";
+"palette_added" = "Paletă adăugată în colecții";
+"live_palette" = "Paletă Live";
+"photo_palette" = "Paletă din fotografie";
+"unlock_full_palette_color_matches" = "Deblochează paleta completă și potrivirile de culori";
+
+/* ======================================================
+   FAVORITES / COLLECTIONS
+   ====================================================== */
+"colors" = "Culori";
+"color" = "Culoare";
+"palettes" = "Palete";
+"palette" = "Paletă";
+"all" = "Toate";
+"no_collections_yet" = "Nicio colecție încă";
+"no_collections_subtitle" = "Salvează culori și palete pentru a le vizualiza aici mai târziu.";
+"clear_all_collections" = "Ștergi toate colecțiile?";
+"yes" = "Da";
+"no" = "Nu";
+"create_palette" = "Creează paletă";
+"palette_name_optional" = "Nume paletă (opțional)";
+"palette_name" = "Nume paletă";
+"add_color" = "Adaugă culoare";
+"edit" = "Editează";
+"cancel" = "Anulează";
+"done" = "Gata";
+"delete_palette" = "Ștergi această paletă?";
+"collections" = "Colecții";
+"new_palette" = "Paletă nouă";
+"untitled_palette" = "Paletă fără titlu";
+"delete" = "Șterge";
+"all_colors_already_added" = "Toate culorile au fost deja adăugate.";
+"select_colors_to_add" = "Selectează culorile de adăugat";
+
+/* ======================================================
+   PHOTOS SCREEN
+   ====================================================== */
+"detected_palette" = "Paletă detectată";
+"choose_photo" = "Alege fotografie";
+"pick_photo" = "Selectează fotografie";
+"pick_color" = "Alege culoare";
+"change_photo" = "Schimbă fotografia";
+"choose_an_image_to_find_matching_colors" = "Alege o imagine pentru a găsi culorile potrivite";
+"unlock_full_palette" = "Deblochează paleta completă";
+"unnamed_color" = "Culoare fără nume";
+"color_added_to_collections" = "Culoare adăugată în colecții";
+
+/* ======================================================
+   SETTINGS SCREEN
+   ====================================================== */
+"appearance" = "Aspect";
+"theme" = "Temă";
+"language" = "Limbă";
+"about" = "Despre";
+"version" = "Versiune:";
+"rate_app" = "Evaluează aplicația";
+"help" = "Ajutor";
+"send_feedback" = "Trimite feedback";
+"app_name" = "Colorit";
+"hrs" = "h";
+"min" = "min";
+"sec" = "s";
+"system" = "Sistem";
+"light" = "Luminos";
+"dark" = "Întunecat";
+"general" = "General";
+
+/* ======================================================
+   PAYWALL / PRO FEATURES
+   ====================================================== */
+"flash_sale" = "Reducere fulger de până la -80% se încheie în";
+"best_value" = "Cea mai bună ofertă";
+"terms_of_use" = "Termeni de utilizare";
+"privacy_policy" = "Politica de confidențialitate";
+"try_free" = "Încearcă gratuit";
+"continue" = "Continuă";
+"unlock_pro_features" = "Deblochează funcțiile Pro";
+"included_in_pro" = "Inclus în Pro";
+"feature_live_color_id_subtitle" = "Identifică instantaneu culorile prin cameră, în timp real.";
+"feature_photo_color_picker_subtitle" = "Extrage palete profesionale din orice fotografie cu precizie AI.";
+"feature_paint_catalogues_subtitle" = "Explorează palete selectate din colecții de vopsele profesionale.";
+"feature_unlimited_collections_subtitle" = "Creează și organizează palete nelimitate pentru muncă sau inspirație.";
+"feature_advanced_search_subtitle" = "Găsește culori după HEX, RGB sau nume rapid și intuitiv.";
+"feature_harmony_colors_subtitle" = "Generează scheme armonioase și descoperă tonuri potrivite.";
+"feature_multiple_layouts_subtitle" = "Comută între vizualizări de tip grilă și listă pentru explorare vizuală.";
+"feature_smart_filters_subtitle" = "Filtrează după nuanță, luminozitate sau armonie cu precizie.";
+"feature_color_matches_subtitle" = "Compară și vizualizează potriviri între mostre live și fotografii.";
+"feature_unlimited_access_subtitle" = "Fără restricții — bucură-te de toate instrumentele, paletele și funcțiile pentru totdeauna.";
+"your_purchases_have_been_restored" = "Achizițiile tale au fost restaurate";
+"no_previous_purchases_found" = "Nu s-au găsit achiziții anterioare.";
+"restore_purchases" = "Restaurează achizițiile";
+"cancel_anytime" = "Anulează oricând";
+"family_sharing_enabled" = "Partajarea familială activată";
+"3_day_free_trial" = "Perioadă de probă gratuită de 3 zile";
+"1_year_plan" = "Plan anual";
+"1_week_plan" = "Plan săptămânal";
+"feature_live_color_id_title" = "Identificare Culoare Live";
+"feature_photo_color_picker_title" = "Selector de Culoare din Fotografii";
+"feature_paint_catalogues_title" = "Cataloage Profesionale de Vopsele";
+"feature_unlimited_collections_title" = "Colecții și Palete Nelimitate";
+"feature_advanced_search_title" = "Căutare Avansată";
+"feature_harmony_colors_title" = "Armonie și Culori Asemănătoare";
+"feature_multiple_layouts_title" = "Mai Multe Tipuri de Vizualizare";
+"feature_smart_filters_title" = "Filtre și Sortare Inteligentă";
+"feature_color_matches_title" = "Potriviri de Culoare pentru Foto și Live";
+"feature_unlimited_access_title" = "Acces Nelimitat";
+
+/* ======================================================
+   TOASTS / GENERIC MESSAGES
+   ====================================================== */
+"toast_copied" = "Copiat";
+"toast_added" = "Adăugat";
+"toast_removed" = "Eliminat";
+"toast_share" = "Distribuie";
+"toast_info" = "Informație";

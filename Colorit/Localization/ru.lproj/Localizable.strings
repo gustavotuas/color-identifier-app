@@ -1,34 +1,200 @@
-"unlock_title" = "Unlock Colorit Pro";
-"unlock_subtitle" = "Experience AI color intelligence & design freedom.";
-"plan_weekly" = "Weekly – $5.99/week";
-"plan_monthly" = "Monthly – $14.99/month";
-"plan_yearly" = "Yearly – $59.99/year";
-"trial_badge" = "Start free for 3 days";
-"discount_badge_today" = "50% OFF today only";
-"discount_badge_limited" = "Save 50% – Limited Time";
-"regular_price_monthly" = "Regular $29.99/month";
-"regular_price_yearly" = "Regular $119.99/year";
-"cta_start_trial_save" = "Start My Free Trial & Save 50%";
-"footer_note" = "Limited-time launch offer. Cancel anytime in Settings. Offer may end soon.";
-"cancel_anytime" = "Cancel anytime";
-"best_value" = "Best Value";
-"selected" = "Selected";
-"offer_ends_in" = "Offer ends in";
-"get_started" = "Get Started";
-"camera" = "Camera";
-"photos" = "Photos";
-"browse" = "Browse";
-"discover" = "Discover";
-"home" = "Home";
-"profile" = "Profile";
-"quick_actions" = "Quick Actions";
-"open_camera" = "Open Camera";
-"from_photos" = "From Photos";
-"unlock_pro" = "Unlock Pro";
-"pick_photo" = "Pick a photo";
-"choose_photo" = "Choose Photo";
-"extract_palette" = "Extract Palette";
-"pro_tips" = "Pro Tips";
-"tip_natural_light" = "Capture under natural light";
-"tip_avoid_glare" = "Avoid reflections and glare";
-"tip_contrast" = "Try contrasty backgrounds";
+/* ======================================================
+   MAIN APP STRUCTURE
+   ====================================================== */
+"tab_collections" = "Коллекции";
+"tab_search" = "Поиск";
+"tab_camera" = "Камера";
+"tab_photos" = "Фото";
+"tab_settings" = "Настройки";
+"pro_badge" = "PRO";
+"unlock_pro" = "Разблокировать Pro";
+"unlock_pro_subtitle" = "Получите доступ ко всем премиум-функциям";
+"unlock_picker" = "Разблокировать выбор";
+
+/* ======================================================
+   SEARCH / COLOR DETAIL
+   ====================================================== */
+"color_harmony" = "Цветовая гармония";
+"mode" = "Режим";
+"harmony" = "Гармония";
+"copy" = "Копировать";
+"share" = "Поделиться";
+"add" = "Добавить";
+"added" = "Добавлено";
+"close" = "Закрыть";
+"copied_to_clipboard" = "Скопировано в буфер обмена";
+"share_preparing" = "Подготовка предпросмотра для общего доступа...";
+"red" = "Красный";
+"green" = "Зелёный";
+"blue" = "Синий";
+"hex" = "Hex";
+"hue" = "Оттенок";
+"saturation" = "Насыщенность";
+"brightness" = "Яркость";
+"cyan" = "Голубой";
+"magenta" = "Пурпурный";
+"yellow" = "Жёлтый";
+"black" = "Чёрный";
+"show_more" = "Показать больше";
+"bucket" = "Палитра";
+"color_not_found" = "Цвет не найден в библиотеке";
+"shades_tints" = "Тени и оттенки";
+"contrast_preview" = "Предпросмотр контраста";
+"vendor" = "Производитель";
+"brand" = "Бренд";
+"code" = "Код";
+"locator" = "Локатор";
+"open_vendor_page" = "Открыть страницу производителя";
+"line" = "Линия";
+"made_with" = "Создано с помощью Colorit";
+"url" = "www.colorit.app";
+"opening_share_sheet" = "Открытие панели общего доступа...";
+"failed_to_open_share_sheet" = "Не удалось открыть панель общего доступа.";
+"unlock_pro_to_view_harmony" = "Разблокируйте Pro, чтобы увидеть гармонию";
+"unlock_pro_to_view_shades_tints" = "Разблокируйте Pro, чтобы увидеть оттенки и тени";
+"text_sample" = "Пример текста";
+"excellent_AAA" = "Отлично (AAA)";
+"good_AA" = "Хорошо (AA)";
+"low_contrast" = "Низкий контраст";
+"select_paint" = "Выбрать краску";
+"sort_alphabetically" = "Сортировать по алфавиту";
+"sort_by_brightness" = "Сортировать по яркости";
+"toggle_layout" = "Изменить макет";
+"search_by" = "Поиск по имени, hex, бренду или коду";
+"paints" = "Краски";
+"general_palette" = "Общая палитра";
+
+/* ======================================================
+   CAMERA SCREEN
+   ====================================================== */
+"no_match_found" = "Совпадений не найдено";
+"added_to_collections" = "Добавлено в коллекции";
+"removed_from_collections" = "Удалено из коллекций";
+"sort_by_alphabetic" = "Сортировать по алфавиту";
+"free_preview" = "Бесплатный предпросмотр – откройте PRO для полного доступа";
+"unlock_live_camera" = "Разблокировать полную Live-камеру";
+"generate_palette" = "Создать палитру";
+"precision" = "Точность";
+"save" = "Сохранить";
+"save_color_to_collections" = "Сохранить цвет в коллекции";
+"color_matches" = "Совпадения цветов";
+
+/* ======================================================
+   LIVE / PHOTO PALETTE DETAILS
+   ====================================================== */
+"add_palette_to_collections" = "Добавить палитру в коллекции";
+"palette_saved" = "Палитра сохранена";
+"palette_added" = "Палитра добавлена в коллекции";
+"live_palette" = "Живая палитра";
+"photo_palette" = "Палитра фото";
+"unlock_full_palette_color_matches" = "Разблокировать полную палитру и совпадения цветов";
+
+/* ======================================================
+   FAVORITES / COLLECTIONS
+   ====================================================== */
+"colors" = "Цвета";
+"color" = "Цвет";
+"palettes" = "Палитры";
+"palette" = "Палитра";
+"all" = "Все";
+"no_collections_yet" = "Коллекции пока нет";
+"no_collections_subtitle" = "Сохраняйте цвета и палитры, чтобы просмотреть их здесь позже.";
+"clear_all_collections" = "Удалить все коллекции?";
+"yes" = "Да";
+"no" = "Нет";
+"create_palette" = "Создать палитру";
+"palette_name_optional" = "Имя палитры (необязательно)";
+"palette_name" = "Имя палитры";
+"add_color" = "Добавить цвет";
+"edit" = "Редактировать";
+"cancel" = "Отмена";
+"done" = "Готово";
+"delete_palette" = "Удалить эту палитру?";
+"collections" = "Коллекции";
+"new_palette" = "Новая палитра";
+"untitled_palette" = "Без названия";
+"delete" = "Удалить";
+"all_colors_already_added" = "Все цвета уже добавлены.";
+"select_colors_to_add" = "Выберите цвета для добавления";
+
+/* ======================================================
+   PHOTOS SCREEN
+   ====================================================== */
+"detected_palette" = "Обнаруженная палитра";
+"choose_photo" = "Выбрать фото";
+"pick_photo" = "Выбрать фотографию";
+"pick_color" = "Выбрать цвет";
+"change_photo" = "Сменить фото";
+"choose_an_image_to_find_matching_colors" = "Выберите изображение, чтобы найти совпадающие цвета";
+"unlock_full_palette" = "Разблокировать полную палитру";
+"unnamed_color" = "Безымянный цвет";
+"color_added_to_collections" = "Цвет добавлен в коллекции";
+
+/* ======================================================
+   SETTINGS SCREEN
+   ====================================================== */
+"appearance" = "Внешний вид";
+"theme" = "Тема";
+"language" = "Язык";
+"about" = "О приложении";
+"version" = "Версия:";
+"rate_app" = "Оценить приложение";
+"help" = "Помощь";
+"send_feedback" = "Отправить отзыв";
+"app_name" = "Colorit";
+"hrs" = "ч";
+"min" = "мин";
+"sec" = "с";
+"system" = "Система";
+"light" = "Светлая";
+"dark" = "Тёмная";
+"general" = "Общие";
+
+/* ======================================================
+   PAYWALL / PRO FEATURES
+   ====================================================== */
+"flash_sale" = "Молниеносная распродажа до -80% заканчивается через";
+"best_value" = "Лучшая цена";
+"terms_of_use" = "Условия использования";
+"privacy_policy" = "Политика конфиденциальности";
+"try_free" = "Попробовать бесплатно";
+"continue" = "Продолжить";
+"unlock_pro_features" = "Разблокировать функции Pro";
+"included_in_pro" = "Включено в Pro";
+"feature_live_color_id_subtitle" = "Определяйте цвета мгновенно через камеру в реальном времени.";
+"feature_photo_color_picker_subtitle" = "Извлекайте профессиональные палитры из любых фотографий с точностью ИИ.";
+"feature_paint_catalogues_subtitle" = "Исследуйте тщательно подобранные палитры из разных коллекций красок.";
+"feature_unlimited_collections_subtitle" = "Создавайте и организуйте неограниченные палитры для работы или вдохновения.";
+"feature_advanced_search_subtitle" = "Находите цвета по HEX, RGB или имени быстро и удобно.";
+"feature_harmony_colors_subtitle" = "Создавайте гармоничные схемы и находите подходящие тона легко.";
+"feature_multiple_layouts_subtitle" = "Переключайтесь между видами сетки и списка для визуального обзора.";
+"feature_smart_filters_subtitle" = "Фильтруйте по оттенку, яркости или гармонии с высокой точностью.";
+"feature_color_matches_subtitle" = "Сравнивайте и визуализируйте совпадения между живыми и сохранёнными образцами.";
+"feature_unlimited_access_subtitle" = "Без ограничений — пользуйтесь всеми инструментами, палитрами и функциями навсегда.";
+"your_purchases_have_been_restored" = "Ваши покупки были восстановлены";
+"no_previous_purchases_found" = "Предыдущие покупки не найдены.";
+"restore_purchases" = "Восстановить покупки";
+"cancel_anytime" = "Отменить в любое время";
+"family_sharing_enabled" = "Семейный доступ включён";
+"3_day_free_trial" = "3-дневная бесплатная пробная версия";
+"1_year_plan" = "Годовой план";
+"1_week_plan" = "Недельный план";
+"feature_live_color_id_title" = "Идентификация цвета Live";
+"feature_photo_color_picker_title" = "Выбор цвета из фото";
+"feature_paint_catalogues_title" = "Профессиональные каталоги красок";
+"feature_unlimited_collections_title" = "Неограниченные коллекции и палитры";
+"feature_advanced_search_title" = "Расширенный поиск";
+"feature_harmony_colors_title" = "Гармония и похожие цвета";
+"feature_multiple_layouts_title" = "Множественные варианты отображения";
+"feature_smart_filters_title" = "Умные фильтры и сортировка";
+"feature_color_matches_title" = "Совпадения цветов для фото и Live";
+"feature_unlimited_access_title" = "Безлимитный доступ";
+
+/* ======================================================
+   TOASTS / GENERIC MESSAGES
+   ====================================================== */
+"toast_copied" = "Скопировано";
+"toast_added" = "Добавлено";
+"toast_removed" = "Удалено";
+"toast_share" = "Поделиться";
+"toast_info" = "Инфо";

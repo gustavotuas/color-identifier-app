@@ -1,34 +1,200 @@
-"unlock_title" = "Unlock Colorit Pro";
-"unlock_subtitle" = "Experience AI color intelligence & design freedom.";
-"plan_weekly" = "Weekly – $5.99/week";
-"plan_monthly" = "Monthly – $14.99/month";
-"plan_yearly" = "Yearly – $59.99/year";
-"trial_badge" = "Start free for 3 days";
-"discount_badge_today" = "50% OFF today only";
-"discount_badge_limited" = "Save 50% – Limited Time";
-"regular_price_monthly" = "Regular $29.99/month";
-"regular_price_yearly" = "Regular $119.99/year";
-"cta_start_trial_save" = "Start My Free Trial & Save 50%";
-"footer_note" = "Limited-time launch offer. Cancel anytime in Settings. Offer may end soon.";
-"cancel_anytime" = "Cancel anytime";
-"best_value" = "Best Value";
-"selected" = "Selected";
-"offer_ends_in" = "Offer ends in";
-"get_started" = "Get Started";
-"camera" = "Camera";
-"photos" = "Photos";
-"browse" = "Browse";
-"discover" = "Discover";
-"home" = "Home";
-"profile" = "Profile";
-"quick_actions" = "Quick Actions";
-"open_camera" = "Open Camera";
-"from_photos" = "From Photos";
-"unlock_pro" = "Unlock Pro";
-"pick_photo" = "Pick a photo";
-"choose_photo" = "Choose Photo";
-"extract_palette" = "Extract Palette";
-"pro_tips" = "Pro Tips";
-"tip_natural_light" = "Capture under natural light";
-"tip_avoid_glare" = "Avoid reflections and glare";
-"tip_contrast" = "Try contrasty backgrounds";
+/* ======================================================
+   MAIN APP STRUCTURE
+   ====================================================== */
+"tab_collections" = "Συλλογές";
+"tab_search" = "Αναζήτηση";
+"tab_camera" = "Κάμερα";
+"tab_photos" = "Φωτογραφίες";
+"tab_settings" = "Ρυθμίσεις";
+"pro_badge" = "PRO";
+"unlock_pro" = "Ξεκλείδωσε το Pro";
+"unlock_pro_subtitle" = "Πρόσβαση σε όλες τις premium λειτουργίες";
+"unlock_picker" = "Ξεκλείδωσε τον επιλογέα";
+
+/* ======================================================
+   SEARCH / COLOR DETAIL
+   ====================================================== */
+"color_harmony" = "Αρμονία χρωμάτων";
+"mode" = "Λειτουργία";
+"harmony" = "Αρμονία";
+"copy" = "Αντιγραφή";
+"share" = "Κοινή χρήση";
+"add" = "Προσθήκη";
+"added" = "Προστέθηκε";
+"close" = "Κλείσιμο";
+"copied_to_clipboard" = "Αντιγράφηκε στο πρόχειρο";
+"share_preparing" = "Προετοιμασία προεπισκόπησης κοινής χρήσης...";
+"red" = "Κόκκινο";
+"green" = "Πράσινο";
+"blue" = "Μπλε";
+"hex" = "Hex";
+"hue" = "Απόχρωση";
+"saturation" = "Κορεσμός";
+"brightness" = "Φωτεινότητα";
+"cyan" = "Κυανό";
+"magenta" = "Ματζέντα";
+"yellow" = "Κίτρινο";
+"black" = "Μαύρο";
+"show_more" = "Δείτε περισσότερα";
+"bucket" = "Κουβάς";
+"color_not_found" = "Το χρώμα δεν βρέθηκε στη βιβλιοθήκη";
+"shades_tints" = "Αποχρώσεις και τόννοι";
+"contrast_preview" = "Προεπισκόπηση αντίθεσης";
+"vendor" = "Προμηθευτής";
+"brand" = "Μάρκα";
+"code" = "Κωδικός";
+"locator" = "Εντοπιστής";
+"open_vendor_page" = "Άνοιγμα σελίδας προμηθευτή";
+"line" = "Σειρά";
+"made_with" = "Δημιουργήθηκε με το Colorit";
+"url" = "www.colorit.app";
+"opening_share_sheet" = "Άνοιγμα παραθύρου κοινής χρήσης...";
+"failed_to_open_share_sheet" = "Αποτυχία ανοίγματος παραθύρου κοινής χρήσης.";
+"unlock_pro_to_view_harmony" = "Ξεκλείδωσε το Pro για να δεις την Αρμονία";
+"unlock_pro_to_view_shades_tints" = "Ξεκλείδωσε το Pro για να δεις Αποχρώσεις και Τόνους";
+"text_sample" = "Δείγμα κειμένου";
+"excellent_AAA" = "Εξαιρετικό (AAA)";
+"good_AA" = "Καλό (AA)";
+"low_contrast" = "Χαμηλή αντίθεση";
+"select_paint" = "Επιλογή βαφής";
+"sort_alphabetically" = "Ταξινόμηση αλφαβητικά";
+"sort_by_brightness" = "Ταξινόμηση κατά φωτεινότητα";
+"toggle_layout" = "Αλλαγή διάταξης";
+"search_by" = "Αναζήτηση με όνομα, hex, μάρκα ή κωδικό";
+"paints" = "Χρώματα";
+"general_palette" = "Γενική παλέτα";
+
+/* ======================================================
+   CAMERA SCREEN
+   ====================================================== */
+"no_match_found" = "Δεν βρέθηκε αντιστοιχία";
+"added_to_collections" = "Προστέθηκε στις συλλογές";
+"removed_from_collections" = "Αφαιρέθηκε από τις συλλογές";
+"sort_by_alphabetic" = "Ταξινόμηση αλφαβητικά";
+"free_preview" = "Δωρεάν προεπισκόπηση – Ξεκλείδωσε το PRO για πλήρη πρόσβαση";
+"unlock_live_camera" = "Ξεκλείδωσε την πλήρη Ζωντανή Κάμερα";
+"generate_palette" = "Δημιουργία παλέτας";
+"precision" = "Ακρίβεια";
+"save" = "Αποθήκευση";
+"save_color_to_collections" = "Αποθήκευση χρώματος στις συλλογές";
+"color_matches" = "Αντιστοιχίες χρωμάτων";
+
+/* ======================================================
+   LIVE / PHOTO PALETTE DETAILS
+   ====================================================== */
+"add_palette_to_collections" = "Προσθήκη παλέτας στις συλλογές";
+"palette_saved" = "Η παλέτα αποθηκεύτηκε";
+"palette_added" = "Η παλέτα προστέθηκε στις συλλογές";
+"live_palette" = "Ζωντανή παλέτα";
+"photo_palette" = "Φωτογραφική παλέτα";
+"unlock_full_palette_color_matches" = "Ξεκλείδωσε την πλήρη παλέτα και τις αντιστοιχίες";
+
+/* ======================================================
+   FAVORITES / COLLECTIONS
+   ====================================================== */
+"colors" = "Χρώματα";
+"color" = "Χρώμα";
+"palettes" = "Παλέτες";
+"palette" = "Παλέτα";
+"all" = "Όλα";
+"no_collections_yet" = "Δεν υπάρχουν ακόμη συλλογές";
+"no_collections_subtitle" = "Αποθήκευσε χρώματα και παλέτες για να τα δεις αργότερα εδώ.";
+"clear_all_collections" = "Εκκαθάριση όλων των συλλογών;";
+"yes" = "Ναι";
+"no" = "Όχι";
+"create_palette" = "Δημιουργία παλέτας";
+"palette_name_optional" = "Όνομα παλέτας (προαιρετικό)";
+"palette_name" = "Όνομα παλέτας";
+"add_color" = "Προσθήκη χρώματος";
+"edit" = "Επεξεργασία";
+"cancel" = "Ακύρωση";
+"done" = "Τέλος";
+"delete_palette" = "Διαγραφή αυτής της παλέτας;";
+"collections" = "Συλλογές";
+"new_palette" = "Νέα παλέτα";
+"untitled_palette" = "Ανώνυμη παλέτα";
+"delete" = "Διαγραφή";
+"all_colors_already_added" = "Όλα τα χρώματα έχουν ήδη προστεθεί.";
+"select_colors_to_add" = "Επιλογή χρωμάτων για προσθήκη";
+
+/* ======================================================
+   PHOTOS SCREEN
+   ====================================================== */
+"detected_palette" = "Ανιχνευμένη παλέτα";
+"choose_photo" = "Επιλογή φωτογραφίας";
+"pick_photo" = "Επιλογή μιας φωτογραφίας";
+"pick_color" = "Επιλογή χρώματος";
+"change_photo" = "Αλλαγή φωτογραφίας";
+"choose_an_image_to_find_matching_colors" = "Επίλεξε εικόνα για να βρεις αντίστοιχα χρώματα";
+"unlock_full_palette" = "Ξεκλείδωσε την πλήρη παλέτα";
+"unnamed_color" = "Ανώνυμο χρώμα";
+"color_added_to_collections" = "Το χρώμα προστέθηκε στις συλλογές";
+
+/* ======================================================
+   SETTINGS SCREEN
+   ====================================================== */
+"appearance" = "Εμφάνιση";
+"theme" = "Θέμα";
+"language" = "Γλώσσα";
+"about" = "Σχετικά";
+"version" = "Έκδοση:";
+"rate_app" = "Αξιολόγηση εφαρμογής";
+"help" = "Βοήθεια";
+"send_feedback" = "Αποστολή σχολίων";
+"app_name" = "Colorit";
+"hrs" = "ώρες";
+"min" = "λεπτά";
+"sec" = "δευτ";
+"system" = "Σύστημα";
+"light" = "Φωτεινό";
+"dark" = "Σκοτεινό";
+"general" = "Γενικά";
+
+/* ======================================================
+   PAYWALL / PRO FEATURES
+   ====================================================== */
+"flash_sale" = "Προσφορά έως -80% λήγει σε";
+"best_value" = "Καλύτερη αξία";
+"terms_of_use" = "Όροι χρήσης";
+"privacy_policy" = "Πολιτική απορρήτου";
+"try_free" = "Δοκίμασε δωρεάν";
+"continue" = "Συνέχεια";
+"unlock_pro_features" = "Ξεκλείδωσε λειτουργίες Pro";
+"included_in_pro" = "Περιλαμβάνεται στο Pro";
+"feature_live_color_id_subtitle" = "Αναγνώρισε άμεσα χρώματα μέσω της κάμερας σου σε πραγματικό χρόνο.";
+"feature_photo_color_picker_subtitle" = "Εξήγαγε επαγγελματικές παλέτες από οποιαδήποτε φωτογραφία με ακρίβεια AI.";
+"feature_paint_catalogues_subtitle" = "Εξερεύνησε επιλεγμένες παλέτες από πολλαπλές συλλογές χρωμάτων.";
+"feature_unlimited_collections_subtitle" = "Δημιούργησε και οργάνωσε απεριόριστες παλέτες για εργασία ή έμπνευση.";
+"feature_advanced_search_subtitle" = "Βρες χρώματα με βάση HEX, RGB ή όνομα άμεσα και εύκολα.";
+"feature_harmony_colors_subtitle" = "Δημιούργησε αρμονικά σχήματα και ανακάλυψε τόνους εύκολα.";
+"feature_multiple_layouts_subtitle" = "Εναλλαγή μεταξύ πλέγματος και λίστας για οπτική εξερεύνηση.";
+"feature_smart_filters_subtitle" = "Φιλτράρισε κατά απόχρωση, φωτεινότητα ή αρμονία με ακρίβεια.";
+"feature_color_matches_subtitle" = "Σύγκρινε και οπτικοποίησε αντιστοιχίες μεταξύ ζωντανών και ληφθέντων δειγμάτων.";
+"feature_unlimited_access_subtitle" = "Χωρίς περιορισμούς — απόλαυσε όλα τα εργαλεία, τις παλέτες και τις λειτουργίες για πάντα.";
+"your_purchases_have_been_restored" = "Οι αγορές σου έχουν αποκατασταθεί";
+"no_previous_purchases_found" = "Δεν βρέθηκαν προηγούμενες αγορές.";
+"restore_purchases" = "Επαναφορά αγορών";
+"cancel_anytime" = "Ακύρωση οποιαδήποτε στιγμή";
+"family_sharing_enabled" = "Η κοινή χρήση οικογένειας είναι ενεργοποιημένη";
+"3_day_free_trial" = "Δωρεάν δοκιμή 3 ημερών";
+"1_year_plan" = "Ετήσιο πλάνο";
+"1_week_plan" = "Εβδομαδιαίο πλάνο";
+"feature_live_color_id_title" = "Ζωντανή αναγνώριση χρώματος";
+"feature_photo_color_picker_title" = "Επιλογέας χρώματος φωτογραφίας";
+"feature_paint_catalogues_title" = "Επαγγελματικοί κατάλογοι βαφών";
+"feature_unlimited_collections_title" = "Απεριόριστες συλλογές και παλέτες";
+"feature_advanced_search_title" = "Προηγμένη αναζήτηση";
+"feature_harmony_colors_title" = "Αρμονία & παρόμοια χρώματα";
+"feature_multiple_layouts_title" = "Πολλαπλές διατάξεις";
+"feature_smart_filters_title" = "Έξυπνα φίλτρα & ταξινόμηση";
+"feature_color_matches_title" = "Αντιστοιχίες χρωμάτων για φωτογραφία & ζωντανή αναγνώριση";
+"feature_unlimited_access_title" = "Απεριόριστη πρόσβαση";
+
+/* ======================================================
+   TOASTS / GENERIC MESSAGES
+   ====================================================== */
+"toast_copied" = "Αντιγράφηκε";
+"toast_added" = "Προστέθηκε";
+"toast_removed" = "Αφαιρέθηκε";
+"toast_share" = "Κοινή χρήση";
+"toast_info" = "Πληροφορία";

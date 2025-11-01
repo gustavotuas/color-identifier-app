@@ -1,34 +1,200 @@
-"unlock_title" = "Unlock Colorit Pro";
-"unlock_subtitle" = "Experience AI color intelligence & design freedom.";
-"plan_weekly" = "Weekly – $5.99/week";
-"plan_monthly" = "Monthly – $14.99/month";
-"plan_yearly" = "Yearly – $59.99/year";
-"trial_badge" = "Start free for 3 days";
-"discount_badge_today" = "50% OFF today only";
-"discount_badge_limited" = "Save 50% – Limited Time";
-"regular_price_monthly" = "Regular $29.99/month";
-"regular_price_yearly" = "Regular $119.99/year";
-"cta_start_trial_save" = "Start My Free Trial & Save 50%";
-"footer_note" = "Limited-time launch offer. Cancel anytime in Settings. Offer may end soon.";
-"cancel_anytime" = "Cancel anytime";
-"best_value" = "Best Value";
-"selected" = "Selected";
-"offer_ends_in" = "Offer ends in";
-"get_started" = "Get Started";
-"camera" = "Camera";
-"photos" = "Photos";
-"browse" = "Browse";
-"discover" = "Discover";
-"home" = "Home";
-"profile" = "Profile";
-"quick_actions" = "Quick Actions";
-"open_camera" = "Open Camera";
-"from_photos" = "From Photos";
-"unlock_pro" = "Unlock Pro";
-"pick_photo" = "Pick a photo";
-"choose_photo" = "Choose Photo";
-"extract_palette" = "Extract Palette";
-"pro_tips" = "Pro Tips";
-"tip_natural_light" = "Capture under natural light";
-"tip_avoid_glare" = "Avoid reflections and glare";
-"tip_contrast" = "Try contrasty backgrounds";
+/* ======================================================
+   MAIN APP STRUCTURE
+   ====================================================== */
+"tab_collections" = "คอลเลกชัน";
+"tab_search" = "ค้นหา";
+"tab_camera" = "กล้อง";
+"tab_photos" = "รูปภาพ";
+"tab_settings" = "การตั้งค่า";
+"pro_badge" = "PRO";
+"unlock_pro" = "ปลดล็อก Pro";
+"unlock_pro_subtitle" = "เข้าถึงคุณสมบัติพรีเมียมทั้งหมด";
+"unlock_picker" = "ปลดล็อกเครื่องมือเลือกสี";
+
+/* ======================================================
+   SEARCH / COLOR DETAIL
+   ====================================================== */
+"color_harmony" = "ความกลมกลืนของสี";
+"mode" = "โหมด";
+"harmony" = "ความกลมกลืน";
+"copy" = "คัดลอก";
+"share" = "แชร์";
+"add" = "เพิ่ม";
+"added" = "เพิ่มแล้ว";
+"close" = "ปิด";
+"copied_to_clipboard" = "คัดลอกไปยังคลิปบอร์ดแล้ว";
+"share_preparing" = "กำลังเตรียมภาพตัวอย่างสำหรับแชร์...";
+"red" = "สีแดง";
+"green" = "สีเขียว";
+"blue" = "สีน้ำเงิน";
+"hex" = "Hex";
+"hue" = "เฉดสี";
+"saturation" = "ความอิ่มตัว";
+"brightness" = "ความสว่าง";
+"cyan" = "ฟ้า";
+"magenta" = "ม่วงแดง";
+"yellow" = "เหลือง";
+"black" = "ดำ";
+"show_more" = "แสดงเพิ่มเติม";
+"bucket" = "ถังสี";
+"color_not_found" = "ไม่พบสีในคลัง";
+"shades_tints" = "เฉดและโทนสี";
+"contrast_preview" = "ตัวอย่างความคมชัด";
+"vendor" = "ผู้จำหน่าย";
+"brand" = "แบรนด์";
+"code" = "รหัส";
+"locator" = "ตัวระบุตำแหน่ง";
+"open_vendor_page" = "เปิดหน้าเว็บของผู้จำหน่าย";
+"line" = "เส้น";
+"made_with" = "สร้างด้วย Colorit";
+"url" = "www.colorit.app";
+"opening_share_sheet" = "กำลังเปิดหน้าต่างแชร์...";
+"failed_to_open_share_sheet" = "ไม่สามารถเปิดหน้าต่างแชร์ได้";
+"unlock_pro_to_view_harmony" = "ปลดล็อก Pro เพื่อดูโหมดความกลมกลืน";
+"unlock_pro_to_view_shades_tints" = "ปลดล็อก Pro เพื่อดูเฉดและโทนสี";
+"text_sample" = "ตัวอย่างข้อความ";
+"excellent_AAA" = "ยอดเยี่ยม (AAA)";
+"good_AA" = "ดี (AA)";
+"low_contrast" = "คอนทราสต์ต่ำ";
+"select_paint" = "เลือกสีทา";
+"sort_alphabetically" = "เรียงตามตัวอักษร";
+"sort_by_brightness" = "เรียงตามความสว่าง";
+"toggle_layout" = "สลับเลย์เอาต์";
+"search_by" = "ค้นหาด้วยชื่อ, hex, แบรนด์ หรือรหัส";
+"paints" = "สีทา";
+"general_palette" = "พาเลตทั่วไป";
+
+/* ======================================================
+   CAMERA SCREEN
+   ====================================================== */
+"no_match_found" = "ไม่พบที่ตรงกัน";
+"added_to_collections" = "เพิ่มในคอลเลกชันแล้ว";
+"removed_from_collections" = "ลบออกจากคอลเลกชันแล้ว";
+"sort_by_alphabetic" = "เรียงตามตัวอักษร";
+"free_preview" = "ดูตัวอย่างฟรี – ปลดล็อก PRO เพื่อเข้าถึงทั้งหมด";
+"unlock_live_camera" = "ปลดล็อกกล้องถ่ายทอดสดเต็มรูปแบบ";
+"generate_palette" = "สร้างพาเลต";
+"precision" = "ความแม่นยำ";
+"save" = "บันทึก";
+"save_color_to_collections" = "บันทึกสีลงในคอลเลกชัน";
+"color_matches" = "สีที่ตรงกัน";
+
+/* ======================================================
+   LIVE / PHOTO PALETTE DETAILS
+   ====================================================== */
+"add_palette_to_collections" = "เพิ่มพาเลตไปยังคอลเลกชัน";
+"palette_saved" = "บันทึกพาเลตแล้ว";
+"palette_added" = "เพิ่มพาเลตในคอลเลกชันแล้ว";
+"live_palette" = "พาเลตแบบสด";
+"photo_palette" = "พาเลตรูปภาพ";
+"unlock_full_palette_color_matches" = "ปลดล็อกพาเลตเต็มและสีที่ตรงกัน";
+
+/* ======================================================
+   FAVORITES / COLLECTIONS
+   ====================================================== */
+"colors" = "สีทั้งหมด";
+"color" = "สี";
+"palettes" = "พาเลต";
+"palette" = "พาเลต";
+"all" = "ทั้งหมด";
+"no_collections_yet" = "ยังไม่มีคอลเลกชัน";
+"no_collections_subtitle" = "บันทึกสีและพาเลตไว้เพื่อดูภายหลังที่นี่";
+"clear_all_collections" = "ล้างคอลเลกชันทั้งหมดหรือไม่?";
+"yes" = "ใช่";
+"no" = "ไม่ใช่";
+"create_palette" = "สร้างพาเลต";
+"palette_name_optional" = "ชื่อพาเลต (ไม่บังคับ)";
+"palette_name" = "ชื่อพาเลต";
+"add_color" = "เพิ่มสี";
+"edit" = "แก้ไข";
+"cancel" = "ยกเลิก";
+"done" = "เสร็จสิ้น";
+"delete_palette" = "ลบพาเลตนี้หรือไม่?";
+"collections" = "คอลเลกชัน";
+"new_palette" = "พาเลตใหม่";
+"untitled_palette" = "พาเลตไม่มีชื่อ";
+"delete" = "ลบ";
+"all_colors_already_added" = "เพิ่มสีทั้งหมดแล้ว";
+"select_colors_to_add" = "เลือกสีที่จะเพิ่ม";
+
+/* ======================================================
+   PHOTOS SCREEN
+   ====================================================== */
+"detected_palette" = "พาเลตที่ตรวจพบ";
+"choose_photo" = "เลือกรูปภาพ";
+"pick_photo" = "เลือกรูป";
+"pick_color" = "เลือกสี";
+"change_photo" = "เปลี่ยนรูปภาพ";
+"choose_an_image_to_find_matching_colors" = "เลือกรูปเพื่อค้นหาสีที่ตรงกัน";
+"unlock_full_palette" = "ปลดล็อกพาเลตเต็มรูปแบบ";
+"unnamed_color" = "สีไม่มีชื่อ";
+"color_added_to_collections" = "เพิ่มสีลงในคอลเลกชันแล้ว";
+
+/* ======================================================
+   SETTINGS SCREEN
+   ====================================================== */
+"appearance" = "ลักษณะ";
+"theme" = "ธีม";
+"language" = "ภาษา";
+"about" = "เกี่ยวกับ";
+"version" = "เวอร์ชัน:";
+"rate_app" = "ให้คะแนนแอป";
+"help" = "ช่วยเหลือ";
+"send_feedback" = "ส่งความคิดเห็น";
+"app_name" = "Colorit";
+"hrs" = "ชม.";
+"min" = "นาที";
+"sec" = "วิ";
+"system" = "ระบบ";
+"light" = "สว่าง";
+"dark" = "มืด";
+"general" = "ทั่วไป";
+
+/* ======================================================
+   PAYWALL / PRO FEATURES
+   ====================================================== */
+"flash_sale" = "ลดราคาพิเศษสูงสุด -80% สิ้นสุดใน";
+"best_value" = "คุ้มค่าที่สุด";
+"terms_of_use" = "ข้อกำหนดการใช้งาน";
+"privacy_policy" = "นโยบายความเป็นส่วนตัว";
+"try_free" = "ทดลองใช้ฟรี";
+"continue" = "ดำเนินการต่อ";
+"unlock_pro_features" = "ปลดล็อกคุณสมบัติ Pro";
+"included_in_pro" = "รวมอยู่ใน Pro";
+"feature_live_color_id_subtitle" = "ระบุสีแบบเรียลไทม์ผ่านกล้องของคุณทันที";
+"feature_photo_color_picker_subtitle" = "ดึงพาเลตสีจากรูปภาพใด ๆ ด้วยความแม่นยำของ AI";
+"feature_paint_catalogues_subtitle" = "สำรวจพาเลตสีที่คัดสรรจากหลายแบรนด์สี";
+"feature_unlimited_collections_subtitle" = "สร้างและจัดระเบียบพาเลตได้ไม่จำกัดเพื่อแรงบันดาลใจของคุณ";
+"feature_advanced_search_subtitle" = "ค้นหาสีด้วย HEX, RGB หรือชื่อได้อย่างรวดเร็วและง่ายดาย";
+"feature_harmony_colors_subtitle" = "สร้างโทนสีที่กลมกลืนและค้นหาสีที่เข้ากันได้ง่าย";
+"feature_multiple_layouts_subtitle" = "สลับระหว่างมุมมองแบบกริดและรายการเพื่อสำรวจได้สะดวก";
+"feature_smart_filters_subtitle" = "กรองตามโทน ความสว่าง หรือความกลมกลืนอย่างแม่นยำ";
+"feature_color_matches_subtitle" = "เปรียบเทียบและดูความตรงกันของสีระหว่างสดและภาพที่บันทึกไว้";
+"feature_unlimited_access_subtitle" = "ไม่จำกัด — เพลิดเพลินกับทุกเครื่องมือ พาเลต และคุณสมบัติได้ตลอดไป";
+"your_purchases_have_been_restored" = "กู้คืนการซื้อของคุณแล้ว";
+"no_previous_purchases_found" = "ไม่พบการซื้อก่อนหน้า";
+"restore_purchases" = "กู้คืนการซื้อ";
+"cancel_anytime" = "ยกเลิกได้ทุกเมื่อ";
+"family_sharing_enabled" = "เปิดใช้งานการแชร์แบบครอบครัวแล้ว";
+"3_day_free_trial" = "ทดลองใช้ฟรี 3 วัน";
+"1_year_plan" = "แผนรายปี";
+"1_week_plan" = "แผนรายสัปดาห์";
+"feature_live_color_id_title" = "การระบุสีสด";
+"feature_photo_color_picker_title" = "ตัวเลือกสีจากภาพ";
+"feature_paint_catalogues_title" = "แคตตาล็อกสีระดับมืออาชีพ";
+"feature_unlimited_collections_title" = "คอลเลกชันและพาเลตไม่จำกัด";
+"feature_advanced_search_title" = "การค้นหาขั้นสูง";
+"feature_harmony_colors_title" = "สีที่กลมกลืนและใกล้เคียง";
+"feature_multiple_layouts_title" = "มุมมองหลายรูปแบบ";
+"feature_smart_filters_title" = "ตัวกรองและการจัดเรียงอัจฉริยะ";
+"feature_color_matches_title" = "สีที่ตรงกันสำหรับภาพและแบบสด";
+"feature_unlimited_access_title" = "การเข้าถึงไม่จำกัด";
+
+/* ======================================================
+   TOASTS / GENERIC MESSAGES
+   ====================================================== */
+"toast_copied" = "คัดลอกแล้ว";
+"toast_added" = "เพิ่มแล้ว";
+"toast_removed" = "ลบแล้ว";
+"toast_share" = "แชร์";
+"toast_info" = "ข้อมูล";

@@ -45,14 +45,14 @@ struct FlashSaleCountdownView: View {
 
     var body: some View {
         VStack(spacing: 6) {
-            Text("⚡ Flash Sale — 80% OFF ends in")
+            Text("⚡ \("flash_sale".localized)")
                 .font(.caption.bold())
                 .foregroundColor(.white.opacity(0.98))
 
             HStack(spacing: 22) {
-                block(hours, "hrs")
-                block(minutes, "min")
-                block(seconds, "sec")
+                block(hours, "hrs".localized)
+                block(minutes, "min".localized)
+                block(seconds, "sec".localized)
             }
             .font(.system(size: 14, weight: .semibold, design: .monospaced))
         }
@@ -122,7 +122,7 @@ struct PaywallView: View {
                                 Spacer()
                             }
 
-                            Text("Unlock Pro Features")
+                            Text("unlock_pro_features".localized)
                                 .font(.system(size: 28, weight: .bold))
                                 .multilineTextAlignment(.center)
                                 .foregroundColor(.primary)
@@ -152,38 +152,40 @@ struct PaywallView: View {
 
                         // FEATURES
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("Included in Pro")
+                            Text("included_in_pro".localized)
                                 .font(.headline)
                                 .foregroundColor(.primary)
                                 .padding(.leading, 4)
 
-                            FeatureRow(icon: "camera.viewfinder", title: "Live Color ID",
-                                       subtitle: "Identify colors instantly through your camera in real-time.", color: .green)
-                            FeatureRow(icon: "photo.on.rectangle.angled", title: "Photo Color Picker",
-                                       subtitle: "Extract professional palettes from any photo with AI precision.", color: .orange)
-                            FeatureRow(icon: "paintpalette.fill", title: "Professional Paint Catalogues",
-                                       subtitle: "Explore curated palettes from multiple paint collections.", color: .pink)
-                            FeatureRow(icon: "heart.text.square.fill", title: "Unlimited Collections & Palettes",
-                                       subtitle: "Create and organise unlimited palettes for your work or inspiration.", color: .red)
-                            FeatureRow(icon: "magnifyingglass", title: "Advanced Search",
-                                       subtitle: "Find colors by HEX, RGB, or name instantly and intuitively.", color: .blue)
-                            FeatureRow(icon: "circle.hexagongrid.fill", title: "Harmony & Similar Colors",
-                                       subtitle: "Generate harmonic schemes and discover matching tones easily.", color: .indigo)
-                            FeatureRow(icon: "square.grid.2x2", title: "Multiple Layout Views",
-                                       subtitle: "Switch between grid and list layouts to explore palettes visually.", color: .purple)
-                            FeatureRow(icon: "wand.and.stars", title: "Smart Filters & Sorting",
-                                       subtitle: "Filter by hue, brightness, or harmony with precision.", color: .teal)
-                            FeatureRow(icon: "photo.stack.fill", title: "Color Matches for Photo & Live ID",
-                                       subtitle: "Compare and visualise matches between live and captured samples.", color: .cyan)
-                            FeatureRow(icon: "lock.open.fill", title: "Unlimited Access",
-                                       subtitle: "No restrictions — enjoy every tool, palette and feature forever.", color: .gray)
+                            FeatureRow(icon: "camera.viewfinder", title: "feature_live_color_id_title".localized,
+                                    subtitle: "feature_live_color_id_subtitle".localized, color: .green)
+                            FeatureRow(icon: "photo.on.rectangle.angled", title: "feature_photo_color_picker_title".localized,
+                                    subtitle: "feature_photo_color_picker_subtitle".localized, color: .orange)
+                            FeatureRow(icon: "paintpalette.fill", title: "feature_paint_catalogues_title".localized,
+                                    subtitle: "feature_paint_catalogues_subtitle".localized, color: .pink)
+                            FeatureRow(icon: "heart.text.square.fill", title: "feature_unlimited_collections_title".localized,
+                                    subtitle: "feature_unlimited_collections_subtitle".localized, color: .red)
+                            FeatureRow(icon: "magnifyingglass", title: "feature_advanced_search_title".localized,
+                                    subtitle: "feature_advanced_search_subtitle".localized, color: .blue)
+                            FeatureRow(icon: "circle.hexagongrid.fill", title: "feature_harmony_colors_title".localized,
+                                    subtitle: "feature_harmony_colors_subtitle".localized, color: .indigo)
+                            FeatureRow(icon: "square.grid.2x2", title: "feature_multiple_layouts_title".localized,
+                                    subtitle: "feature_multiple_layouts_subtitle".localized, color: .purple)
+                            FeatureRow(icon: "wand.and.stars", title: "feature_smart_filters_title".localized,
+                                    subtitle: "feature_smart_filters_subtitle".localized, color: .teal)
+                            FeatureRow(icon: "photo.stack.fill", title: "feature_color_matches_title".localized,
+                                    subtitle: "feature_color_matches_subtitle".localized, color: .cyan)
+                            FeatureRow(icon: "lock.open.fill", title: "feature_unlimited_access_title".localized,
+                                    subtitle: "feature_unlimited_access_subtitle".localized, color: .gray)
+
+
 
                             // 👇 Links moved here, visible only when scrolls down
                             VStack(spacing: 10) {
                                 HStack(spacing: 18) {
-                                    Link("Terms of Use",
+                                    Link("terms_of_use".localized,
                                          destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
-                                    Link("Privacy Policy",
+                                    Link("privacy_policy".localized,
                                          destination: URL(string: "https://www.coloritapp.com/privacy")!)
                                 }
                                 .font(.caption2)
@@ -203,7 +205,7 @@ struct PaywallView: View {
                 // CTA + FOOTER (solo botón y restore)
                 VStack(spacing: 10) {
                     let selected = store.products.first(where: { $0.id == store.selectedID })
-                    let buttonLabel = (selected?.id == store.weekly) ? "Continue" : "Try for Free"
+                    let buttonLabel = (selected?.id == store.weekly) ? "continue".localized : "try_free".localized
 
                     AnimatedTryFreeButton(label: buttonLabel) {
                         Task { await store.buySelected() }
@@ -214,12 +216,12 @@ struct PaywallView: View {
                             await store.restorePurchases()
                             restoreMessage = AlertMessage(
                                 text: store.isPro
-                                    ? "Your purchases have been restored ✅"
-                                    : "No previous purchases found."
+                                    ? "\("your_purchases_have_been_restored".localized) ✅"
+                                    : "no_previous_purchases_found".localized
                             )
                         }
                     } label: {
-                        Text("Restore Purchases")
+                        Text("restore_purchases".localized)
                             .font(.caption)
                             .underline()
                             .foregroundColor(.blue)
@@ -229,9 +231,9 @@ struct PaywallView: View {
                     }
 
                     HStack {
-                        Label("Cancel anytime", systemImage: "checkmark.circle")
+                        Label("cancel_anytime".localized, systemImage: "checkmark.circle")
                         Spacer()
-                        Label("Family Sharing Enabled", systemImage: "person.3.fill")
+                        Label("family_sharing_enabled".localized, systemImage: "person.3.fill")
                     }
                     .font(.caption)
                     .foregroundColor(.secondary)
@@ -329,7 +331,7 @@ struct SelectablePlanCard: View {
                         .foregroundColor(.primary)
 
                     if store.hasTrial(product) {
-                        Text("3-Day Free Trial")
+                        Text("3_day_free_trial".localized)
                             .font(.subheadline.bold())
                             .foregroundColor(.green)
                     }
@@ -339,7 +341,7 @@ struct SelectablePlanCard: View {
 
                 // 💙 Best Value badge (blue gradient)
                 if product.id == store.yearly {
-                    Text("Best Value")
+                    Text("best_value".localized)
                         .font(.caption2.bold())
                         .padding(.horizontal, 8)
                         .padding(.vertical, 3)
@@ -406,8 +408,8 @@ struct SelectablePlanCard: View {
 
     private func displayTitle(for product: Product) -> String {
         switch product.id {
-        case store.yearly: return "1 Year Plan"
-        case store.weekly: return "1 Week Plan"
+        case store.yearly: return "1_year_plan".localized
+        case store.weekly: return "1_week_plan".localized
         default: return product.displayName
         }
     }

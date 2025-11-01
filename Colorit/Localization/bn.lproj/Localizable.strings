@@ -1,34 +1,200 @@
-"unlock_title" = "Unlock Colorit Pro";
-"unlock_subtitle" = "Experience AI color intelligence & design freedom.";
-"plan_weekly" = "Weekly – $5.99/week";
-"plan_monthly" = "Monthly – $14.99/month";
-"plan_yearly" = "Yearly – $59.99/year";
-"trial_badge" = "Start free for 3 days";
-"discount_badge_today" = "50% OFF today only";
-"discount_badge_limited" = "Save 50% – Limited Time";
-"regular_price_monthly" = "Regular $29.99/month";
-"regular_price_yearly" = "Regular $119.99/year";
-"cta_start_trial_save" = "Start My Free Trial & Save 50%";
-"footer_note" = "Limited-time launch offer. Cancel anytime in Settings. Offer may end soon.";
-"cancel_anytime" = "Cancel anytime";
-"best_value" = "Best Value";
-"selected" = "Selected";
-"offer_ends_in" = "Offer ends in";
-"get_started" = "Get Started";
-"camera" = "Camera";
-"photos" = "Photos";
-"browse" = "Browse";
-"discover" = "Discover";
-"home" = "Home";
-"profile" = "Profile";
-"quick_actions" = "Quick Actions";
-"open_camera" = "Open Camera";
-"from_photos" = "From Photos";
-"unlock_pro" = "Unlock Pro";
-"pick_photo" = "Pick a photo";
-"choose_photo" = "Choose Photo";
-"extract_palette" = "Extract Palette";
-"pro_tips" = "Pro Tips";
-"tip_natural_light" = "Capture under natural light";
-"tip_avoid_glare" = "Avoid reflections and glare";
-"tip_contrast" = "Try contrasty backgrounds";
+/* ======================================================
+   MAIN APP STRUCTURE
+   ====================================================== */
+"tab_collections" = "সংগ্রহসমূহ";
+"tab_search" = "অনুসন্ধান";
+"tab_camera" = "ক্যামেরা";
+"tab_photos" = "ছবিসমূহ";
+"tab_settings" = "সেটিংস";
+"pro_badge" = "প্রো";
+"unlock_pro" = "প্রো আনলক করুন";
+"unlock_pro_subtitle" = "সমস্ত প্রিমিয়াম বৈশিষ্ট্য অ্যাক্সেস করুন";
+"unlock_picker" = "পিকার আনলক করুন";
+
+/* ======================================================
+   SEARCH / COLOR DETAIL
+   ====================================================== */
+"color_harmony" = "রঙের সামঞ্জস্য";
+"mode" = "মোড";
+"harmony" = "সামঞ্জস্য";
+"copy" = "কপি";
+"share" = "শেয়ার";
+"add" = "যোগ করুন";
+"added" = "যোগ হয়েছে";
+"close" = "বন্ধ করুন";
+"copied_to_clipboard" = "ক্লিপবোর্ডে কপি করা হয়েছে";
+"share_preparing" = "শেয়ারের প্রিভিউ প্রস্তুত করা হচ্ছে...";
+"red" = "লাল";
+"green" = "সবুজ";
+"blue" = "নীল";
+"hex" = "হেক্স";
+"hue" = "রঙের টোন";
+"saturation" = "সম্পৃক্ততা";
+"brightness" = "উজ্জ্বলতা";
+"cyan" = "আকাশি";
+"magenta" = "ম্যাজেন্টা";
+"yellow" = "হলুদ";
+"black" = "কালো";
+"show_more" = "আরও দেখান";
+"bucket" = "বালতি";
+"color_not_found" = "লাইব্রেরিতে রঙ পাওয়া যায়নি";
+"shades_tints" = "ছায়া ও টিন্টস";
+"contrast_preview" = "কনট্রাস্ট প্রিভিউ";
+"vendor" = "সরবরাহকারী";
+"brand" = "ব্র্যান্ড";
+"code" = "কোড";
+"locator" = "লোকেটর";
+"open_vendor_page" = "সরবরাহকারীর পৃষ্ঠা খুলুন";
+"line" = "লাইন";
+"made_with" = "Colorit দিয়ে তৈরি";
+"url" = "www.colorit.app";
+"opening_share_sheet" = "শেয়ার শীট খোলা হচ্ছে...";
+"failed_to_open_share_sheet" = "শেয়ার শীট খোলা যায়নি।";
+"unlock_pro_to_view_harmony" = "সামঞ্জস্য দেখতে প্রো আনলক করুন";
+"unlock_pro_to_view_shades_tints" = "ছায়া ও টিন্টস দেখতে প্রো আনলক করুন";
+"text_sample" = "টেক্সট নমুনা";
+"excellent_AAA" = "চমৎকার (AAA)";
+"good_AA" = "ভালো (AA)";
+"low_contrast" = "কম কনট্রাস্ট";
+"select_paint" = "পেইন্ট নির্বাচন করুন";
+"sort_alphabetically" = "বর্ণানুক্রমিকভাবে সাজান";
+"sort_by_brightness" = "উজ্জ্বলতা অনুযায়ী সাজান";
+"toggle_layout" = "লেআউট পরিবর্তন করুন";
+"search_by" = "নাম, হেক্স, ব্র্যান্ড বা কোড দ্বারা অনুসন্ধান করুন";
+"paints" = "পেইন্টস";
+"general_palette" = "সাধারণ প্যালেট";
+
+/* ======================================================
+   CAMERA SCREEN
+   ====================================================== */
+"no_match_found" = "কোনও মিল পাওয়া যায়নি";
+"added_to_collections" = "সংগ্রহে যোগ করা হয়েছে";
+"removed_from_collections" = "সংগ্রহ থেকে সরানো হয়েছে";
+"sort_by_alphabetic" = "বর্ণানুক্রমিকভাবে সাজান";
+"free_preview" = "ফ্রি প্রিভিউ – সম্পূর্ণ অ্যাক্সেসের জন্য প্রো আনলক করুন";
+"unlock_live_camera" = "সম্পূর্ণ লাইভ ক্যামেরা আনলক করুন";
+"generate_palette" = "প্যালেট তৈরি করুন";
+"precision" = "নির্ভুলতা";
+"save" = "সংরক্ষণ করুন";
+"save_color_to_collections" = "রঙটি সংগ্রহে সংরক্ষণ করুন";
+"color_matches" = "রঙের মিল";
+
+/* ======================================================
+   LIVE / PHOTO PALETTE DETAILS
+   ====================================================== */
+"add_palette_to_collections" = "প্যালেটটি সংগ্রহে যোগ করুন";
+"palette_saved" = "প্যালেট সংরক্ষিত হয়েছে";
+"palette_added" = "প্যালেটটি সংগ্রহে যোগ করা হয়েছে";
+"live_palette" = "লাইভ প্যালেট";
+"photo_palette" = "ছবির প্যালেট";
+"unlock_full_palette_color_matches" = "সম্পূর্ণ প্যালেট ও রঙের মিল আনলক করুন";
+
+/* ======================================================
+   FAVORITES / COLLECTIONS
+   ====================================================== */
+"colors" = "রং";
+"color" = "রঙ";
+"palettes" = "প্যালেটসমূহ";
+"palette" = "প্যালেট";
+"all" = "সব";
+"no_collections_yet" = "এখনও কোনও সংগ্রহ নেই";
+"no_collections_subtitle" = "রঙ এবং প্যালেট সংরক্ষণ করুন যাতে পরে দেখতে পারেন।";
+"clear_all_collections" = "সব সংগ্রহ মুছে ফেলবেন?";
+"yes" = "হ্যাঁ";
+"no" = "না";
+"create_palette" = "প্যালেট তৈরি করুন";
+"palette_name_optional" = "প্যালেটের নাম (ঐচ্ছিক)";
+"palette_name" = "প্যালেটের নাম";
+"add_color" = "রঙ যোগ করুন";
+"edit" = "সম্পাদনা করুন";
+"cancel" = "বাতিল করুন";
+"done" = "সম্পন্ন";
+"delete_palette" = "এই প্যালেটটি মুছে ফেলবেন?";
+"collections" = "সংগ্রহসমূহ";
+"new_palette" = "নতুন প্যালেট";
+"untitled_palette" = "শিরোনামহীন প্যালেট";
+"delete" = "মুছুন";
+"all_colors_already_added" = "সব রঙ ইতিমধ্যেই যোগ করা হয়েছে।";
+"select_colors_to_add" = "যোগ করার জন্য রঙ নির্বাচন করুন";
+
+/* ======================================================
+   PHOTOS SCREEN
+   ====================================================== */
+"detected_palette" = "সনাক্তকৃত প্যালেট";
+"choose_photo" = "ছবি নির্বাচন করুন";
+"pick_photo" = "একটি ছবি বাছাই করুন";
+"pick_color" = "রঙ বাছাই করুন";
+"change_photo" = "ছবি পরিবর্তন করুন";
+"choose_an_image_to_find_matching_colors" = "মিলযুক্ত রঙ খুঁজতে একটি ছবি বাছাই করুন";
+"unlock_full_palette" = "সম্পূর্ণ প্যালেট আনলক করুন";
+"unnamed_color" = "নামহীন রঙ";
+"color_added_to_collections" = "রঙটি সংগ্রহে যোগ করা হয়েছে";
+
+/* ======================================================
+   SETTINGS SCREEN
+   ====================================================== */
+"appearance" = "দেখতে কেমন হবে";
+"theme" = "থিম";
+"language" = "ভাষা";
+"about" = "সম্পর্কে";
+"version" = "সংস্করণ:";
+"rate_app" = "অ্যাপটি রেট করুন";
+"help" = "সহায়তা";
+"send_feedback" = "প্রতিক্রিয়া পাঠান";
+"app_name" = "Colorit";
+"hrs" = "ঘ";
+"min" = "মি";
+"sec" = "সে";
+"system" = "সিস্টেম";
+"light" = "হালকা";
+"dark" = "গাঢ়";
+"general" = "সাধারণ";
+
+/* ======================================================
+   PAYWALL / PRO FEATURES
+   ====================================================== */
+"flash_sale" = "ফ্ল্যাশ সেল — সর্বোচ্চ ৮০% ছাড় শীঘ্রই শেষ হবে";
+"best_value" = "সেরা মূল্য";
+"terms_of_use" = "ব্যবহারের শর্তাবলী";
+"privacy_policy" = "গোপনীয়তা নীতি";
+"try_free" = "ফ্রি ট্রাই করুন";
+"continue" = "চালিয়ে যান";
+"unlock_pro_features" = "প্রো বৈশিষ্ট্য আনলক করুন";
+"included_in_pro" = "প্রো সংস্করণে অন্তর্ভুক্ত";
+"feature_live_color_id_subtitle" = "রিয়েল-টাইমে আপনার ক্যামেরা দিয়ে সাথে সাথে রঙ শনাক্ত করুন।";
+"feature_photo_color_picker_subtitle" = "যেকোনও ছবি থেকে AI নির্ভুলতায় পেশাদার প্যালেট বের করুন।";
+"feature_paint_catalogues_subtitle" = "একাধিক পেইন্ট সংগ্রহ থেকে নির্বাচিত প্যালেট এক্সপ্লোর করুন।";
+"feature_unlimited_collections_subtitle" = "আপনার কাজ বা অনুপ্রেরণার জন্য সীমাহীন প্যালেট তৈরি ও সংগঠিত করুন।";
+"feature_advanced_search_subtitle" = "HEX, RGB বা নাম দ্বারা সহজে এবং দ্রুত রঙ খুঁজুন।";
+"feature_harmony_colors_subtitle" = "সহজেই সাদৃশ্যপূর্ণ রঙ এবং সামঞ্জস্যপূর্ণ টোন তৈরি করুন।";
+"feature_multiple_layouts_subtitle" = "ভিজ্যুয়াল এক্সপ্লোরেশনের জন্য গ্রিড ও লিস্ট ভিউ পরিবর্তন করুন।";
+"feature_smart_filters_subtitle" = "রঙ, উজ্জ্বলতা বা সামঞ্জস্য অনুযায়ী ফিল্টার করুন।";
+"feature_color_matches_subtitle" = "লাইভ ও ছবির রঙের মিল তুলনা ও দেখুন।";
+"feature_unlimited_access_subtitle" = "কোনও সীমাবদ্ধতা নেই — সমস্ত টুল, প্যালেট ও বৈশিষ্ট্য উপভোগ করুন।";
+"your_purchases_have_been_restored" = "আপনার ক্রয়গুলি পুনরুদ্ধার করা হয়েছে";
+"no_previous_purchases_found" = "কোনও পূর্ববর্তী ক্রয় পাওয়া যায়নি।";
+"restore_purchases" = "ক্রয় পুনরুদ্ধার করুন";
+"cancel_anytime" = "যেকোনও সময় বাতিল করুন";
+"family_sharing_enabled" = "ফ্যামিলি শেয়ারিং সক্রিয়";
+"3_day_free_trial" = "৩ দিনের ফ্রি ট্রায়াল";
+"1_year_plan" = "১ বছরের প্ল্যান";
+"1_week_plan" = "১ সপ্তাহের প্ল্যান";
+"feature_live_color_id_title" = "লাইভ রঙ শনাক্তকারী";
+"feature_photo_color_picker_title" = "ছবি থেকে রঙ পিকার";
+"feature_paint_catalogues_title" = "পেশাদার পেইন্ট ক্যাটালগ";
+"feature_unlimited_collections_title" = "সীমাহীন সংগ্রহ ও প্যালেট";
+"feature_advanced_search_title" = "উন্নত অনুসন্ধান";
+"feature_harmony_colors_title" = "সামঞ্জস্যপূর্ণ ও অনুরূপ রঙ";
+"feature_multiple_layouts_title" = "বহু লেআউট ভিউ";
+"feature_smart_filters_title" = "স্মার্ট ফিল্টার ও সাজানো";
+"feature_color_matches_title" = "ছবি ও লাইভ রঙের মিল";
+"feature_unlimited_access_title" = "সীমাহীন অ্যাক্সেস";
+
+/* ======================================================
+   TOASTS / GENERIC MESSAGES
+   ====================================================== */
+"toast_copied" = "কপি হয়েছে";
+"toast_added" = "যোগ হয়েছে";
+"toast_removed" = "সরানো হয়েছে";
+"toast_share" = "শেয়ার";
+"toast_info" = "তথ্য";

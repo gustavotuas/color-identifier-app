@@ -43,7 +43,7 @@ struct VendorListSheet: View {
                     } label: {
                         HStack {
                             Image(systemName: selection == .genericOnly ? "checkmark.circle.fill" : "circle")
-                            Text("General")
+                            Text("general".localized)
                         }
                     }
                 }
@@ -83,7 +83,7 @@ struct VendorListSheet: View {
                 }
             }
             .listStyle(.insetGrouped)
-            .navigationTitle("Paints")
+            .navigationTitle("paints".localized)
             .navigationBarTitleDisplayMode(.inline)
         }
     }

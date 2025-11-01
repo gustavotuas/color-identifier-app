@@ -79,7 +79,7 @@ private func savePhotoPalette() {
     let dateString = formatter.string(from: Date())
 
     // 🔹 Nombre de la paleta con timestamp
-    let paletteName = "Photo Palette – \(dateString)"
+    let paletteName = "\("photo_palette".localized) – \(dateString)"
 
     // Guardar en colecciones (usa tu store/favs actual)
     favs.addPalette(name: paletteName, colors: unique)
@@ -88,7 +88,7 @@ private func savePhotoPalette() {
     withAnimation(.spring(response: 0.25, dampingFraction: 0.7)) {
         addedPalette = true
     }
-    showToast("Palette Added to Collections")
+    showToast("palette_added".localized)
 
     // Volver al estado normal después de un momento (mismo feel de rebote)
     DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
@@ -113,7 +113,7 @@ private func savePhotoPalette() {
                 }
                 .padding(.top, 10)
             }
-            .navigationTitle("Photos")
+            .navigationTitle("tab_photos".localized)
             .toolbar {
                 // ⚙️ Botón izquierdo (Filtros)
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -128,7 +128,7 @@ private func savePhotoPalette() {
                         Button {
                             store.showPaywall = true
                         } label: {
-                            Text("PRO")
+                            Text("pro_badge".localized)
                                 .font(.caption.bold())
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 6)
@@ -288,7 +288,7 @@ private var vendorFilterBar: some View {
                         Button {
                             showColorPicker = true
                         } label: {
-                            Label("Pick Color", systemImage: "eyedropper")
+                            Label("pick_color".localized, systemImage: "eyedropper")
                                 .font(.subheadline.weight(.semibold))
                                 .foregroundColor(.white)
                                 .padding(.horizontal, 16)
@@ -302,7 +302,7 @@ private var vendorFilterBar: some View {
                         Button {
                             showSystemPicker = true
                         } label: {
-                            Label("Change Photo", systemImage: "photo.on.rectangle")
+                            Label("change_photo".localized, systemImage: "photo.on.rectangle")
                                 .font(.subheadline.weight(.semibold))
                                 .foregroundColor(.white)
                                 .padding(.horizontal, 14)
@@ -319,7 +319,7 @@ private var vendorFilterBar: some View {
                     Image(systemName: "photo.on.rectangle.angled")
                         .font(.largeTitle)
                         .foregroundColor(.secondary)
-                    Text("Choose an image to find matching colors")
+                    Text("choose_an_image_to_find_matching_colors".localized)
                         .multilineTextAlignment(.center)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
@@ -328,7 +328,7 @@ private var vendorFilterBar: some View {
                         showSystemPicker = true
                     } label: {
                         HStack(spacing: 6) {
-                            Text("Choose Photo")
+                            Text("choose_photo".localized)
                                 .font(.system(size: 17, weight: .semibold))
                         }
                         .foregroundColor(Color.accentColor)
@@ -374,9 +374,9 @@ private var paletteCard: some View {
     ZStack {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("Detected Palette").font(.headline)
+                Text("detected_palette".localized).font(.headline)
                 Spacer()
-                Text("(\(matches.count) colors)")
+                Text("(\(matches.count) \("colors".localized))")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -403,7 +403,7 @@ Button {
     HStack(spacing: 6) {
         Image(systemName: addedPalette ? "checkmark.circle.fill" : "square.and.arrow.down")
             .font(.system(size: 17, weight: .semibold))
-        Text(addedPalette ? "Palette Saved" : "Add Palette to Collections")
+        Text(addedPalette ? "palette_saved".localized : "add_palette_to_collections".localized)
             .font(.system(size: 17, weight: .semibold))
     }
     .foregroundColor(Color.accentColor)
@@ -487,7 +487,7 @@ Button {
                     .foregroundColor(.white.opacity(0.95))
                     .shadow(color: .white.opacity(0.4), radius: 3, y: 1)
 
-                Text("Unlock Full Palette")
+                Text("unlock_full_palette".localized)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundColor(.white)
                     .padding(.horizontal, 26)
@@ -601,7 +601,7 @@ private struct DetectedPaletteSheet: View {
                                     .shadow(color: .black.opacity(0.1), radius: 2, y: 1)
 
                                 VStack(alignment: .leading, spacing: 4) {
-                                    Text(display?.name ?? "Unnamed Color")
+                                    Text(display?.name ?? "unnamed_color".localized)
                                         .font(.headline)
                                     if let brand = display?.vendor?.brand {
                                         Text(brand)
@@ -805,7 +805,7 @@ struct ColorPickerView: View {
                             if store.isPro {
                                 let rgb = hexToRGB(hexValue)
                                 favs.add(color: rgb)
-                                showToast("Color Added to Collections")
+                                showToast("color_added_to_collections".localized)
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                                     dismiss()
                                 }
@@ -813,7 +813,7 @@ struct ColorPickerView: View {
                                 store.showPaywall = true
                             }
                         } label: {
-                            Label("Add Color", systemImage: "plus")
+                            Label("add_color".localized, systemImage: "plus")
                                 .font(.subheadline.weight(.semibold))
                                 .foregroundColor(.white)
                                 .padding(.horizontal, 24)
@@ -850,7 +850,7 @@ struct ColorPickerView: View {
                             .zIndex(2)
 
                         // 🔒 Botón Unlock encima
-                        MagicalUnlockButtonSmall(title: "Unlock Picker")
+                        MagicalUnlockButtonSmall(title: "unlock_picker".localized)
                             .onTapGesture { store.showPaywall = true }
                             .zIndex(3)
                     }
@@ -868,7 +868,7 @@ struct ColorPickerView: View {
                         HStack(spacing: 6) {
                             Image(systemName: "xmark.circle.fill")
                                 .font(.system(size: 22, weight: .semibold))
-                            Text("Close")
+                            Text("close".localized)
                                 .font(.headline.weight(.semibold))
                         }
                         .padding(.horizontal, 16)

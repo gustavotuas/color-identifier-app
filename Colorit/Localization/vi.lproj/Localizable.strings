@@ -1,34 +1,200 @@
-"unlock_title" = "Unlock Colorit Pro";
-"unlock_subtitle" = "Experience AI color intelligence & design freedom.";
-"plan_weekly" = "Weekly – $5.99/week";
-"plan_monthly" = "Monthly – $14.99/month";
-"plan_yearly" = "Yearly – $59.99/year";
-"trial_badge" = "Start free for 3 days";
-"discount_badge_today" = "50% OFF today only";
-"discount_badge_limited" = "Save 50% – Limited Time";
-"regular_price_monthly" = "Regular $29.99/month";
-"regular_price_yearly" = "Regular $119.99/year";
-"cta_start_trial_save" = "Start My Free Trial & Save 50%";
-"footer_note" = "Limited-time launch offer. Cancel anytime in Settings. Offer may end soon.";
-"cancel_anytime" = "Cancel anytime";
-"best_value" = "Best Value";
-"selected" = "Selected";
-"offer_ends_in" = "Offer ends in";
-"get_started" = "Get Started";
-"camera" = "Camera";
-"photos" = "Photos";
-"browse" = "Browse";
-"discover" = "Discover";
-"home" = "Home";
-"profile" = "Profile";
-"quick_actions" = "Quick Actions";
-"open_camera" = "Open Camera";
-"from_photos" = "From Photos";
-"unlock_pro" = "Unlock Pro";
-"pick_photo" = "Pick a photo";
-"choose_photo" = "Choose Photo";
-"extract_palette" = "Extract Palette";
-"pro_tips" = "Pro Tips";
-"tip_natural_light" = "Capture under natural light";
-"tip_avoid_glare" = "Avoid reflections and glare";
-"tip_contrast" = "Try contrasty backgrounds";
+/* ======================================================
+   MAIN APP STRUCTURE
+   ====================================================== */
+"tab_collections" = "Bộ sưu tập";
+"tab_search" = "Tìm kiếm";
+"tab_camera" = "Máy ảnh";
+"tab_photos" = "Ảnh";
+"tab_settings" = "Cài đặt";
+"pro_badge" = "PRO";
+"unlock_pro" = "Mở khóa Pro";
+"unlock_pro_subtitle" = "Truy cập tất cả tính năng cao cấp";
+"unlock_picker" = "Mở khóa Trình chọn màu";
+
+/* ======================================================
+   SEARCH / COLOR DETAIL
+   ====================================================== */
+"color_harmony" = "Phối hợp màu sắc";
+"mode" = "Chế độ";
+"harmony" = "Hài hòa";
+"copy" = "Sao chép";
+"share" = "Chia sẻ";
+"add" = "Thêm";
+"added" = "Đã thêm";
+"close" = "Đóng";
+"copied_to_clipboard" = "Đã sao chép vào clipboard";
+"share_preparing" = "Đang chuẩn bị bản xem trước chia sẻ...";
+"red" = "Đỏ";
+"green" = "Xanh lá";
+"blue" = "Xanh dương";
+"hex" = "Hex";
+"hue" = "Sắc độ";
+"saturation" = "Độ bão hòa";
+"brightness" = "Độ sáng";
+"cyan" = "Xanh lam";
+"magenta" = "Hồng tím";
+"yellow" = "Vàng";
+"black" = "Đen";
+"show_more" = "Hiển thị thêm";
+"bucket" = "Xô màu";
+"color_not_found" = "Không tìm thấy màu trong thư viện";
+"shades_tints" = "Sắc độ và tông màu";
+"contrast_preview" = "Xem trước độ tương phản";
+"vendor" = "Nhà cung cấp";
+"brand" = "Thương hiệu";
+"code" = "Mã";
+"locator" = "Trình định vị";
+"open_vendor_page" = "Mở trang nhà cung cấp";
+"line" = "Dòng";
+"made_with" = "Tạo bằng Colorit";
+"url" = "www.colorit.app";
+"opening_share_sheet" = "Đang mở bảng chia sẻ...";
+"failed_to_open_share_sheet" = "Không thể mở bảng chia sẻ.";
+"unlock_pro_to_view_harmony" = "Mở Pro để xem Phối hợp màu";
+"unlock_pro_to_view_shades_tints" = "Mở Pro để xem Sắc độ và Tông màu";
+"text_sample" = "Mẫu văn bản";
+"excellent_AAA" = "Xuất sắc (AAA)";
+"good_AA" = "Tốt (AA)";
+"low_contrast" = "Độ tương phản thấp";
+"select_paint" = "Chọn sơn";
+"sort_alphabetically" = "Sắp xếp theo bảng chữ cái";
+"sort_by_brightness" = "Sắp xếp theo độ sáng";
+"toggle_layout" = "Chuyển đổi bố cục";
+"search_by" = "Tìm theo tên, hex, thương hiệu hoặc mã";
+"paints" = "Sơn";
+"general_palette" = "Bảng màu tổng hợp";
+
+/* ======================================================
+   CAMERA SCREEN
+   ====================================================== */
+"no_match_found" = "Không tìm thấy kết quả phù hợp";
+"added_to_collections" = "Đã thêm vào bộ sưu tập";
+"removed_from_collections" = "Đã xóa khỏi bộ sưu tập";
+"sort_by_alphabetic" = "Sắp xếp theo bảng chữ cái";
+"free_preview" = "Xem trước miễn phí – Mở PRO để truy cập đầy đủ";
+"unlock_live_camera" = "Mở khóa Máy ảnh Trực tiếp";
+"generate_palette" = "Tạo bảng màu";
+"precision" = "Độ chính xác";
+"save" = "Lưu";
+"save_color_to_collections" = "Lưu màu vào bộ sưu tập";
+"color_matches" = "Màu tương đồng";
+
+/* ======================================================
+   LIVE / PHOTO PALETTE DETAILS
+   ====================================================== */
+"add_palette_to_collections" = "Thêm bảng màu vào bộ sưu tập";
+"palette_saved" = "Đã lưu bảng màu";
+"palette_added" = "Đã thêm bảng màu vào bộ sưu tập";
+"live_palette" = "Bảng màu trực tiếp";
+"photo_palette" = "Bảng màu ảnh";
+"unlock_full_palette_color_matches" = "Mở toàn bộ bảng màu và màu tương đồng";
+
+/* ======================================================
+   FAVORITES / COLLECTIONS
+   ====================================================== */
+"colors" = "Màu sắc";
+"color" = "Màu";
+"palettes" = "Bảng màu";
+"palette" = "Bảng màu";
+"all" = "Tất cả";
+"no_collections_yet" = "Chưa có bộ sưu tập nào";
+"no_collections_subtitle" = "Lưu màu và bảng màu để xem lại sau tại đây.";
+"clear_all_collections" = "Xóa tất cả bộ sưu tập?";
+"yes" = "Có";
+"no" = "Không";
+"create_palette" = "Tạo bảng màu";
+"palette_name_optional" = "Tên bảng màu (tùy chọn)";
+"palette_name" = "Tên bảng màu";
+"add_color" = "Thêm màu";
+"edit" = "Chỉnh sửa";
+"cancel" = "Hủy";
+"done" = "Hoàn tất";
+"delete_palette" = "Xóa bảng màu này?";
+"collections" = "Bộ sưu tập";
+"new_palette" = "Bảng màu mới";
+"untitled_palette" = "Bảng màu chưa đặt tên";
+"delete" = "Xóa";
+"all_colors_already_added" = "Tất cả màu đã được thêm.";
+"select_colors_to_add" = "Chọn màu để thêm";
+
+/* ======================================================
+   PHOTOS SCREEN
+   ====================================================== */
+"detected_palette" = "Bảng màu đã phát hiện";
+"choose_photo" = "Chọn ảnh";
+"pick_photo" = "Chọn một ảnh";
+"pick_color" = "Chọn màu";
+"change_photo" = "Đổi ảnh";
+"choose_an_image_to_find_matching_colors" = "Chọn hình để tìm màu tương đồng";
+"unlock_full_palette" = "Mở toàn bộ bảng màu";
+"unnamed_color" = "Màu chưa đặt tên";
+"color_added_to_collections" = "Màu đã được thêm vào bộ sưu tập";
+
+/* ======================================================
+   SETTINGS SCREEN
+   ====================================================== */
+"appearance" = "Giao diện";
+"theme" = "Chủ đề";
+"language" = "Ngôn ngữ";
+"about" = "Giới thiệu";
+"version" = "Phiên bản:";
+"rate_app" = "Đánh giá ứng dụng";
+"help" = "Trợ giúp";
+"send_feedback" = "Gửi phản hồi";
+"app_name" = "Colorit";
+"hrs" = "giờ";
+"min" = "phút";
+"sec" = "giây";
+"system" = "Hệ thống";
+"light" = "Sáng";
+"dark" = "Tối";
+"general" = "Chung";
+
+/* ======================================================
+   PAYWALL / PRO FEATURES
+   ====================================================== */
+"flash_sale" = "Giảm giá lên đến -80% kết thúc trong";
+"best_value" = "Giá trị tốt nhất";
+"terms_of_use" = "Điều khoản sử dụng";
+"privacy_policy" = "Chính sách bảo mật";
+"try_free" = "Dùng thử miễn phí";
+"continue" = "Tiếp tục";
+"unlock_pro_features" = "Mở khóa tính năng Pro";
+"included_in_pro" = "Bao gồm trong Pro";
+"feature_live_color_id_subtitle" = "Nhận diện màu ngay lập tức qua máy ảnh theo thời gian thực.";
+"feature_photo_color_picker_subtitle" = "Trích xuất bảng màu chuyên nghiệp từ bất kỳ ảnh nào bằng AI.";
+"feature_paint_catalogues_subtitle" = "Khám phá các bảng màu được chọn lọc từ nhiều bộ sưu tập sơn khác nhau.";
+"feature_unlimited_collections_subtitle" = "Tạo và sắp xếp bảng màu không giới hạn cho công việc hoặc cảm hứng của bạn.";
+"feature_advanced_search_subtitle" = "Tìm màu bằng HEX, RGB hoặc tên một cách nhanh chóng và trực quan.";
+"feature_harmony_colors_subtitle" = "Tạo bảng phối màu hài hòa và khám phá các tông màu tương đồng.";
+"feature_multiple_layouts_subtitle" = "Chuyển đổi giữa dạng lưới và danh sách để khám phá bảng màu trực quan.";
+"feature_smart_filters_subtitle" = "Lọc theo sắc độ, độ sáng hoặc sự hài hòa một cách chính xác.";
+"feature_color_matches_subtitle" = "So sánh và xem trực quan màu tương đồng giữa ảnh và chế độ trực tiếp.";
+"feature_unlimited_access_subtitle" = "Không giới hạn — tận hưởng mọi công cụ, bảng màu và tính năng mãi mãi.";
+"your_purchases_have_been_restored" = "Giao dịch mua của bạn đã được khôi phục";
+"no_previous_purchases_found" = "Không tìm thấy giao dịch mua trước đó.";
+"restore_purchases" = "Khôi phục giao dịch mua";
+"cancel_anytime" = "Hủy bất cứ lúc nào";
+"family_sharing_enabled" = "Chia sẻ gia đình được bật";
+"3_day_free_trial" = "Dùng thử miễn phí 3 ngày";
+"1_year_plan" = "Gói 1 năm";
+"1_week_plan" = "Gói 1 tuần";
+"feature_live_color_id_title" = "Nhận diện màu trực tiếp";
+"feature_photo_color_picker_title" = "Trình chọn màu từ ảnh";
+"feature_paint_catalogues_title" = "Danh mục sơn chuyên nghiệp";
+"feature_unlimited_collections_title" = "Bộ sưu tập và bảng màu không giới hạn";
+"feature_advanced_search_title" = "Tìm kiếm nâng cao";
+"feature_harmony_colors_title" = "Màu hài hòa và tương đồng";
+"feature_multiple_layouts_title" = "Nhiều chế độ bố cục";
+"feature_smart_filters_title" = "Bộ lọc thông minh và sắp xếp";
+"feature_color_matches_title" = "Màu tương đồng cho ảnh và chế độ trực tiếp";
+"feature_unlimited_access_title" = "Truy cập không giới hạn";
+
+/* ======================================================
+   TOASTS / GENERIC MESSAGES
+   ====================================================== */
+"toast_copied" = "Đã sao chép";
+"toast_added" = "Đã thêm";
+"toast_removed" = "Đã xóa";
+"toast_share" = "Chia sẻ";
+"toast_info" = "Thông tin";

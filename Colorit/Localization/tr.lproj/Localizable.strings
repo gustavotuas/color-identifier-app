@@ -1,34 +1,200 @@
-"unlock_title" = "Unlock Colorit Pro";
-"unlock_subtitle" = "Experience AI color intelligence & design freedom.";
-"plan_weekly" = "Weekly – $5.99/week";
-"plan_monthly" = "Monthly – $14.99/month";
-"plan_yearly" = "Yearly – $59.99/year";
-"trial_badge" = "Start free for 3 days";
-"discount_badge_today" = "50% OFF today only";
-"discount_badge_limited" = "Save 50% – Limited Time";
-"regular_price_monthly" = "Regular $29.99/month";
-"regular_price_yearly" = "Regular $119.99/year";
-"cta_start_trial_save" = "Start My Free Trial & Save 50%";
-"footer_note" = "Limited-time launch offer. Cancel anytime in Settings. Offer may end soon.";
-"cancel_anytime" = "Cancel anytime";
-"best_value" = "Best Value";
-"selected" = "Selected";
-"offer_ends_in" = "Offer ends in";
-"get_started" = "Get Started";
-"camera" = "Camera";
-"photos" = "Photos";
-"browse" = "Browse";
-"discover" = "Discover";
-"home" = "Home";
-"profile" = "Profile";
-"quick_actions" = "Quick Actions";
-"open_camera" = "Open Camera";
-"from_photos" = "From Photos";
-"unlock_pro" = "Unlock Pro";
-"pick_photo" = "Pick a photo";
-"choose_photo" = "Choose Photo";
-"extract_palette" = "Extract Palette";
-"pro_tips" = "Pro Tips";
-"tip_natural_light" = "Capture under natural light";
-"tip_avoid_glare" = "Avoid reflections and glare";
-"tip_contrast" = "Try contrasty backgrounds";
+/* ======================================================
+   MAIN APP STRUCTURE
+   ====================================================== */
+"tab_collections" = "Koleksiyonlar";
+"tab_search" = "Ara";
+"tab_camera" = "Kamera";
+"tab_photos" = "Fotoğraflar";
+"tab_settings" = "Ayarlar";
+"pro_badge" = "PRO";
+"unlock_pro" = "Pro’yu Aç";
+"unlock_pro_subtitle" = "Tüm premium özelliklere erişim kazanın";
+"unlock_picker" = "Seçiciyi Aç";
+
+/* ======================================================
+   SEARCH / COLOR DETAIL
+   ====================================================== */
+"color_harmony" = "Renk Uyumu";
+"mode" = "Mod";
+"harmony" = "Uyum";
+"copy" = "Kopyala";
+"share" = "Paylaş";
+"add" = "Ekle";
+"added" = "Eklendi";
+"close" = "Kapat";
+"copied_to_clipboard" = "Panoya kopyalandı";
+"share_preparing" = "Paylaşım önizlemesi hazırlanıyor...";
+"red" = "Kırmızı";
+"green" = "Yeşil";
+"blue" = "Mavi";
+"hex" = "Hex";
+"hue" = "Ton";
+"saturation" = "Doygunluk";
+"brightness" = "Parlaklık";
+"cyan" = "Camgöbeği";
+"magenta" = "Macenta";
+"yellow" = "Sarı";
+"black" = "Siyah";
+"show_more" = "Daha fazla göster";
+"bucket" = "Kova";
+"color_not_found" = "Kütüphanede renk bulunamadı";
+"shades_tints" = "Tonlar ve Gölgeler";
+"contrast_preview" = "Kontrast Önizlemesi";
+"vendor" = "Satıcı";
+"brand" = "Marka";
+"code" = "Kod";
+"locator" = "Bulucu";
+"open_vendor_page" = "Satıcı Sayfasını Aç";
+"line" = "Seri";
+"made_with" = "Colorit ile yapıldı";
+"url" = "www.colorit.app";
+"opening_share_sheet" = "Paylaşım sayfası açılıyor...";
+"failed_to_open_share_sheet" = "Paylaşım sayfası açılamadı.";
+"unlock_pro_to_view_harmony" = "Uyumu görmek için Pro’yu açın";
+"unlock_pro_to_view_shades_tints" = "Tonları ve gölgeleri görmek için Pro’yu açın";
+"text_sample" = "Metin örneği";
+"excellent_AAA" = "Mükemmel (AAA)";
+"good_AA" = "İyi (AA)";
+"low_contrast" = "Düşük Kontrast";
+"select_paint" = "Boya Seç";
+"sort_alphabetically" = "Alfabetik olarak sırala";
+"sort_by_brightness" = "Parlaklığa göre sırala";
+"toggle_layout" = "Düzeni değiştir";
+"search_by" = "İsme, hex, markaya veya koda göre ara";
+"paints" = "Boyalar";
+"general_palette" = "Genel Palet";
+
+/* ======================================================
+   CAMERA SCREEN
+   ====================================================== */
+"no_match_found" = "Eşleşme bulunamadı";
+"added_to_collections" = "Koleksiyonlara eklendi";
+"removed_from_collections" = "Koleksiyonlardan kaldırıldı";
+"sort_by_alphabetic" = "Alfabetik sırala";
+"free_preview" = "Ücretsiz Önizleme – Tam erişim için PRO’yu açın";
+"unlock_live_camera" = "Tam Canlı Kamera’yı Aç";
+"generate_palette" = "Palet Oluştur";
+"precision" = "Hassasiyet";
+"save" = "Kaydet";
+"save_color_to_collections" = "Rengi koleksiyonlara kaydet";
+"color_matches" = "Renk Eşleşmeleri";
+
+/* ======================================================
+   LIVE / PHOTO PALETTE DETAILS
+   ====================================================== */
+"add_palette_to_collections" = "Paleti Koleksiyonlara Ekle";
+"palette_saved" = "Palet Kaydedildi";
+"palette_added" = "Palet Koleksiyonlara Eklendi";
+"live_palette" = "Canlı Palet";
+"photo_palette" = "Fotoğraf Paleti";
+"unlock_full_palette_color_matches" = "Tam Palet ve Renk Eşleşmelerini Aç";
+
+/* ======================================================
+   FAVORITES / COLLECTIONS
+   ====================================================== */
+"colors" = "Renkler";
+"color" = "Renk";
+"palettes" = "Paletler";
+"palette" = "Palet";
+"all" = "Tümü";
+"no_collections_yet" = "Henüz koleksiyon yok";
+"no_collections_subtitle" = "Renkleri ve paletleri kaydedip burada tekrar görüntüleyin.";
+"clear_all_collections" = "Tüm koleksiyonlar silinsin mi?";
+"yes" = "Evet";
+"no" = "Hayır";
+"create_palette" = "Palet Oluştur";
+"palette_name_optional" = "Palet adı (isteğe bağlı)";
+"palette_name" = "Palet adı";
+"add_color" = "Renk Ekle";
+"edit" = "Düzenle";
+"cancel" = "İptal";
+"done" = "Tamamlandı";
+"delete_palette" = "Bu palet silinsin mi?";
+"collections" = "Koleksiyonlar";
+"new_palette" = "Yeni Palet";
+"untitled_palette" = "İsimsiz Palet";
+"delete" = "Sil";
+"all_colors_already_added" = "Tüm renkler zaten eklendi.";
+"select_colors_to_add" = "Eklenecek renkleri seç";
+
+/* ======================================================
+   PHOTOS SCREEN
+   ====================================================== */
+"detected_palette" = "Algılanan Palet";
+"choose_photo" = "Fotoğraf Seç";
+"pick_photo" = "Fotoğraf Seçin";
+"pick_color" = "Renk Seçin";
+"change_photo" = "Fotoğrafı Değiştir";
+"choose_an_image_to_find_matching_colors" = "Eşleşen renkleri bulmak için bir görsel seçin";
+"unlock_full_palette" = "Tam Paleti Aç";
+"unnamed_color" = "İsimsiz Renk";
+"color_added_to_collections" = "Renk Koleksiyonlara Eklendi";
+
+/* ======================================================
+   SETTINGS SCREEN
+   ====================================================== */
+"appearance" = "Görünüm";
+"theme" = "Tema";
+"language" = "Dil";
+"about" = "Hakkında";
+"version" = "Sürüm:";
+"rate_app" = "Uygulamayı Değerlendir";
+"help" = "Yardım";
+"send_feedback" = "Geri Bildirim Gönder";
+"app_name" = "Colorit";
+"hrs" = "sa";
+"min" = "dk";
+"sec" = "sn";
+"system" = "Sistem";
+"light" = "Aydınlık";
+"dark" = "Koyu";
+"general" = "Genel";
+
+/* ======================================================
+   PAYWALL / PRO FEATURES
+   ====================================================== */
+"flash_sale" = "Fırsat indirimi %80’e varan – sona eriyor";
+"best_value" = "En İyi Değer";
+"terms_of_use" = "Kullanım Şartları";
+"privacy_policy" = "Gizlilik Politikası";
+"try_free" = "Ücretsiz Dene";
+"continue" = "Devam Et";
+"unlock_pro_features" = "Pro Özelliklerini Aç";
+"included_in_pro" = "Pro’ya Dahil";
+"feature_live_color_id_subtitle" = "Kameranla anında gerçek zamanlı renk tanımlaması yap.";
+"feature_photo_color_picker_subtitle" = "Herhangi bir fotoğraftan profesyonel paletleri AI hassasiyetiyle çıkar.";
+"feature_paint_catalogues_subtitle" = "Birden fazla boya koleksiyonundan seçilmiş paletleri keşfet.";
+"feature_unlimited_collections_subtitle" = "Çalışmaların veya ilhamların için sınırsız palet oluştur ve düzenle.";
+"feature_advanced_search_subtitle" = "HEX, RGB veya isimle anında ve sezgisel olarak renk bul.";
+"feature_harmony_colors_subtitle" = "Uyumlu renk şemaları oluştur ve benzer tonları kolayca keşfet.";
+"feature_multiple_layouts_subtitle" = "Paletleri görsel olarak keşfetmek için ızgara veya liste görünümüne geç.";
+"feature_smart_filters_subtitle" = "Ton, parlaklık veya uyuma göre hassas filtreleme yap.";
+"feature_color_matches_subtitle" = "Canlı ve kaydedilmiş örnekler arasında renk eşleşmelerini karşılaştır ve görselleştir.";
+"feature_unlimited_access_subtitle" = "Kısıtlama yok — tüm araçların, paletlerin ve özelliklerin tadını çıkar.";
+"your_purchases_have_been_restored" = "Satın alımlarınız geri yüklendi";
+"no_previous_purchases_found" = "Önceki satın alım bulunamadı.";
+"restore_purchases" = "Satın Alımları Geri Yükle";
+"cancel_anytime" = "İstediğin zaman iptal et";
+"family_sharing_enabled" = "Aile Paylaşımı Etkin";
+"3_day_free_trial" = "3 Günlük Ücretsiz Deneme";
+"1_year_plan" = "1 Yıllık Plan";
+"1_week_plan" = "1 Haftalık Plan";
+"feature_live_color_id_title" = "Canlı Renk Tanımlama";
+"feature_photo_color_picker_title" = "Fotoğraf Renk Seçici";
+"feature_paint_catalogues_title" = "Profesyonel Boya Kataloğu";
+"feature_unlimited_collections_title" = "Sınırsız Koleksiyonlar ve Paletler";
+"feature_advanced_search_title" = "Gelişmiş Arama";
+"feature_harmony_colors_title" = "Uyumlu ve Benzer Renkler";
+"feature_multiple_layouts_title" = "Birden Fazla Düzen Görünümü";
+"feature_smart_filters_title" = "Akıllı Filtreler ve Sıralama";
+"feature_color_matches_title" = "Fotoğraf ve Canlı Renk Eşleşmeleri";
+"feature_unlimited_access_title" = "Sınırsız Erişim";
+
+/* ======================================================
+   TOASTS / GENERIC MESSAGES
+   ====================================================== */
+"toast_copied" = "Kopyalandı";
+"toast_added" = "Eklendi";
+"toast_removed" = "Kaldırıldı";
+"toast_share" = "Paylaş";
+"toast_info" = "Bilgi";

@@ -1,34 +1,200 @@
-"unlock_title" = "Unlock Colorit Pro";
-"unlock_subtitle" = "Experience AI color intelligence & design freedom.";
-"plan_weekly" = "Weekly – $5.99/week";
-"plan_monthly" = "Monthly – $14.99/month";
-"plan_yearly" = "Yearly – $59.99/year";
-"trial_badge" = "Start free for 3 days";
-"discount_badge_today" = "50% OFF today only";
-"discount_badge_limited" = "Save 50% – Limited Time";
-"regular_price_monthly" = "Regular $29.99/month";
-"regular_price_yearly" = "Regular $119.99/year";
-"cta_start_trial_save" = "Start My Free Trial & Save 50%";
-"footer_note" = "Limited-time launch offer. Cancel anytime in Settings. Offer may end soon.";
-"cancel_anytime" = "Cancel anytime";
-"best_value" = "Best Value";
-"selected" = "Selected";
-"offer_ends_in" = "Offer ends in";
-"get_started" = "Get Started";
-"camera" = "Camera";
-"photos" = "Photos";
-"browse" = "Browse";
-"discover" = "Discover";
-"home" = "Home";
-"profile" = "Profile";
-"quick_actions" = "Quick Actions";
-"open_camera" = "Open Camera";
-"from_photos" = "From Photos";
-"unlock_pro" = "Unlock Pro";
-"pick_photo" = "Pick a photo";
-"choose_photo" = "Choose Photo";
-"extract_palette" = "Extract Palette";
-"pro_tips" = "Pro Tips";
-"tip_natural_light" = "Capture under natural light";
-"tip_avoid_glare" = "Avoid reflections and glare";
-"tip_contrast" = "Try contrasty backgrounds";
+/* ======================================================
+   MAIN APP STRUCTURE
+   ====================================================== */
+"tab_collections" = "Coleções";
+"tab_search" = "Buscar";
+"tab_camera" = "Câmera";
+"tab_photos" = "Fotos";
+"tab_settings" = "Configurações";
+"pro_badge" = "PRO";
+"unlock_pro" = "Desbloquear Pro";
+"unlock_pro_subtitle" = "Acesse todos os recursos premium";
+"unlock_picker" = "Desbloquear Seletor";
+
+/* ======================================================
+   SEARCH / COLOR DETAIL
+   ====================================================== */
+"color_harmony" = "Harmonia de Cores";
+"mode" = "Modo";
+"harmony" = "Harmonia";
+"copy" = "Copiar";
+"share" = "Compartilhar";
+"add" = "Adicionar";
+"added" = "Adicionado";
+"close" = "Fechar";
+"copied_to_clipboard" = "Copiado para a área de transferência";
+"share_preparing" = "Preparando visualização para compartilhar...";
+"red" = "Vermelho";
+"green" = "Verde";
+"blue" = "Azul";
+"hex" = "Hex";
+"hue" = "Matiz";
+"saturation" = "Saturação";
+"brightness" = "Brilho";
+"cyan" = "Ciano";
+"magenta" = "Magenta";
+"yellow" = "Amarelo";
+"black" = "Preto";
+"show_more" = "Mostrar mais";
+"bucket" = "Balde";
+"color_not_found" = "Cor não encontrada na biblioteca";
+"shades_tints" = "Tons e Matizes";
+"contrast_preview" = "Prévia de Contraste";
+"vendor" = "Fornecedor";
+"brand" = "Marca";
+"code" = "Código";
+"locator" = "Localizador";
+"open_vendor_page" = "Abrir página do fornecedor";
+"line" = "Linha";
+"made_with" = "Feito com Colorit";
+"url" = "www.colorit.app";
+"opening_share_sheet" = "Abrindo painel de compartilhamento...";
+"failed_to_open_share_sheet" = "Falha ao abrir painel de compartilhamento.";
+"unlock_pro_to_view_harmony" = "Desbloqueie o Pro para ver a Harmonia";
+"unlock_pro_to_view_shades_tints" = "Desbloqueie o Pro para ver Tons e Matizes";
+"text_sample" = "Exemplo de texto";
+"excellent_AAA" = "Excelente (AAA)";
+"good_AA" = "Bom (AA)";
+"low_contrast" = "Baixo contraste";
+"select_paint" = "Selecionar tinta";
+"sort_alphabetically" = "Ordenar alfabeticamente";
+"sort_by_brightness" = "Ordenar por brilho";
+"toggle_layout" = "Alternar layout";
+"search_by" = "Buscar por nome, hex, marca ou código";
+"paints" = "Tintas";
+"general_palette" = "Paleta geral";
+
+/* ======================================================
+   CAMERA SCREEN
+   ====================================================== */
+"no_match_found" = "Nenhuma correspondência encontrada";
+"added_to_collections" = "Adicionado às coleções";
+"removed_from_collections" = "Removido das coleções";
+"sort_by_alphabetic" = "Ordenar alfabeticamente";
+"free_preview" = "Prévia gratuita – desbloqueie PRO para acesso completo";
+"unlock_live_camera" = "Desbloquear câmera ao vivo completa";
+"generate_palette" = "Gerar paleta";
+"precision" = "Precisão";
+"save" = "Salvar";
+"save_color_to_collections" = "Salvar cor nas coleções";
+"color_matches" = "Combinações de cores";
+
+/* ======================================================
+   LIVE / PHOTO PALETTE DETAILS
+   ====================================================== */
+"add_palette_to_collections" = "Adicionar paleta às coleções";
+"palette_saved" = "Paleta salva";
+"palette_added" = "Paleta adicionada às coleções";
+"live_palette" = "Paleta ao vivo";
+"photo_palette" = "Paleta da foto";
+"unlock_full_palette_color_matches" = "Desbloqueie paleta completa e combinações de cores";
+
+/* ======================================================
+   FAVORITES / COLLECTIONS
+   ====================================================== */
+"colors" = "Cores";
+"color" = "Cor";
+"palettes" = "Paletas";
+"palette" = "Paleta";
+"all" = "Tudo";
+"no_collections_yet" = "Nenhuma coleção ainda";
+"no_collections_subtitle" = "Salve cores e paletas para visualizá-las aqui.";
+"clear_all_collections" = "Apagar todas as coleções?";
+"yes" = "Sim";
+"no" = "Não";
+"create_palette" = "Criar paleta";
+"palette_name_optional" = "Nome da paleta (opcional)";
+"palette_name" = "Nome da paleta";
+"add_color" = "Adicionar cor";
+"edit" = "Editar";
+"cancel" = "Cancelar";
+"done" = "Concluir";
+"delete_palette" = "Excluir esta paleta?";
+"collections" = "Coleções";
+"new_palette" = "Nova paleta";
+"untitled_palette" = "Paleta sem título";
+"delete" = "Excluir";
+"all_colors_already_added" = "Todas as cores já foram adicionadas.";
+"select_colors_to_add" = "Selecione cores para adicionar";
+
+/* ======================================================
+   PHOTOS SCREEN
+   ====================================================== */
+"detected_palette" = "Paleta detectada";
+"choose_photo" = "Escolher foto";
+"pick_photo" = "Selecionar foto";
+"pick_color" = "Escolher cor";
+"change_photo" = "Trocar foto";
+"choose_an_image_to_find_matching_colors" = "Escolha uma imagem para encontrar cores correspondentes";
+"unlock_full_palette" = "Desbloquear paleta completa";
+"unnamed_color" = "Cor sem nome";
+"color_added_to_collections" = "Cor adicionada às coleções";
+
+/* ======================================================
+   SETTINGS SCREEN
+   ====================================================== */
+"appearance" = "Aparência";
+"theme" = "Tema";
+"language" = "Idioma";
+"about" = "Sobre";
+"version" = "Versão:";
+"rate_app" = "Avaliar aplicativo";
+"help" = "Ajuda";
+"send_feedback" = "Enviar feedback";
+"app_name" = "Colorit";
+"hrs" = "h";
+"min" = "min";
+"sec" = "s";
+"system" = "Sistema";
+"light" = "Claro";
+"dark" = "Escuro";
+"general" = "Geral";
+
+/* ======================================================
+   PAYWALL / PRO FEATURES
+   ====================================================== */
+"flash_sale" = "Promoção relâmpago de até -80% termina em";
+"best_value" = "Melhor valor";
+"terms_of_use" = "Termos de uso";
+"privacy_policy" = "Política de privacidade";
+"try_free" = "Experimente grátis";
+"continue" = "Continuar";
+"unlock_pro_features" = "Desbloquear recursos Pro";
+"included_in_pro" = "Incluído no Pro";
+"feature_live_color_id_subtitle" = "Identifique cores instantaneamente pela câmera em tempo real.";
+"feature_photo_color_picker_subtitle" = "Extraia paletas profissionais de qualquer foto com precisão de IA.";
+"feature_paint_catalogues_subtitle" = "Explore paletas selecionadas de diversas coleções de tintas.";
+"feature_unlimited_collections_subtitle" = "Crie e organize paletas ilimitadas para seu trabalho ou inspiração.";
+"feature_advanced_search_subtitle" = "Encontre cores por HEX, RGB ou nome de forma rápida e intuitiva.";
+"feature_harmony_colors_subtitle" = "Gere esquemas harmônicos e descubra tons correspondentes facilmente.";
+"feature_multiple_layouts_subtitle" = "Alterne entre visualização em grade e lista para explorar visualmente.";
+"feature_smart_filters_subtitle" = "Filtre por matiz, brilho ou harmonia com precisão.";
+"feature_color_matches_subtitle" = "Compare e visualize combinações entre amostras ao vivo e fotos.";
+"feature_unlimited_access_subtitle" = "Sem limites — aproveite todas as ferramentas, paletas e recursos para sempre.";
+"your_purchases_have_been_restored" = "Suas compras foram restauradas";
+"no_previous_purchases_found" = "Nenhuma compra anterior encontrada.";
+"restore_purchases" = "Restaurar compras";
+"cancel_anytime" = "Cancele a qualquer momento";
+"family_sharing_enabled" = "Compartilhamento familiar ativado";
+"3_day_free_trial" = "Teste grátis de 3 dias";
+"1_year_plan" = "Plano anual";
+"1_week_plan" = "Plano semanal";
+"feature_live_color_id_title" = "Identificação de Cores ao Vivo";
+"feature_photo_color_picker_title" = "Seletor de Cores de Fotos";
+"feature_paint_catalogues_title" = "Catálogos de Tintas Profissionais";
+"feature_unlimited_collections_title" = "Coleções e Paletas Ilimitadas";
+"feature_advanced_search_title" = "Busca Avançada";
+"feature_harmony_colors_title" = "Harmonia e Cores Semelhantes";
+"feature_multiple_layouts_title" = "Várias Visualizações de Layout";
+"feature_smart_filters_title" = "Filtros e Ordenações Inteligentes";
+"feature_color_matches_title" = "Combinações de Cores para Foto e Ao Vivo";
+"feature_unlimited_access_title" = "Acesso Ilimitado";
+
+/* ======================================================
+   TOASTS / GENERIC MESSAGES
+   ====================================================== */
+"toast_copied" = "Copiado";
+"toast_added" = "Adicionado";
+"toast_removed" = "Removido";
+"toast_share" = "Compartilhar";
+"toast_info" = "Informação";
