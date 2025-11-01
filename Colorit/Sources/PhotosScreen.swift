@@ -106,7 +106,7 @@ private func savePhotoPalette() {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 18) {
-                    if selection.isFiltered { filterHeader }
+                    vendorFilterBar
                     if !palette.isEmpty { paletteCard }
                     imageSection
                     Spacer(minLength: 60)
@@ -210,38 +210,66 @@ private func savePhotoPalette() {
         }
     }
 
-    // MARK: - Filter Header
-    private var filterHeader: some View {
+
+    // MARK: - Vendor Filter Bar (estilo Favorites)
+private var vendorFilterBar: some View {
+    ScrollView(.horizontal, showsIndicators: false) {
         HStack(spacing: 8) {
-            Image(systemName: "paintpalette.fill")
-            Text(selection.filterSubtitle)
-                .lineLimit(1)
-            Spacer()
-            Button {
-                withAnimation(.easeInOut) {
-                    selection = .genericOnly
-                    VendorSelectionStorage.save(selection)
-                    rebuildMatches()
+            ForEach(CatalogID.allCases, id: \.self) { id in
+                let isSelected = selection == .vendor(id) || (selection == .genericOnly && id == .generic)
+                let isLocked = !store.isPro && id != .generic
+
+                Button {
+                    if isLocked {
+                        // Mostrar paywall
+                        withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                            store.showPaywall = true
+                        }
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                    } else {
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            if id == .generic {
+                                selection = .genericOnly
+                            } else {
+                                selection = .vendor(id)
+                            }
+                            VendorSelectionStorage.save(selection)
+                        }
+                        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+                    }
+                } label: {
+                    HStack(spacing: 6) {
+                        Text(id.displayName)
+                            .font(.subheadline.bold())
+
+                        if isLocked {
+                            Image(systemName: "lock.fill")
+                                .font(.system(size: 10, weight: .semibold))
+                        }
+                    }
+                    .padding(.vertical, 6)
+                    .padding(.horizontal, 16)
+                    .background(
+                        Capsule()
+                            .fill(isSelected ? Color.secondary.opacity(0.2) : Color.clear)
+                            .overlay(
+                                Capsule()
+                                    .stroke(Color.secondary.opacity(0.3), lineWidth: 1)
+                            )
+                    )
+                    .foregroundColor(
+                        isLocked
+                        ? .gray.opacity(0.7)
+                        : (isSelected ? .primary : .secondary)
+                    )
                 }
-            } label: {
-                Label("Clear", systemImage: "xmark.circle.fill")
-                    .labelStyle(.titleAndIcon)
             }
-            .buttonStyle(.bordered)
-            .tint(.blue)
-            .font(.caption.bold())
         }
-        .font(.footnote)
-        .padding(10)
-        .background(Color.blue.opacity(0.12))
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(Color.blue.opacity(0.5), lineWidth: 1)
-        )
-        .foregroundColor(.blue)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
         .padding(.horizontal)
+        .padding(.top, 8)
     }
+}
+
 
     // MARK: - Image Section
     private var imageSection: some View {
