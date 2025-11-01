@@ -140,7 +140,6 @@ struct PaywallView: View {
                                 SelectablePlanCard(
                                     product: p,
                                     isSelected: store.selectedID == p.id,
-                                    pulse: pulse && p.id == store.yearly
                                 )
                                 .onTapGesture {
                                     withAnimation(.spring()) {
@@ -249,9 +248,9 @@ struct PaywallView: View {
             if let yearly = store.products.first(where: { $0.id == store.yearly }) {
                 store.selectedID = yearly.id
             }
-            withAnimation(.easeInOut(duration: 1).repeatForever(autoreverses: true)) {
-                pulse = true
-            }
+            // withAnimation(.easeInOut(duration: 1).repeatForever(autoreverses: true)) {
+            //     pulse = true
+            // }
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 withAnimation(.easeIn(duration: 0.3)) {
                     showClose = true
@@ -320,15 +319,15 @@ struct SelectablePlanCard: View {
     @Environment(\.colorScheme) private var scheme
     let product: Product
     let isSelected: Bool
-    let pulse: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(displayTitle(for: product))
-                        .font(.headline)
+                        .font(product.id == store.yearly ? .title3.bold() : .headline)
                         .foregroundColor(.primary)
+
                     if store.hasTrial(product) {
                         Text("3-Day Free Trial")
                             .font(.subheadline.bold())
@@ -345,23 +344,26 @@ struct SelectablePlanCard: View {
                         .padding(.horizontal, 8)
                         .padding(.vertical, 3)
                         .background(
-                            LinearGradient(colors: [Color(hex: "#3C8CE7"), Color(hex: "#5AA9FF")],
-                                           startPoint: .topLeading, endPoint: .bottomTrailing)
+                            LinearGradient(
+                                colors: [Color(hex: "#3C8CE7"), Color(hex: "#5AA9FF")],
+                                startPoint: .topLeading, endPoint: .bottomTrailing
+                            )
                         )
                         .foregroundColor(.white)
                         .cornerRadius(6)
-                        .scaleEffect(pulse ? 1.1 : 1.0)
-                        .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: pulse)
+                        .scaleEffect(isSelected ? 1.05 : 1.0)
+                        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
                 }
 
                 if isSelected {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundColor(Color(hex: "#6F3CE7"))
-                        .scaleEffect(pulse ? 1.1 : 1.0)
-                        .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: pulse)
+                        .scaleEffect(isSelected ? 1.05 : 1.0)
+                        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
                 }
             }
 
+            // PRICE
             if product.id == store.yearly,
                let yearly = store.products.first(where: { $0.id == store.yearly }) {
                 let discount = 80
@@ -388,7 +390,7 @@ struct SelectablePlanCard: View {
                     .foregroundColor(.primary)
             }
         }
-        .padding()
+        .padding(product.id == store.yearly ? 20 : 16)
         .frame(maxWidth: .infinity)
         .background(scheme == .dark ? Color(.secondarySystemBackground) : Color.white)
         .overlay(
@@ -397,8 +399,9 @@ struct SelectablePlanCard: View {
                         lineWidth: isSelected ? 3 : 1)
         )
         .cornerRadius(16)
+        .scaleEffect(product.id == store.yearly ? 1.04 : 0.96) // 👈 diferencia visual
         .shadow(color: scheme == .dark ? .white.opacity(0.04) : .black.opacity(0.08),
-                radius: 4, x: 0, y: 1)
+                radius: product.id == store.yearly ? 8 : 4, x: 0, y: product.id == store.yearly ? 3 : 1)
     }
 
     private func displayTitle(for product: Product) -> String {
@@ -411,7 +414,6 @@ struct SelectablePlanCard: View {
 
     private func inflatedPrice(for product: Product, percentage: Int) -> String {
         let base = product.price as Decimal
-        // Convierte descuento en factor inverso (ej. 80% off → factor = 1 / 0.2 = 5)
         let discount = Double(percentage) / 100
         let factor = Decimal(1 / (1 - discount))
         let inflated = base * factor
@@ -421,8 +423,8 @@ struct SelectablePlanCard: View {
         formatter.locale = product.priceFormatStyle.locale
         return formatter.string(from: inflated as NSDecimalNumber) ?? product.displayPrice
     }
-
 }
+
 
 // ============================================================================
 // MARK: - FeatureRow
